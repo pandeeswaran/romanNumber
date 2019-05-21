@@ -320,7 +320,7 @@ public class CreateEventActivity extends AppCompatActivity {
         Date dt = Calendar.getInstance().getTime();
 
         try {
-            dt = new SimpleDateFormat("yyyy-MM-dd’T’HH:mm:ssZ").parse(etDate.getText().toString().trim());
+            dt = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(etDate.getText().toString().trim());
         } catch (ParseException e) {
             e.printStackTrace();
         }
