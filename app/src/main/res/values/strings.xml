@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">Talktiva</string>
+
+    //Create Event Activity Titles
+    <string name="cea_title1">New Event</string>
+    <string name="cea_title2">Edit Event</string>
+
+    //Create Event Activity Menu
+    <string name="cea_menu_save">Save</string>
+
+    //Intent Parsing Strings
+    <string name="cea_event_id">eventId</string>
+    <string name="cea_from">From</string>
+    <string name="cea_from_new">New</string>
+    <string name="cea_from_edit">Edit</string>
+
+    //Network and Gps Error Message
+    <string name="gps_msg">Your GPS seems to be disabled, do you want to enable it?</string>
+    <string name="internet_msg">Your INTERNET seems to be disabled, do you want to enable it?</string>
+    <string name="network_msg">There is no network connection \nat the moment, try again later.</string>
+    <string name="connection_msg">Opps!!! Connection is slow, please try again.</string>
+    <string name="time_out_msg">Sorry!!! Connection time out, please try again.</string>
+    <string name="authentication_msg">You are not authorize newUser to do this event&#8230;</string>
+    <string name="server_msg">Sorry!!! could not get data from server, please try again.</string>
+
+    //HomeScreen Tab Titles
+    <string name="ha_bnm_title_home">Home</string>
+    <string name="ha_bnm_title_chat">Chat</string>
+    <string name="ha_bnm_title_notifications">Notifications</string>
+    <string name="ha_bnm_title_event">Events</string>
+
+    //Add Popup Image View Description
+    <string name="dd_add_post">Post</string>
+    <string name="dd_add_event">Event</string>
+    <string name="dd_add_alert">Safety Alert</string>
+
+    //Event Fragment Yours RecyclerView Item ImageButton Description
+    <string name="yf_rv_private">Private</string>
+    <string name="yf_rv_edit">Edit</string>
+    <string name="yf_rv_share">Share</string>
+    <string name="yf_rv_like">Like</string>
+    <string name="yf_rv_more">More</string>
+
+    //Event Fragment Yours RecyclerView Item Button Text
+    <string name="yf_rv_accept">Accept</string>
+    <string name="yf_rv_decline">Decline</string>
+
+    //Event Fragment Tab Titles
+    <string name="ef_tab_pending">Pending</string>
+    <string name="ef_tab_upcoming">Upcoming</string>
+    <string name="ef_tab_yours">Yours</string>
+
+    //Event Fragment Option Menu Title
+    <string name="ef_menu_create">Create</string>
+
+    //Create Event EditText Hint
+    <string name="event_name">Event Name</string>
+    <string name="event_date">Event Date</string>
+    <string name="event_time">Event Time</string>
+    <string name="event_location">Event Location</string>
+    <string name="event_private">Private Event</string>
+    <string name="event_can_guest">Guest can invite community friends</string>
+    <string name="event_more_guest">Invite More Guest</string>
+    <string name="event_guest">Invite Guests</string>
+    <string name="event_invited">Guests Invited</string>
+    <string name="event_delete">Delete Event</string>
+
+</resources>
