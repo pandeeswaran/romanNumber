@@ -11,29 +11,42 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.gson.Gson;
 import com.lbh.talktiva.R;
 import com.lbh.talktiva.helper.CustomTypefaceSpan;
 import com.lbh.talktiva.helper.Utility;
+import com.lbh.talktiva.model.Address;
 import com.lbh.talktiva.model.Event;
+import com.lbh.talktiva.model.Invitations;
+import com.lbh.talktiva.model.User;
 import com.lbh.talktiva.rest.ApiClient;
 import com.lbh.talktiva.rest.ApiInterface;
+import com.lbh.talktiva.results.ResultEvents;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
+import butterknife.OnTextChanged;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -78,6 +91,7 @@ public class CreateEventActivity extends AppCompatActivity {
 
     private Calendar currentDate, newDate;
 
+    private boolean canGuest, isPrivate;
     private String intentData;
     private int count;
 
@@ -112,6 +126,9 @@ public class CreateEventActivity extends AppCompatActivity {
             count = 0;
         }
 
+        swCanGuest.setChecked(false);
+        swPrivate.setChecked(true);
+
         switch (intentData) {
             case "New":
                 setTitle(getResources().getString(R.string.cea_title1));
@@ -129,47 +146,25 @@ public class CreateEventActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (intentData == "Edit") {
-                        currentDate = Calendar.getInstance();
+                    currentDate = Calendar.getInstance();
 
-                        new DatePickerDialog(CreateEventActivity.this, new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                newDate = Calendar.getInstance();
-                                newDate.set(year, month, dayOfMonth);
+                    new DatePickerDialog(CreateEventActivity.this, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                            newDate = Calendar.getInstance();
+                            newDate.set(year, month, dayOfMonth);
 
-                                new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                                    @Override
-                                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                        newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                        newDate.set(Calendar.MINUTE, minute);
+                            new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                    newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                    newDate.set(Calendar.MINUTE, minute);
 
-                                        etDate.setText(dateFormat.format(newDate.getTime()));
-                                    }
-                                }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
-                            }
-                        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
-                    } else {
-                        currentDate = Calendar.getInstance();
-
-                        new DatePickerDialog(CreateEventActivity.this, new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                newDate = Calendar.getInstance();
-                                newDate.set(year, month, dayOfMonth);
-
-                                new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                                    @Override
-                                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                        newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                        newDate.set(Calendar.MINUTE, minute);
-
-                                        etDate.setText(dateFormat.format(newDate.getTime()));
-                                    }
-                                }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
-                            }
-                        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
-                    }
+                                    etDate.setText(dateFormat.format(newDate.getTime()));
+                                }
+                            }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
+                        }
+                    }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
                     return true;
                 } else {
                     return false;
@@ -192,11 +187,38 @@ public class CreateEventActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.cea_menu_save:
+                if (etName != null && etDate != null && etLocation != null) {
+                    if (etName.getText().toString().trim().length() != 0 && etDate.getText().toString().trim().length() != 0 && etLocation.getText().toString().trim().length() != 0) {
+                        createEvent();
+                    } else {
+                        utility.showMsg("Please enter details.");
+                    }
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    @OnCheckedChanged(R.id.cea_sw_private)
+    void setSwPrivateOnCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        isPrivate = isChecked;
+    }
+
+    @OnCheckedChanged(R.id.cea_sw_cg)
+    void setSwCanGuestCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        canGuest = isChecked;
+    }
+
+    @OnTextChanged(value = R.id.cea_et_name, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    void setEtNameOnTextChange(CharSequence s, int start, int before, int count) {
+        if (intentData.equalsIgnoreCase("edit")) {
+
+        } else {
+            item.setVisible(true);
+        }
+    }
+
 
     private void getEventDetails(int id) {
         progressDialog.show();
@@ -232,8 +254,102 @@ public class CreateEventActivity extends AppCompatActivity {
         });
     }
 
-    private void createEvent(){
+    private void createEvent() {
+        progressDialog.show();
 
+        //region Address for user-1
+        Address address1 = new Address();
+        address1.setAddressId(5);
+        address1.setStreet("Street address");
+        address1.setCity("Ahmedabad");
+        address1.setState("Gujarat");
+        address1.setZip("12345");
+        //endregion
+
+        //region Add address to addressList for user-1
+        List<Address> addressList1 = new ArrayList<>();
+        addressList1.add(address1);
+        //endregion
+
+        //region Invitee for invitation-1
+        User user1 = new User();
+        user1.setUserId(5);
+        user1.setFirstName("Manish");
+        user1.setLastName("Singh");
+        user1.setEmail("manish@test.com");
+        user1.setAddressList(addressList1);
+        //endregion
+
+        //region Address for user-2
+        Address address2 = new Address();
+        address2.setAddressId(7);
+        address2.setStreet("Street address");
+        address2.setCity("Ahmedabad");
+        address2.setState("Gujarat");
+        address2.setZip("12345");
+        //endregion
+
+        //region Add address to addressList for user-2
+        List<Address> addressList2 = new ArrayList<>();
+        addressList2.add(address2);
+        //endregion
+
+        //region Invitee for invitation-2
+        User user2 = new User();
+        user2.setUserId(7);
+        user2.setFirstName("Chirag");
+        user2.setLastName("Nayak");
+        user2.setEmail("chirag@test.com");
+        user2.setAddressList(addressList2);
+        //endregion
+
+        //region Two invitations for new event
+        Invitations invitations1 = new Invitations();
+        invitations1.setInvitee(user1);
+
+        Invitations invitations2 = new Invitations();
+        invitations2.setInvitee(user2);
+        //endregion
+
+        //region Preparing invitations for new event
+        List<Invitations> invitations = new ArrayList<>();
+        invitations.add(invitations1);
+        invitations.add(invitations2);
+        //endregion
+
+        Date dt = Calendar.getInstance().getTime();
+
+        try {
+            dt = new SimpleDateFormat("yyyy-MM-dd’T’HH:mm:ssZ").parse(etDate.getText().toString().trim());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //region Preparing new event
+        Event event = new Event();
+        event.setCanInviteGuests(canGuest);
+        event.setEventDate(dt);
+        event.setLocation(etLocation.getText().toString().trim());
+        event.setIsPrivate(isPrivate);
+        event.setTitle(etName.getText().toString().trim());
+        event.setInvitations(invitations);
+        //endregion
+
+        String s = new Gson().toJson(event);
+
+        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        Call<ResultEvents> call = apiInterface.createEvent(event);
+        call.enqueue(new Callback<ResultEvents>() {
+            @Override
+            public void onResponse(Call<ResultEvents> call, Response<ResultEvents> response) {
+                Log.d("res", "onResponse: ");
+            }
+
+            @Override
+            public void onFailure(Call<ResultEvents> call, Throwable t) {
+                Log.d("error", "onFailure: ");
+            }
+        });
     }
 
     private void dismissDialog() {

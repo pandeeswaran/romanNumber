@@ -62,7 +62,7 @@ public class PendingFragment extends Fragment {
         swipeRefreshLayout.setRefreshing(true);
 
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-        Call<ResultEvents> call = apiInterface.getMyEvents();
+        Call<ResultEvents> call = apiInterface.getPendingEvents();
         call.enqueue(new Callback<ResultEvents>() {
             @Override
             public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
