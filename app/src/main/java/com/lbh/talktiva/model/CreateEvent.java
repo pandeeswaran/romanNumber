@@ -2,12 +2,10 @@ package com.lbh.talktiva.model;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.sql.Timestamp;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
-public class Event {
+public class CreateEvent {
 
     @SerializedName("eventId")
     private int eventId;
@@ -22,7 +20,7 @@ public class Event {
     private Date modifiedOn;
 
     @SerializedName("eventDate")
-    private Date eventDate;
+    private Long eventDate;
 
     @SerializedName("status")
     private String status;
@@ -42,50 +40,6 @@ public class Event {
     @SerializedName("private")
     private Boolean isPrivate;
 
-    public int getEventId() {
-        return eventId;
-    }
-
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    public Date getCreatedOn() {
-        return createdOn;
-    }
-
-    public Date getModifiedOn() {
-        return modifiedOn;
-    }
-
-    public Date getEventDate() {
-        return eventDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public Boolean getCanInviteGuests() {
-        return canInviteGuests;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public List<Invitations> getInvitations() {
-        return invitations;
-    }
-
-    public Boolean getIsPrivate() {
-        return isPrivate;
-    }
-
     public void setEventId(int eventId) {
         this.eventId = eventId;
     }
@@ -102,7 +56,7 @@ public class Event {
         this.modifiedOn = modifiedOn;
     }
 
-    public void setEventDate(Date eventDate) {
+    public void setEventDate(Long eventDate) {
         this.eventDate = eventDate;
     }
 

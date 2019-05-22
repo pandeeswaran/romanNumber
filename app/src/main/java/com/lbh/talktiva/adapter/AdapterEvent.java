@@ -18,6 +18,7 @@ import com.lbh.talktiva.model.Event;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,7 +44,6 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
         return new EventViewHolder(LayoutInflater.from(activity).inflate(R.layout.event_item_layout, viewGroup, false));
     }
 
-    @SuppressLint("SimpleDateFormat")
     @Override
     public void onBindViewHolder(@NonNull final EventViewHolder eventViewHolder, @SuppressLint("RecyclerView") final int position) {
         eventViewHolder.tvEventDate.setTypeface(utility.getFont(), Typeface.BOLD);
@@ -54,9 +54,9 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
         eventViewHolder.tvDecline.setTypeface(utility.getFont());
         eventViewHolder.tvComingCount.setTypeface(utility.getFont());
 
-        eventViewHolder.tvEventDate.setText(new SimpleDateFormat("MMM").format(events.get(position).getEventDate()).concat("\n").concat(new SimpleDateFormat("dd").format(events.get(position).getEventDate())));
+        eventViewHolder.tvEventDate.setText(new SimpleDateFormat("MMM", Locale.US).format(events.get(position).getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(events.get(position).getEventDate())));
         eventViewHolder.tvTitle.setText(events.get(position).getTitle());
-        eventViewHolder.tvFullDate.setText(events.get(position).getEventDate().toGMTString());
+        eventViewHolder.tvFullDate.setText(new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a", Locale.US).format(events.get(position).getEventDate()));
         eventViewHolder.tvAddress.setText(events.get(position).getLocation());
         eventViewHolder.tvComingCount.setText(String.valueOf(events.get(position).getInvitations().size()));
 

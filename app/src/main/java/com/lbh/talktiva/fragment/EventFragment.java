@@ -12,6 +12,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
@@ -56,6 +57,14 @@ public class EventFragment extends Fragment {
     public EventFragment() {
     }
 
+    protected BroadcastReceiver r = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            viewPager.setCurrentItem(2);
+            LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent("Refresh"));
+        }
+    };
+
     //region Register And Unregister Broadcast Connectivity Receiver
     private void registerNetworkBroadcast() {
         getActivity().registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
@@ -75,12 +84,14 @@ public class EventFragment extends Fragment {
         super.onAttach(context);
         receiver = new NetworkChangeReceiver(getActivity());
         registerNetworkBroadcast();
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r, new IntentFilter("MyEventPage"));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         unregisterNetworkBroadcast();
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r);
     }
 
     @Override
@@ -177,4 +188,6 @@ public class EventFragment extends Fragment {
             return super.getPageTitle(position);
         }
     }
+
+
 }

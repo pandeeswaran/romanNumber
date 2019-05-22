@@ -1,5 +1,6 @@
 package com.lbh.talktiva.fragment.event;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,12 +13,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lbh.talktiva.R;
+import com.lbh.talktiva.activity.EventActivity;
 import com.lbh.talktiva.adapter.AdapterEvent;
 import com.lbh.talktiva.adapter.ClickListener;
 import com.lbh.talktiva.helper.Utility;
+import com.lbh.talktiva.model.Event;
 import com.lbh.talktiva.rest.ApiClient;
 import com.lbh.talktiva.rest.ApiInterface;
 import com.lbh.talktiva.results.ResultEvents;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,7 +80,14 @@ public class UpcomingFragment extends Fragment {
                     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                     recyclerView.setLayoutManager(layoutManager);
 
-                    AdapterEvent adapterEvent = new AdapterEvent(getActivity(), response.body() != null ? response.body().getContent() : null, 1);
+                    List<Event> events = new ArrayList<>();
+                    for (int i = 0; i < response.body().getContent().size(); i++) {
+                        if (response.body().getContent().get(i).getStatus().equalsIgnoreCase("ACTIVE")) {
+                            events.add(response.body().getContent().get(i));
+                        }
+                    }
+
+                    AdapterEvent adapterEvent = new AdapterEvent(getActivity(), events, 1);
                     recyclerView.setAdapter(adapterEvent);
                     adapterEvent.notifyDataSetChanged();
 
@@ -82,6 +96,10 @@ public class UpcomingFragment extends Fragment {
                         public void onPositionClicked(View view, int eventId, int from) {
                             switch (view.getId()) {
                                 case R.id.yf_rv_cl:
+                                    Intent intent1 = new Intent(getActivity(), EventActivity.class);
+                                    intent1.putExtra(getResources().getString(R.string.cea_from), from);
+                                    intent1.putExtra(getResources().getString(R.string.cea_event_id), eventId);
+                                    Objects.requireNonNull(getActivity()).startActivity(intent1);
                                     break;
                                 case R.id.yf_rv_iv_share:
                                     break;

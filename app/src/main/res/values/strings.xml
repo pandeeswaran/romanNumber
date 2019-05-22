@@ -2,6 +2,7 @@
     <string name="app_name">Talktiva</string>
 
     //Create Event Activity Titles
+    <string name="ea_title">View Event</string>
     <string name="cea_title1">New Event</string>
     <string name="cea_title2">Edit Event</string>
 
@@ -36,6 +37,7 @@
 
     //Event Fragment Yours RecyclerView Item ImageButton Description
     <string name="yf_rv_private">Private</string>
+    <string name="yf_rv_chat">Chat</string>
     <string name="yf_rv_edit">Edit</string>
     <string name="yf_rv_share">Share</string>
     <string name="yf_rv_like">Like</string>
@@ -63,6 +65,6 @@
     <string name="event_more_guest">Invite More Guest</string>
     <string name="event_guest">Invite Guests</string>
     <string name="event_invited">Guests Invited</string>
-    <string name="event_delete">Delete Event</string>
+    <string name="event_cancel">Cancel Event</string>
 
 </resources>

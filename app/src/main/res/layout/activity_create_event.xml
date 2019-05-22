@@ -157,7 +157,7 @@
             android:paddingTop="4dp"
             android:paddingEnd="8dp"
             android:paddingBottom="4dp"
-            android:text="@string/event_delete"
+            android:text="@string/event_cancel"
             android:textAllCaps="false"
             android:textColor="@color/red"
             android:textSize="18sp"

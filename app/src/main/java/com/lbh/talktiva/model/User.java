@@ -18,12 +18,6 @@ public class User {
     @SerializedName("email")
     private String email;
 
-    @SerializedName("createdOn")
-    private String createdOn;
-
-    @SerializedName("modifiedOn")
-    private String modifiedOn;
-
     @SerializedName("addresses")
     private List<Address> addressList;
 
@@ -41,14 +35,6 @@ public class User {
 
     public String getEmail() {
         return email;
-    }
-
-    public String getCreatedOn() {
-        return createdOn;
-    }
-
-    public String getModifiedOn() {
-        return modifiedOn;
     }
 
     public List<Address> getAddressList() {
@@ -69,14 +55,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public void setCreatedOn(String createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    public void setModifiedOn(String modifiedOn) {
-        this.modifiedOn = modifiedOn;
     }
 
     public void setAddressList(List<Address> addressList) {

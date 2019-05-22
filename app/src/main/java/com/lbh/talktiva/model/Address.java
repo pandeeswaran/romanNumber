@@ -18,12 +18,6 @@ public class Address {
     @SerializedName("zip")
     private String zip;
 
-    @SerializedName("createdOn")
-    private String createdOn;
-
-    @SerializedName("modifiedOn")
-    private String modifiedOn;
-
     public int getAddressId() {
         return addressId;
     }
@@ -44,14 +38,6 @@ public class Address {
         return zip;
     }
 
-    public String getCreatedOn() {
-        return createdOn;
-    }
-
-    public String getModifiedOn() {
-        return modifiedOn;
-    }
-
     public void setAddressId(int addressId) {
         this.addressId = addressId;
     }
@@ -70,13 +56,5 @@ public class Address {
 
     public void setZip(String zip) {
         this.zip = zip;
-    }
-
-    public void setCreatedOn(String createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    public void setModifiedOn(String modifiedOn) {
-        this.modifiedOn = modifiedOn;
     }
 }

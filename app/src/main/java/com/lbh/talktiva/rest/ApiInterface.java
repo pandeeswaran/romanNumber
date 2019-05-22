@@ -1,5 +1,6 @@
 package com.lbh.talktiva.rest;
 
+import com.lbh.talktiva.model.CreateEvent;
 import com.lbh.talktiva.model.Event;
 import com.lbh.talktiva.results.ResultEvents;
 
@@ -18,14 +19,18 @@ public interface ApiInterface {
     @GET("api/v1/events/pending")
     Call<ResultEvents> getPendingEvents();
 
-
     @GET("api/v1/events/upcoming")
     Call<ResultEvents> getUpcomingEvents();
 
     @GET("api/v1/events/{id}")
     Call<Event> getEventById(@Path("id") int id);
 
-    @Headers("Content-Type:application/json; charset:utf-8")
+    @Headers("Content-Type: application/json;charset=UTF-8")
     @POST("api/v1/events")
-    Call<ResultEvents> createEvent(@Body Event event);
+    Call<ResultEvents> createEvent(@Body CreateEvent event);
+
+    @GET("api/v1/events/{id}/cancel")
+    Call<ResultEvents> deleteEvent(@Path("id") int id);
+
+
 }

@@ -2,8 +2,6 @@ package com.lbh.talktiva.model;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Date;
-
 public class Invitations {
 
     @SerializedName("invitationId")
@@ -15,11 +13,8 @@ public class Invitations {
     @SerializedName("status")
     private String status;
 
-    @SerializedName("createdOn")
-    private String createdOn;
-
     @SerializedName("statusChangedDate")
-    private Date statusChangedDate;
+    private String statusChangedDate;
 
     @SerializedName("guestUserEmail")
     private String guestUserEmail;
@@ -39,11 +34,7 @@ public class Invitations {
         return status;
     }
 
-    public String getCreatedOn() {
-        return createdOn;
-    }
-
-    public Date getStatusChangedDate() {
+    public String getStatusChangedDate() {
         return statusChangedDate;
     }
 
@@ -67,11 +58,7 @@ public class Invitations {
         this.status = status;
     }
 
-    public void setCreatedOn(String createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    public void setStatusChangedDate(Date statusChangedDate) {
+    public void setStatusChangedDate(String statusChangedDate) {
         this.statusChangedDate = statusChangedDate;
     }
 

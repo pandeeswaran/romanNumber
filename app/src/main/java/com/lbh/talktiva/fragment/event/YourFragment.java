@@ -1,10 +1,14 @@
 package com.lbh.talktiva.fragment.event;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,13 +18,17 @@ import android.view.ViewGroup;
 
 import com.lbh.talktiva.R;
 import com.lbh.talktiva.activity.CreateEventActivity;
+import com.lbh.talktiva.activity.EventActivity;
 import com.lbh.talktiva.adapter.AdapterEvent;
 import com.lbh.talktiva.adapter.ClickListener;
 import com.lbh.talktiva.helper.Utility;
+import com.lbh.talktiva.model.Event;
 import com.lbh.talktiva.rest.ApiClient;
 import com.lbh.talktiva.rest.ApiInterface;
 import com.lbh.talktiva.results.ResultEvents;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -41,6 +49,13 @@ public class YourFragment extends Fragment {
 
     public YourFragment() {
     }
+
+    protected BroadcastReceiver r = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            setRecycler();
+        }
+    };
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,7 +93,14 @@ public class YourFragment extends Fragment {
                     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                     recyclerView.setLayoutManager(layoutManager);
 
-                    AdapterEvent adapterEvent = new AdapterEvent(getActivity(), response.body() != null ? response.body().getContent() : null, 2);
+                    List<Event> events = new ArrayList<>();
+                    for (int i = 0; i < response.body().getContent().size(); i++) {
+                        if (response.body().getContent().get(i).getStatus().equalsIgnoreCase("ACTIVE")) {
+                            events.add(response.body().getContent().get(i));
+                        }
+                    }
+
+                    AdapterEvent adapterEvent = new AdapterEvent(getActivity(), events, 2);
                     recyclerView.setAdapter(adapterEvent);
                     adapterEvent.notifyDataSetChanged();
 
@@ -87,12 +109,16 @@ public class YourFragment extends Fragment {
                         public void onPositionClicked(View view, int eventId, int from) {
                             switch (view.getId()) {
                                 case R.id.yf_rv_cl:
+                                    Intent intent1 = new Intent(getActivity(), EventActivity.class);
+                                    intent1.putExtra(getResources().getString(R.string.cea_from), from);
+                                    intent1.putExtra(getResources().getString(R.string.cea_event_id), eventId);
+                                    Objects.requireNonNull(getActivity()).startActivity(intent1);
                                     break;
                                 case R.id.yf_rv_iv_edit:
-                                    Intent intent = new Intent(getActivity(), CreateEventActivity.class);
-                                    intent.putExtra(getResources().getString(R.string.cea_from), getResources().getString(R.string.cea_from_edit));
-                                    intent.putExtra(getResources().getString(R.string.cea_event_id), eventId);
-                                    Objects.requireNonNull(getActivity()).startActivity(intent);
+                                    Intent intent2 = new Intent(getActivity(), CreateEventActivity.class);
+                                    intent2.putExtra(getResources().getString(R.string.cea_from), getResources().getString(R.string.cea_from_edit));
+                                    intent2.putExtra(getResources().getString(R.string.cea_event_id), eventId);
+                                    Objects.requireNonNull(getActivity()).startActivity(intent2);
                                     break;
                                 case R.id.yf_rv_iv_share:
                                     break;
@@ -113,6 +139,18 @@ public class YourFragment extends Fragment {
                 utility.showMsg(t.getMessage());
             }
         });
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r, new IntentFilter("Refresh"));
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r);
     }
 }
 

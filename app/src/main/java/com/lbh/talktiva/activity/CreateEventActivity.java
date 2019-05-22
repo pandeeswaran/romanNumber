@@ -4,9 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
@@ -29,6 +32,7 @@ import com.lbh.talktiva.R;
 import com.lbh.talktiva.helper.CustomTypefaceSpan;
 import com.lbh.talktiva.helper.Utility;
 import com.lbh.talktiva.model.Address;
+import com.lbh.talktiva.model.CreateEvent;
 import com.lbh.talktiva.model.Event;
 import com.lbh.talktiva.model.Invitations;
 import com.lbh.talktiva.model.User;
@@ -42,10 +46,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -83,7 +90,7 @@ public class CreateEventActivity extends AppCompatActivity {
     @BindView(R.id.cea_tv_del)
     TextView tvDelete;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm a");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.US);
     private ProgressDialog progressDialog;
     private Utility utility;
     private MenuItem item;
@@ -105,6 +112,8 @@ public class CreateEventActivity extends AppCompatActivity {
 
         utility = new Utility(this);
         utility.setTitleFont(toolbar);
+
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         progressDialog = utility.getProgress();
 
@@ -146,7 +155,7 @@ public class CreateEventActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    currentDate = Calendar.getInstance();
+                    currentDate = Calendar.getInstance(Locale.US);
 
                     new DatePickerDialog(CreateEventActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
@@ -186,6 +195,9 @@ public class CreateEventActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.cea_menu_save:
                 if (etName != null && etDate != null && etLocation != null) {
                     if (etName.getText().toString().trim().length() != 0 && etDate.getText().toString().trim().length() != 0 && etLocation.getText().toString().trim().length() != 0) {
@@ -233,9 +245,9 @@ public class CreateEventActivity extends AppCompatActivity {
                     curEvent = response.body();
                     dismissDialog();
 
-                    etName.setText(response.body() != null ? response.body().getTitle() : null);
+                    etName.setText(response.body() != null ? response.body().getTitle() : "");
                     etDate.setText(dateFormat.format(response.body() != null ? response.body().getEventDate() : null));
-                    etLocation.setText(response.body() != null ? response.body().getLocation() : null);
+                    etLocation.setText(response.body() != null ? response.body().getLocation() : "");
                     swPrivate.setChecked(response.body() != null ? response.body().getIsPrivate() : false);
                     swCanGuest.setChecked(response.body() != null ? response.body().getCanInviteGuests() : false);
                     count = response.body() != null ? response.body().getInvitations().size() : 0;
@@ -317,39 +329,90 @@ public class CreateEventActivity extends AppCompatActivity {
         invitations.add(invitations2);
         //endregion
 
-        Date dt = Calendar.getInstance().getTime();
+        Date dt = Calendar.getInstance(Locale.US).getTime();
 
         try {
-            dt = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(etDate.getText().toString().trim());
+            dt = new SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.US).parse(etDate.getText().toString().trim());
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         //region Preparing new event
-        Event event = new Event();
+        CreateEvent event = new CreateEvent();
         event.setCanInviteGuests(canGuest);
-        event.setEventDate(dt);
+        event.setEventDate(dt.getTime() / 1000);
         event.setLocation(etLocation.getText().toString().trim());
         event.setIsPrivate(isPrivate);
         event.setTitle(etName.getText().toString().trim());
         event.setInvitations(invitations);
+        event.setStatus("ACTIVE");
         //endregion
 
-        String s = new Gson().toJson(event);
+        Log.d("Event Json : ", new Gson().toJson(event));
 
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
         Call<ResultEvents> call = apiInterface.createEvent(event);
         call.enqueue(new Callback<ResultEvents>() {
             @Override
-            public void onResponse(Call<ResultEvents> call, Response<ResultEvents> response) {
-                Log.d("res", "onResponse: ");
+            public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
+                if (response.isSuccessful()) {
+                    dismissDialog();
+                    utility.showMsg("Event Created Successfully");
+                    finish();
+                    LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEventPage"));
+                } else {
+                    dismissDialog();
+                    utility.showMsg(response.message());
+                }
             }
 
             @Override
-            public void onFailure(Call<ResultEvents> call, Throwable t) {
-                Log.d("error", "onFailure: ");
+            public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
+                dismissDialog();
+                utility.showMsg(t.getMessage());
             }
         });
+
+    }
+
+    @OnClick(R.id.cea_tv_del)
+    void setTvDeleteOnClick(View v) {
+        utility.showAlert("Cancel Event", "Are you sure want to cancel this event?", false, "Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                progressDialog.show();
+
+                ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+                Call<ResultEvents> call = apiInterface.deleteEvent(curEvent.getEventId());
+                call.enqueue(new Callback<ResultEvents>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
+                        if (response.isSuccessful()) {
+                            dialog.dismiss();
+                            dismissDialog();
+                            finish();
+                            LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEventPage"));
+                        } else {
+                            dialog.dismiss();
+                            dismissDialog();
+                            utility.showMsg(response.message());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
+                        dialog.dismiss();
+                        dismissDialog();
+                        utility.showMsg(t.getMessage());
+                    }
+                });
+            }
+        }, "No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).show();
     }
 
     private void dismissDialog() {
