@@ -67,7 +67,7 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
                 } else {
                     eventViewHolder.ivPrivate.setVisibility(View.GONE);
                 }
-                eventViewHolder.ivMore.setVisibility(View.GONE);
+                eventViewHolder.ivMore.setVisibility(View.VISIBLE);
                 eventViewHolder.ivEdit.setVisibility(View.GONE);
                 eventViewHolder.tvAccept.setVisibility(View.VISIBLE);
                 eventViewHolder.tvDecline.setVisibility(View.VISIBLE);
@@ -78,7 +78,7 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
                 } else {
                     eventViewHolder.ivPrivate.setVisibility(View.GONE);
                 }
-                eventViewHolder.ivMore.setVisibility(View.GONE);
+                eventViewHolder.ivMore.setVisibility(View.VISIBLE);
                 eventViewHolder.ivEdit.setVisibility(View.GONE);
                 eventViewHolder.tvAccept.setVisibility(View.GONE);
                 eventViewHolder.tvDecline.setVisibility(View.GONE);
