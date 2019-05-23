@@ -72,10 +72,12 @@ public class HomeActivity extends AppCompatActivity {
                     View smallItemText = item.findViewById(android.support.design.R.id.smallLabel);
                     if (smallItemText instanceof TextView) {
                         ((TextView) smallItemText).setTypeface(utility.getFont());
+                        ((TextView) smallItemText).setTextSize(10);
                     }
                     View largeItemText = item.findViewById(android.support.design.R.id.largeLabel);
                     if (largeItemText instanceof TextView) {
                         ((TextView) largeItemText).setTypeface(utility.getFont());
+                        ((TextView) largeItemText).setTextSize(10);
                     }
                 }
             }

@@ -16,7 +16,7 @@ public class Event {
     private User createdBy;
 
     @SerializedName("eventDate")
-    private Long eventDate;
+    private Date eventDate;
 
     @SerializedName("status")
     private String status;
@@ -44,7 +44,7 @@ public class Event {
         return createdBy;
     }
 
-    public Long getEventDate() {
+    public Date getEventDate() {
         return eventDate;
     }
 
@@ -80,7 +80,7 @@ public class Event {
         this.createdBy = createdBy;
     }
 
-    public void setEventDate(Long eventDate) {
+    public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
     }
 

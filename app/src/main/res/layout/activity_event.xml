@@ -21,7 +21,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+        </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -86,7 +88,7 @@
             android:contentDescription="@string/yf_rv_private"
             app:layout_constraintEnd_toStartOf="@id/ea_iv_chat"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_private" />
+            app:srcCompat="@drawable/ic_private2" />
 
         <TextView
             android:id="@+id/ea_tv_full_date"

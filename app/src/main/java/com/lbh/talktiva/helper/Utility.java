@@ -16,7 +16,9 @@ import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +51,10 @@ public class Utility {
             View v = toolbar.getChildAt(i);
             if (v instanceof TextView && ((TextView) v).getText() == context.getTitle()) {
                 ((TextView) v).setTypeface(getFont());
+                ((TextView) v).setGravity(Gravity.CENTER);
+                Toolbar.LayoutParams layoutParams = (Toolbar.LayoutParams) v.getLayoutParams();
+                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                toolbar.requestLayout();
             }
         }
     }

@@ -25,7 +25,7 @@ public interface ApiInterface {
     @GET("api/v1/events/{id}")
     Call<Event> getEventById(@Path("id") int id);
 
-    @Headers("Content-Type: application/json;charset=UTF-8")
+    @Headers("Content-Type:application/json;charset=UTF-8")
     @POST("api/v1/events")
     Call<ResultEvents> createEvent(@Body CreateEvent event);
 
