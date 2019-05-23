@@ -15,14 +15,8 @@ public class Event {
     @SerializedName("createdBy")
     private User createdBy;
 
-    @SerializedName("createdOn")
-    private Date createdOn;
-
-    @SerializedName("modifiedOn")
-    private Date modifiedOn;
-
     @SerializedName("eventDate")
-    private Date eventDate;
+    private Long eventDate;
 
     @SerializedName("status")
     private String status;
@@ -50,15 +44,7 @@ public class Event {
         return createdBy;
     }
 
-    public Date getCreatedOn() {
-        return createdOn;
-    }
-
-    public Date getModifiedOn() {
-        return modifiedOn;
-    }
-
-    public Date getEventDate() {
+    public Long getEventDate() {
         return eventDate;
     }
 
@@ -94,15 +80,7 @@ public class Event {
         this.createdBy = createdBy;
     }
 
-    public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    public void setModifiedOn(Date modifiedOn) {
-        this.modifiedOn = modifiedOn;
-    }
-
-    public void setEventDate(Date eventDate) {
+    public void setEventDate(Long eventDate) {
         this.eventDate = eventDate;
     }
 

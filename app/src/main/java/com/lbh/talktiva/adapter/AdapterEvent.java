@@ -17,6 +17,7 @@ import com.lbh.talktiva.helper.Utility;
 import com.lbh.talktiva.model.Event;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,9 +55,12 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
         eventViewHolder.tvDecline.setTypeface(utility.getFont());
         eventViewHolder.tvComingCount.setTypeface(utility.getFont());
 
-        eventViewHolder.tvEventDate.setText(new SimpleDateFormat("MMM", Locale.US).format(events.get(position).getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(events.get(position).getEventDate())));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(events.get(position).getEventDate());
+
+        eventViewHolder.tvEventDate.setText(new SimpleDateFormat("MMM", Locale.US).format(calendar.getTime()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(calendar.getTime())));
         eventViewHolder.tvTitle.setText(events.get(position).getTitle());
-        eventViewHolder.tvFullDate.setText(new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a", Locale.US).format(events.get(position).getEventDate()));
+        eventViewHolder.tvFullDate.setText(new SimpleDateFormat("MMM-dd yyyy HH:mm a", Locale.US).format(calendar.getTime()));
         eventViewHolder.tvAddress.setText(events.get(position).getLocation());
         eventViewHolder.tvComingCount.setText(String.valueOf(events.get(position).getInvitations().size()));
 
