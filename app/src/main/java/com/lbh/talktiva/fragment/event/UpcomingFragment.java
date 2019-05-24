@@ -8,22 +8,31 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.lbh.talktiva.R;
 import com.lbh.talktiva.activity.EventActivity;
-import com.lbh.talktiva.adapter.AdapterEvent;
+import com.lbh.talktiva.adapter.AdapterUpcomingEvent;
 import com.lbh.talktiva.adapter.ClickListener;
 import com.lbh.talktiva.helper.Utility;
+import com.lbh.talktiva.model.DateItem;
 import com.lbh.talktiva.model.Event;
+import com.lbh.talktiva.model.GeneralItem;
+import com.lbh.talktiva.model.ListItem;
 import com.lbh.talktiva.rest.ApiClient;
 import com.lbh.talktiva.rest.ApiInterface;
 import com.lbh.talktiva.results.ResultEvents;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -81,17 +90,41 @@ public class UpcomingFragment extends Fragment {
                     recyclerView.setLayoutManager(layoutManager);
 
                     List<Event> events = new ArrayList<>();
-                    for (int i = 0; i < response.body().getContent().size(); i++) {
+                    for (int i = 0; i < (response.body() != null ? response.body().getContent().size() : 0); i++) {
                         if (response.body().getContent().get(i).getStatus().equalsIgnoreCase("ACTIVE")) {
                             events.add(response.body().getContent().get(i));
                         }
                     }
 
-                    AdapterEvent adapterEvent = new AdapterEvent(getActivity(), events, 1);
-                    recyclerView.setAdapter(adapterEvent);
-                    adapterEvent.notifyDataSetChanged();
+                    Collections.sort(events, new Comparator<Event>() {
+                        @Override
+                        public int compare(Event o1, Event o2) {
+                            return o1.getEventDate().compareTo(o2.getEventDate());
+                        }
+                    });
 
-                    adapterEvent.setOnPositionClicked(new ClickListener() {
+                    List<ListItem> consolidatedList = new ArrayList<>();
+                    HashMap<String, List<Event>> listHashMap = groupDataIntoHashMap(events);
+
+                    for (String date : listHashMap.keySet()) {
+                        DateItem dateItem = new DateItem();
+                        dateItem.setDate(date);
+                        consolidatedList.add(dateItem);
+
+                        for (Event pojoOfJsonArray : Objects.requireNonNull(listHashMap.get(date))) {
+                            GeneralItem generalItem = new GeneralItem();
+                            generalItem.setPojoOfJsonArray(pojoOfJsonArray);
+                            consolidatedList.add(generalItem);
+                        }
+                    }
+
+                    Log.d("ListGrouped", "onResponse: " + consolidatedList.size());
+
+                    AdapterUpcomingEvent adapterUpcomingEvent = new AdapterUpcomingEvent(getActivity(), consolidatedList, 1);
+                    recyclerView.setAdapter(adapterUpcomingEvent);
+                    adapterUpcomingEvent.notifyDataSetChanged();
+
+                    adapterUpcomingEvent.setOnPositionClicked(new ClickListener() {
                         @Override
                         public void onPositionClicked(View view, int eventId, int from) {
                             switch (view.getId()) {
@@ -119,4 +152,21 @@ public class UpcomingFragment extends Fragment {
             }
         });
     }
+
+    private HashMap<String, List<Event>> groupDataIntoHashMap(List<Event> events) {
+        HashMap<String, List<Event>> groupedHashMap = new HashMap<>();
+        for (Event event : events) {
+            String hashMapKey = new SimpleDateFormat("MMM-dd, yyyy", Locale.US).format(event.getEventDate());
+            if (groupedHashMap.containsKey(hashMapKey)) {
+                Objects.requireNonNull(groupedHashMap.get(hashMapKey)).add(event);
+            } else {
+                List<Event> list = new ArrayList<>();
+                list.add(event);
+                groupedHashMap.put(hashMapKey, list);
+            }
+        }
+        return groupedHashMap;
+    }
+
+
 }

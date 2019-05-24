@@ -41,9 +41,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.HomeActivity" />
-        <activity android:name=".activity.EventActivity" />
-        <activity android:name=".activity.CreateEventActivity" />
+
+        <activity
+            android:name=".activity.HomeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.EventActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.CreateEventActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

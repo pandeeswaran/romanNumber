@@ -5,7 +5,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://13.232.219.244:8080/talktiva/";
+//    private static final String BASE_URL = "http://13.232.219.244:8080/talktiva/";
+    private static final String BASE_URL = "http://13.233.95.10:8080/talktiva/";
 
     private static Retrofit retrofit = null;
 

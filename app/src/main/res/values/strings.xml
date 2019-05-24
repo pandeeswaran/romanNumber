@@ -60,11 +60,16 @@
     <string name="event_date">Event Date</string>
     <string name="event_time">Event Time</string>
     <string name="event_location">Event Location</string>
-    <string name="event_private">Private Event</string>
+    <string name="event_private">Private event</string>
     <string name="event_can_guest">Guest can invite community friends</string>
-    <string name="event_more_guest">Invite More Guest</string>
-    <string name="event_guest">Invite Guests</string>
-    <string name="event_invited">Guests Invited</string>
+    <string name="event_guest">Add Guests</string>
+    <string name="event_invited">guests added</string>
     <string name="event_cancel">Cancel Event</string>
+
+    <string name="event_today">TODAY</string>
+    <string name="event_tomorrow">TOMORROW</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

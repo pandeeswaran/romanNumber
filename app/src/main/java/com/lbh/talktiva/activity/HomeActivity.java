@@ -61,52 +61,51 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         utility = new Utility(this);
         ButterKnife.bind(this);
-        checkAndRequestPermission();
 
-        for (int i = 0; i < bottomNavigationView.getChildCount(); i++) {
-            View child = bottomNavigationView.getChildAt(i);
-            if (child instanceof BottomNavigationMenuView) {
-                BottomNavigationMenuView menu = (BottomNavigationMenuView) child;
-                for (int j = 0; j < menu.getChildCount(); j++) {
-                    View item = menu.getChildAt(j);
-                    View smallItemText = item.findViewById(android.support.design.R.id.smallLabel);
-                    if (smallItemText instanceof TextView) {
-                        ((TextView) smallItemText).setTypeface(utility.getFont());
-                        ((TextView) smallItemText).setTextSize(10);
-                    }
-                    View largeItemText = item.findViewById(android.support.design.R.id.largeLabel);
-                    if (largeItemText instanceof TextView) {
-                        ((TextView) largeItemText).setTypeface(utility.getFont());
-                        ((TextView) largeItemText).setTextSize(10);
+        if (checkAndRequestPermission()) {
+            for (int i = 0; i < bottomNavigationView.getChildCount(); i++) {
+                View child = bottomNavigationView.getChildAt(i);
+                if (child instanceof BottomNavigationMenuView) {
+                    BottomNavigationMenuView menu = (BottomNavigationMenuView) child;
+                    for (int j = 0; j < menu.getChildCount(); j++) {
+                        View item = menu.getChildAt(j);
+                        View smallItemText = item.findViewById(android.support.design.R.id.smallLabel);
+                        if (smallItemText instanceof TextView) {
+                            ((TextView) smallItemText).setTypeface(utility.getFont());
+                            ((TextView) smallItemText).setTextSize(10);
+                        }
+                        View largeItemText = item.findViewById(android.support.design.R.id.largeLabel);
+                        if (largeItemText instanceof TextView) {
+                            ((TextView) largeItemText).setTypeface(utility.getFont());
+                            ((TextView) largeItemText).setTextSize(10);
+                        }
                     }
                 }
             }
+
+            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.ha_bnm_home:
+                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home), HomeActivity.this));
+                            return true;
+                        case R.id.ha_bnm_chat:
+                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat), HomeActivity.this));
+                            return true;
+                        case R.id.ha_bnm_add:
+                            return true;
+                        case R.id.ha_bnm_notification:
+                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications), HomeActivity.this));
+                            return true;
+                        case R.id.ha_bnm_event:
+                            loadFragment(new EventFragment());
+                            return true;
+                    }
+                    return false;
+                }
+            });
         }
-
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.ha_bnm_home:
-                        loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home), HomeActivity.this));
-                        return true;
-                    case R.id.ha_bnm_chat:
-                        loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat), HomeActivity.this));
-                        return true;
-                    case R.id.ha_bnm_add:
-//                        addDialog().show();
-                        return true;
-                    case R.id.ha_bnm_notification:
-                        loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications), HomeActivity.this));
-                        return true;
-                    case R.id.ha_bnm_event:
-                        loadFragment(new EventFragment());
-                        return true;
-                }
-                return false;
-            }
-        });
-
         bottomNavigationView.setSelectedItemId(R.id.ha_bnm_home);
     }
 
@@ -166,42 +165,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    private Dialog addDialog() {
-        dialog = new Dialog(HomeActivity.this, R.style.MaterialDialogSheet);
-        dialog.setContentView(R.layout.dialog_add);
-        ((TextView) dialog.findViewById(R.id.dd_add_tv_post)).setTypeface(utility.getFont());
-        ((TextView) dialog.findViewById(R.id.dd_add_tv_event)).setTypeface(utility.getFont());
-        ((TextView) dialog.findViewById(R.id.dd_add_tv_sa)).setTypeface(utility.getFont());
-        (dialog.findViewById(R.id.dd_cl)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-        (dialog.findViewById(R.id.dd_add_cl_post)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-        (dialog.findViewById(R.id.dd_add_cl_event)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-        (dialog.findViewById(R.id.dd_add_cl_sa)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-        dialog.setCancelable(true);
-        Objects.requireNonNull(dialog.getWindow()).setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        dialog.getWindow().setGravity(Gravity.BOTTOM);
-        return dialog;
     }
 
     //region Register And Unregister Broadcast Connectivity Receiver

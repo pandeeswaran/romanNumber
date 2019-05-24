@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 
 import com.lbh.talktiva.R;
 import com.lbh.talktiva.activity.EventActivity;
-import com.lbh.talktiva.adapter.AdapterEvent;
+import com.lbh.talktiva.adapter.AdapterPendingEvent;
 import com.lbh.talktiva.adapter.ClickListener;
 import com.lbh.talktiva.helper.Utility;
 import com.lbh.talktiva.model.Event;
@@ -87,11 +87,11 @@ public class PendingFragment extends Fragment {
                         }
                     }
 
-                    AdapterEvent adapterEvent = new AdapterEvent(getActivity(), events, 0);
-                    recyclerView.setAdapter(adapterEvent);
-                    adapterEvent.notifyDataSetChanged();
+                    AdapterPendingEvent adapterPendingEvent = new AdapterPendingEvent(getActivity(), events, 0);
+                    recyclerView.setAdapter(adapterPendingEvent);
+                    adapterPendingEvent.notifyDataSetChanged();
 
-                    adapterEvent.setOnPositionClicked(new ClickListener() {
+                    adapterPendingEvent.setOnPositionClicked(new ClickListener() {
                         @Override
                         public void onPositionClicked(View view, int eventId, int from) {
                             switch (view.getId()) {

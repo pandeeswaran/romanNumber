@@ -19,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -78,8 +77,8 @@ public class CreateEventActivity extends AppCompatActivity {
     @BindView(R.id.cea_sw_cg)
     Switch swCanGuest;
 
-    @BindView(R.id.cea_bt_invitee)
-    Button btInvitee;
+    @BindView(R.id.cea_tv_invitee)
+    TextView tvInvitee;
 
     @BindView(R.id.cea_tv_count_fig)
     TextView tvCountFig;
@@ -90,7 +89,7 @@ public class CreateEventActivity extends AppCompatActivity {
     @BindView(R.id.cea_tv_del)
     TextView tvDelete;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.US);
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd 'at' hh:mm a ZZZ", Locale.US);
     private ProgressDialog progressDialog;
     private Utility utility;
     private MenuItem item;
@@ -114,6 +113,7 @@ public class CreateEventActivity extends AppCompatActivity {
         utility.setTitleFont(toolbar);
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationIcon(R.drawable.ic_back);
 
         progressDialog = utility.getProgress();
 
@@ -122,10 +122,10 @@ public class CreateEventActivity extends AppCompatActivity {
         etLocation.setTypeface(utility.getFont());
         swPrivate.setTypeface(utility.getFont());
         swCanGuest.setTypeface(utility.getFont());
-        btInvitee.setTypeface(utility.getFont());
+        tvInvitee.setTypeface(utility.getFont());
         tvCountFig.setTypeface(utility.getFont(), Typeface.BOLD);
         tvCount.setTypeface(utility.getFont());
-        tvDelete.setTypeface(utility.getFont(), Typeface.BOLD);
+        tvDelete.setTypeface(utility.getFont());
 
         intentData = getIntent().getStringExtra(getResources().getString(R.string.cea_from));
 

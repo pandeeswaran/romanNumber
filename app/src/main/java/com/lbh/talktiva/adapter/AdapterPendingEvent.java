@@ -23,7 +23,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHolder> {
+public class AdapterPendingEvent extends RecyclerView.Adapter<AdapterPendingEvent.EventViewHolder> {
 
     private ClickListener clickListener;
     private List<Event> events;
@@ -31,7 +31,7 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
     private Utility utility;
     private int from;
 
-    public AdapterEvent(Activity activity, List<Event> events, int from) {
+    public AdapterPendingEvent(Activity activity, List<Event> events, int from) {
         utility = new Utility(activity);
         this.activity = activity;
         this.events = events;
@@ -40,7 +40,7 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
 
     @NonNull
     @Override
-    public AdapterEvent.EventViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public EventViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         return new EventViewHolder(LayoutInflater.from(activity).inflate(R.layout.event_item_layout, viewGroup, false));
     }
 
@@ -48,15 +48,15 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
     public void onBindViewHolder(@NonNull final EventViewHolder eventViewHolder, @SuppressLint("RecyclerView") final int position) {
         eventViewHolder.tvEventDate.setTypeface(utility.getFont(), Typeface.BOLD);
         eventViewHolder.tvTitle.setTypeface(utility.getFont(), Typeface.BOLD);
-        eventViewHolder.tvFullDate.setTypeface(utility.getFont());
+        eventViewHolder.tvFullDate.setTypeface(utility.getFont(), Typeface.BOLD);
         eventViewHolder.tvAddress.setTypeface(utility.getFont());
         eventViewHolder.tvAccept.setTypeface(utility.getFont());
         eventViewHolder.tvDecline.setTypeface(utility.getFont());
-        eventViewHolder.tvComingCount.setTypeface(utility.getFont());
+        eventViewHolder.tvComingCount.setTypeface(utility.getFont(), Typeface.BOLD);
 
         eventViewHolder.tvEventDate.setText(new SimpleDateFormat("MMM", Locale.US).format(events.get(position).getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(events.get(position).getEventDate())));
         eventViewHolder.tvTitle.setText(events.get(position).getTitle());
-        eventViewHolder.tvFullDate.setText(new SimpleDateFormat("MMM dd yyyy HH:mm a", Locale.US).format(events.get(position).getEventDate()));
+        eventViewHolder.tvFullDate.setText(new SimpleDateFormat("MMM dd-hh:mm a Z", Locale.US).format(events.get(position).getEventDate()));
         eventViewHolder.tvAddress.setText(events.get(position).getLocation());
         eventViewHolder.tvComingCount.setText(String.valueOf(events.get(position).getInvitations().size()));
 
@@ -67,24 +67,17 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
                 } else {
                     eventViewHolder.ivPrivate.setVisibility(View.GONE);
                 }
-                eventViewHolder.ivMore.setVisibility(View.VISIBLE);
+                eventViewHolder.ivMore.setVisibility(View.GONE);
                 eventViewHolder.ivEdit.setVisibility(View.GONE);
                 eventViewHolder.tvAccept.setVisibility(View.VISIBLE);
                 eventViewHolder.tvDecline.setVisibility(View.VISIBLE);
                 break;
-            case 1:
+            case 2:
                 if (events.get(position).getIsPrivate()) {
                     eventViewHolder.ivPrivate.setVisibility(View.VISIBLE);
                 } else {
                     eventViewHolder.ivPrivate.setVisibility(View.GONE);
                 }
-                eventViewHolder.ivMore.setVisibility(View.VISIBLE);
-                eventViewHolder.ivEdit.setVisibility(View.GONE);
-                eventViewHolder.tvAccept.setVisibility(View.GONE);
-                eventViewHolder.tvDecline.setVisibility(View.GONE);
-                break;
-            case 2:
-                eventViewHolder.ivPrivate.setVisibility(View.GONE);
                 eventViewHolder.ivMore.setVisibility(View.VISIBLE);
                 eventViewHolder.ivEdit.setVisibility(View.VISIBLE);
                 eventViewHolder.tvAccept.setVisibility(View.GONE);
