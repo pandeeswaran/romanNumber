@@ -1,14 +1,14 @@
 package com.lbh.talktiva.model;
 
 public class GeneralItem extends ListItem {
-    private Event pojoOfJsonArray;
+    private Event event;
 
-    public Event getPojoOfJsonArray() {
-        return pojoOfJsonArray;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setPojoOfJsonArray(Event pojoOfJsonArray) {
-        this.pojoOfJsonArray = pojoOfJsonArray;
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
     @Override

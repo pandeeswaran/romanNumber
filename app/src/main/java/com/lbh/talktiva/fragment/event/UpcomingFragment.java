@@ -113,7 +113,7 @@ public class UpcomingFragment extends Fragment {
 
                         for (Event pojoOfJsonArray : Objects.requireNonNull(listHashMap.get(date))) {
                             GeneralItem generalItem = new GeneralItem();
-                            generalItem.setPojoOfJsonArray(pojoOfJsonArray);
+                            generalItem.setEvent(pojoOfJsonArray);
                             consolidatedList.add(generalItem);
                         }
                     }

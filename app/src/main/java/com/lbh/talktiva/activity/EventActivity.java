@@ -106,7 +106,7 @@ public class EventActivity extends AppCompatActivity {
 
         from = getIntent().getIntExtra(getResources().getString(R.string.cea_from), 0);
 
-        getEventById(getIntent().getIntExtra(getResources().getString(R.string.cea_event_id), 0));
+//        getEventById(getIntent().getIntExtra(getResources().getString(R.string.cea_event_id), 0));
     }
 
     private void getEventById(int id) {

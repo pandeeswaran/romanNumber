@@ -77,14 +77,14 @@ public class AdapterUpcomingEvent extends RecyclerView.Adapter<RecyclerView.View
                 eventViewHolder.tvDecline.setTypeface(utility.getFont());
                 eventViewHolder.tvComingCount.setTypeface(utility.getFont(), Typeface.BOLD);
 
-                eventViewHolder.tvEventDate.setText(new SimpleDateFormat("MMM", Locale.US).format(generalItem.getPojoOfJsonArray().getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(generalItem.getPojoOfJsonArray().getEventDate())));
-                eventViewHolder.tvTitle.setText(generalItem.getPojoOfJsonArray().getTitle());
-                eventViewHolder.tvFullDate.setText(new SimpleDateFormat("MMM dd-hh:mm a Z", Locale.US).format(generalItem.getPojoOfJsonArray().getEventDate()));
-                eventViewHolder.tvAddress.setText(generalItem.getPojoOfJsonArray().getLocation());
-                eventViewHolder.tvComingCount.setText(String.valueOf(generalItem.getPojoOfJsonArray().getInvitations().size()));
+                eventViewHolder.tvEventDate.setText(new SimpleDateFormat("MMM", Locale.US).format(generalItem.getEvent().getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(generalItem.getEvent().getEventDate())));
+                eventViewHolder.tvTitle.setText(generalItem.getEvent().getTitle());
+                eventViewHolder.tvFullDate.setText(new SimpleDateFormat("MMM dd-hh:mm a Z", Locale.US).format(generalItem.getEvent().getEventDate()));
+                eventViewHolder.tvAddress.setText(generalItem.getEvent().getLocation());
+                eventViewHolder.tvComingCount.setText(String.valueOf(generalItem.getEvent().getInvitations().size()));
 
                 if (from == 1) {
-                    if (generalItem.getPojoOfJsonArray().getIsPrivate()) {
+                    if (generalItem.getEvent().getIsPrivate()) {
                         eventViewHolder.ivPrivate.setVisibility(View.VISIBLE);
                     } else {
                         eventViewHolder.ivPrivate.setVisibility(View.GONE);
@@ -99,14 +99,14 @@ public class AdapterUpcomingEvent extends RecyclerView.Adapter<RecyclerView.View
                 eventViewHolder.clItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.clItem, generalItem.getPojoOfJsonArray().getEventId(), from);
+                        clickListener.onPositionClicked(eventViewHolder.clItem, generalItem.getEvent().getEventId(), from);
                     }
                 });
 
                 eventViewHolder.ivShare.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.ivShare, generalItem.getPojoOfJsonArray().getEventId(), from);
+                        clickListener.onPositionClicked(eventViewHolder.ivShare, generalItem.getEvent().getEventId(), from);
                     }
                 });
                 //endregion
@@ -115,14 +115,14 @@ public class AdapterUpcomingEvent extends RecyclerView.Adapter<RecyclerView.View
                 eventViewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.ivEdit, generalItem.getPojoOfJsonArray().getEventId(), from);
+                        clickListener.onPositionClicked(eventViewHolder.ivEdit, generalItem.getEvent().getEventId(), from);
                     }
                 });
 
                 eventViewHolder.ivMore.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.ivMore, generalItem.getPojoOfJsonArray().getEventId(), from);
+                        clickListener.onPositionClicked(eventViewHolder.ivMore, generalItem.getEvent().getEventId(), from);
                     }
                 });
                 //endregion
@@ -131,14 +131,14 @@ public class AdapterUpcomingEvent extends RecyclerView.Adapter<RecyclerView.View
                 eventViewHolder.tvAccept.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.tvAccept, generalItem.getPojoOfJsonArray().getEventId(), from);
+                        clickListener.onPositionClicked(eventViewHolder.tvAccept, generalItem.getEvent().getEventId(), from);
                     }
                 });
 
                 eventViewHolder.tvDecline.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.tvDecline, generalItem.getPojoOfJsonArray().getEventId(), from);
+                        clickListener.onPositionClicked(eventViewHolder.tvDecline, generalItem.getEvent().getEventId(), from);
                     }
                 });
                 //endregion
