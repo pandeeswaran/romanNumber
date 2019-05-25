@@ -56,7 +56,7 @@ public class AdapterPendingEvent extends RecyclerView.Adapter<AdapterPendingEven
 
         eventViewHolder.tvEventDate.setText(new SimpleDateFormat("MMM", Locale.US).format(events.get(position).getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(events.get(position).getEventDate())));
         eventViewHolder.tvTitle.setText(events.get(position).getTitle());
-        eventViewHolder.tvFullDate.setText(new SimpleDateFormat("MMM dd-hh:mm a Z", Locale.US).format(events.get(position).getEventDate()));
+        eventViewHolder.tvFullDate.setText(events.get(position).getEventDate().toLocaleString());
         eventViewHolder.tvAddress.setText(events.get(position).getLocation());
         eventViewHolder.tvComingCount.setText(String.valueOf(events.get(position).getInvitations().size()));
 
@@ -89,14 +89,22 @@ public class AdapterPendingEvent extends RecyclerView.Adapter<AdapterPendingEven
         eventViewHolder.clItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickListener.onPositionClicked(eventViewHolder.clItem, events.get(position).getEventId(), from);
+                for (int i = 0; i < events.get(position).getInvitations().size(); i++) {
+                    if (events.get(position).getInvitations().get(i).getInvitee().getUserId() == 1) {
+                        clickListener.onPositionClicked(eventViewHolder.clItem, events.get(position).getEventId(), events.get(position).getInvitations().get(i).getInvitationId(), from);
+                    }
+                }
             }
         });
 
         eventViewHolder.ivShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickListener.onPositionClicked(eventViewHolder.ivShare, events.get(position).getEventId(), from);
+                for (int i = 0; i < events.get(position).getInvitations().size(); i++) {
+                    if (events.get(position).getInvitations().get(i).getInvitee().getUserId() == 1) {
+                        clickListener.onPositionClicked(eventViewHolder.ivShare, events.get(position).getEventId(), events.get(position).getInvitations().get(i).getInvitationId(), from);
+                    }
+                }
             }
         });
         //endregion
@@ -105,14 +113,22 @@ public class AdapterPendingEvent extends RecyclerView.Adapter<AdapterPendingEven
         eventViewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickListener.onPositionClicked(eventViewHolder.ivEdit, events.get(position).getEventId(), from);
+                for (int i = 0; i < events.get(position).getInvitations().size(); i++) {
+                    if (events.get(position).getInvitations().get(i).getInvitee().getUserId() == 1) {
+                        clickListener.onPositionClicked(eventViewHolder.ivEdit, events.get(position).getEventId(), events.get(position).getInvitations().get(i).getInvitationId(), from);
+                    }
+                }
             }
         });
 
         eventViewHolder.ivMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickListener.onPositionClicked(eventViewHolder.ivMore, events.get(position).getEventId(), from);
+                for (int i = 0; i < events.get(position).getInvitations().size(); i++) {
+                    if (events.get(position).getInvitations().get(i).getInvitee().getUserId() == 1) {
+                        clickListener.onPositionClicked(eventViewHolder.ivMore, events.get(position).getEventId(), events.get(position).getInvitations().get(i).getInvitationId(), from);
+                    }
+                }
             }
         });
         //endregion
@@ -121,14 +137,22 @@ public class AdapterPendingEvent extends RecyclerView.Adapter<AdapterPendingEven
         eventViewHolder.tvAccept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickListener.onPositionClicked(eventViewHolder.tvAccept, events.get(position).getEventId(), from);
+                for (int i = 0; i < events.get(position).getInvitations().size(); i++) {
+                    if (events.get(position).getInvitations().get(i).getInvitee().getUserId() == 1) {
+                        clickListener.onPositionClicked(eventViewHolder.tvAccept, events.get(position).getEventId(), events.get(position).getInvitations().get(i).getInvitationId(), from);
+                    }
+                }
             }
         });
 
         eventViewHolder.tvDecline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickListener.onPositionClicked(eventViewHolder.tvDecline, events.get(position).getEventId(), from);
+                for (int i = 0; i < events.get(position).getInvitations().size(); i++) {
+                    if (events.get(position).getInvitations().get(i).getInvitee().getUserId() == 1) {
+                        clickListener.onPositionClicked(eventViewHolder.tvDecline, events.get(position).getEventId(), events.get(position).getInvitations().get(i).getInvitationId(), from);
+                    }
+                }
             }
         });
         //endregion

@@ -29,7 +29,6 @@ import com.lbh.talktiva.results.ResultEvents;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -64,18 +63,20 @@ public class UpcomingFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         utility = new Utility(getActivity());
         ButterKnife.bind(this, view);
-        setRecycler();
+        setRecycler(0);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                setRecycler();
+                setRecycler(0);
             }
         });
     }
 
-    private void setRecycler() {
-        swipeRefreshLayout.setRefreshing(true);
+    private void setRecycler(int when) {
+        if (when == 0) {
+            swipeRefreshLayout.setRefreshing(true);
+        }
 
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
         Call<ResultEvents> call = apiInterface.getUpcomingEvents();
@@ -96,27 +97,19 @@ public class UpcomingFragment extends Fragment {
                         }
                     }
 
-                    Collections.sort(events, new Comparator<Event>() {
-                        @Override
-                        public int compare(Event o1, Event o2) {
-                            return o1.getEventDate().compareTo(o2.getEventDate());
-                        }
-                    });
-
                     List<ListItem> consolidatedList = new ArrayList<>();
                     HashMap<String, List<Event>> listHashMap = groupDataIntoHashMap(events);
-
                     for (String date : listHashMap.keySet()) {
                         DateItem dateItem = new DateItem();
                         dateItem.setDate(date);
-                        consolidatedList.add(dateItem);
-
-                        for (Event pojoOfJsonArray : Objects.requireNonNull(listHashMap.get(date))) {
+                        for (Event event : Objects.requireNonNull(listHashMap.get(date))) {
                             GeneralItem generalItem = new GeneralItem();
-                            generalItem.setEvent(pojoOfJsonArray);
+                            generalItem.setEvent(event);
                             consolidatedList.add(generalItem);
                         }
+                        consolidatedList.add(dateItem);
                     }
+                    Collections.reverse(consolidatedList);
 
                     Log.d("ListGrouped", "onResponse: " + consolidatedList.size());
 
@@ -126,13 +119,16 @@ public class UpcomingFragment extends Fragment {
 
                     adapterUpcomingEvent.setOnPositionClicked(new ClickListener() {
                         @Override
-                        public void onPositionClicked(View view, int eventId, int from) {
+                        public void onPositionClicked(View view, int eventId, int invitationId, int from) {
                             switch (view.getId()) {
                                 case R.id.yf_rv_cl:
                                     Intent intent1 = new Intent(getActivity(), EventActivity.class);
                                     intent1.putExtra(getResources().getString(R.string.cea_from), from);
                                     intent1.putExtra(getResources().getString(R.string.cea_event_id), eventId);
                                     Objects.requireNonNull(getActivity()).startActivity(intent1);
+                                    break;
+                                case R.id.yf_rv_tv_decline:
+                                    acceptEvent(eventId, invitationId, false);
                                     break;
                                 case R.id.yf_rv_iv_share:
                                     break;
@@ -168,5 +164,27 @@ public class UpcomingFragment extends Fragment {
         return groupedHashMap;
     }
 
+    private void acceptEvent(int eventId, int invitationId, boolean bool) {
+        swipeRefreshLayout.setRefreshing(true);
 
+        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        Call<ResultEvents> call = apiInterface.acceptOrDeclineEvent(eventId, invitationId, bool);
+        call.enqueue(new Callback<ResultEvents>() {
+            @Override
+            public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
+                if (response.isSuccessful()) {
+                    setRecycler(1);
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+                    utility.showMsg(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
+                swipeRefreshLayout.setRefreshing(false);
+                utility.showMsg(t.getMessage());
+            }
+        });
+    }
 }

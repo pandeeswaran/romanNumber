@@ -106,7 +106,7 @@ public class YourFragment extends Fragment {
 
                     adapterPendingEvent.setOnPositionClicked(new ClickListener() {
                         @Override
-                        public void onPositionClicked(View view, int eventId, int from) {
+                        public void onPositionClicked(View view, int eventId, int invitationId, int from) {
                             switch (view.getId()) {
                                 case R.id.yf_rv_cl:
                                     Intent intent1 = new Intent(getActivity(), EventActivity.class);

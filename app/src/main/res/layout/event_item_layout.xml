@@ -39,7 +39,7 @@
         android:textColor="@color/colorPrimary"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@id/yf_rv_tv_full_date"
-        app:layout_constraintEnd_toStartOf="@+id/yf_rv_tv_accept"
+        app:layout_constraintEnd_toStartOf="@id/yf_rv_tv_accept"
         app:layout_constraintStart_toEndOf="@id/yf_rv_tv_date"
         app:layout_constraintTop_toTopOf="@id/yf_rv_tv_date" />
 
@@ -51,7 +51,7 @@
         android:layout_marginEnd="8dp"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@id/yf_rv_tv_add"
-        app:layout_constraintEnd_toStartOf="@+id/yf_rv_tv_accept"
+        app:layout_constraintEnd_toStartOf="@id/yf_rv_tv_accept"
         app:layout_constraintStart_toEndOf="@id/yf_rv_tv_date"
         app:layout_constraintTop_toBottomOf="@id/yf_rv_tv_title" />
 
@@ -170,8 +170,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/event_item_date_bg"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?android:selectableItemBackground"
@@ -183,9 +182,9 @@
         android:textAllCaps="true"
         android:textColor="@color/black"
         android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="@+id/yf_rv_tv_full_date"
-        app:layout_constraintEnd_toStartOf="@+id/yf_rv_tv_decline"
-        app:layout_constraintTop_toTopOf="@+id/yf_rv_tv_title"
+        app:layout_constraintBottom_toTopOf="@+id/yf_rv_tv_full_date"
+        app:layout_constraintEnd_toStartOf="@id/yf_rv_tv_decline"
+        app:layout_constraintTop_toTopOf="@id/yf_rv_tv_title"
         tools:ignore="SmallSp,UnusedAttribute" />
 
     <TextView
@@ -193,8 +192,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/event_item_date_bg"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?android:selectableItemBackground"
@@ -207,9 +205,9 @@
         android:textColor="@color/black"
         android:textSize="10sp"
         android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="@+id/yf_rv_tv_full_date"
+        app:layout_constraintBottom_toTopOf="@+id/yf_rv_tv_full_date"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/yf_rv_tv_title"
+        app:layout_constraintTop_toTopOf="@id/yf_rv_tv_title"
         tools:ignore="SmallSp,UnusedAttribute" />
 
 </android.support.constraint.ConstraintLayout>

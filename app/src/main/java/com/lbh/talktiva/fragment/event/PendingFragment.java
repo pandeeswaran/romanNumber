@@ -55,18 +55,20 @@ public class PendingFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         utility = new Utility(getActivity());
         ButterKnife.bind(this, view);
-        setRecycler();
+        setRecycler(0);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                setRecycler();
+                setRecycler(0);
             }
         });
     }
 
-    private void setRecycler() {
-        swipeRefreshLayout.setRefreshing(true);
+    private void setRecycler(int when) {
+        if (when == 0) {
+            swipeRefreshLayout.setRefreshing(true);
+        }
 
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
         Call<ResultEvents> call = apiInterface.getPendingEvents();
@@ -81,7 +83,7 @@ public class PendingFragment extends Fragment {
                     recyclerView.setLayoutManager(layoutManager);
 
                     List<Event> events = new ArrayList<>();
-                    for (int i = 0; i < response.body().getContent().size(); i++) {
+                    for (int i = 0; i < (response.body() != null ? response.body().getContent().size() : 0); i++) {
                         if (response.body().getContent().get(i).getStatus().equalsIgnoreCase("ACTIVE")) {
                             events.add(response.body().getContent().get(i));
                         }
@@ -93,7 +95,7 @@ public class PendingFragment extends Fragment {
 
                     adapterPendingEvent.setOnPositionClicked(new ClickListener() {
                         @Override
-                        public void onPositionClicked(View view, int eventId, int from) {
+                        public void onPositionClicked(View view, int eventId, int invitationId, int from) {
                             switch (view.getId()) {
                                 case R.id.yf_rv_cl:
                                     Intent intent1 = new Intent(getActivity(), EventActivity.class);
@@ -101,15 +103,43 @@ public class PendingFragment extends Fragment {
                                     intent1.putExtra(getResources().getString(R.string.cea_event_id), eventId);
                                     Objects.requireNonNull(getActivity()).startActivity(intent1);
                                     break;
+                                case R.id.ea_iv_like:
+                                    break;
                                 case R.id.yf_rv_iv_share:
                                     break;
                                 case R.id.yf_rv_tv_accept:
+                                    acceptEvent(eventId, invitationId, true);
                                     break;
                                 case R.id.yf_rv_tv_decline:
+                                    acceptEvent(eventId, invitationId, false);
                                     break;
                             }
                         }
                     });
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+                    utility.showMsg(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
+                swipeRefreshLayout.setRefreshing(false);
+                utility.showMsg(t.getMessage());
+            }
+        });
+    }
+
+    private void acceptEvent(int eventId, int invitationId, boolean bool) {
+        swipeRefreshLayout.setRefreshing(true);
+
+        ApiInterface apiInterface = ApiClient.getClient().create    (ApiInterface.class);
+        Call<ResultEvents> call = apiInterface.acceptOrDeclineEvent(eventId, invitationId, bool);
+        call.enqueue(new Callback<ResultEvents>() {
+            @Override
+            public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
+                if (response.isSuccessful()) {
+                    setRecycler(1);
                 } else {
                     swipeRefreshLayout.setRefreshing(false);
                     utility.showMsg(response.message());

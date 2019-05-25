@@ -32,5 +32,6 @@ public interface ApiInterface {
     @GET("api/v1/events/{id}/cancel")
     Call<ResultEvents> deleteEvent(@Path("id") int id);
 
-
+    @GET("api/v1/events/{id}/invitations/{invitationId}/{acceptOrDecline}")
+    Call<ResultEvents> acceptOrDeclineEvent(@Path("id") int id, @Path("invitationId") int invitationId, @Path("acceptOrDecline") boolean acceptOrDecline);
 }

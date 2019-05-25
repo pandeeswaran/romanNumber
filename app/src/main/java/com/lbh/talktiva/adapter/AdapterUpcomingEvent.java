@@ -63,23 +63,21 @@ public class AdapterUpcomingEvent extends RecyclerView.Adapter<RecyclerView.View
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         switch (viewHolder.getItemViewType()) {
             case ListItem.TYPE_GENERAL:
-                final GeneralItem generalItem = (GeneralItem) consolidatedList.get(i);
+                final GeneralItem generalItem = (GeneralItem) consolidatedList.get(position);
                 final EventViewHolder eventViewHolder = (EventViewHolder) viewHolder;
 
                 eventViewHolder.tvEventDate.setTypeface(utility.getFont(), Typeface.BOLD);
                 eventViewHolder.tvTitle.setTypeface(utility.getFont(), Typeface.BOLD);
                 eventViewHolder.tvFullDate.setTypeface(utility.getFont(), Typeface.BOLD);
                 eventViewHolder.tvAddress.setTypeface(utility.getFont());
-                eventViewHolder.tvAccept.setTypeface(utility.getFont());
-                eventViewHolder.tvDecline.setTypeface(utility.getFont());
                 eventViewHolder.tvComingCount.setTypeface(utility.getFont(), Typeface.BOLD);
 
                 eventViewHolder.tvEventDate.setText(new SimpleDateFormat("MMM", Locale.US).format(generalItem.getEvent().getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(generalItem.getEvent().getEventDate())));
                 eventViewHolder.tvTitle.setText(generalItem.getEvent().getTitle());
-                eventViewHolder.tvFullDate.setText(new SimpleDateFormat("MMM dd-hh:mm a Z", Locale.US).format(generalItem.getEvent().getEventDate()));
+                eventViewHolder.tvFullDate.setText(generalItem.getEvent().getEventDate().toLocaleString());
                 eventViewHolder.tvAddress.setText(generalItem.getEvent().getLocation());
                 eventViewHolder.tvComingCount.setText(String.valueOf(generalItem.getEvent().getInvitations().size()));
 
@@ -92,21 +90,29 @@ public class AdapterUpcomingEvent extends RecyclerView.Adapter<RecyclerView.View
                     eventViewHolder.ivMore.setVisibility(View.VISIBLE);
                     eventViewHolder.ivEdit.setVisibility(View.GONE);
                     eventViewHolder.tvAccept.setVisibility(View.GONE);
-                    eventViewHolder.tvDecline.setVisibility(View.VISIBLE);
+                    eventViewHolder.tvDecline.setVisibility(View.GONE);
                 }
 
                 //region General Events
                 eventViewHolder.clItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.clItem, generalItem.getEvent().getEventId(), from);
+                        for (int i = 0; i < generalItem.getEvent().getInvitations().size(); i++) {
+                            if (generalItem.getEvent().getInvitations().get(i).getInvitee().getUserId() == 1) {
+                                clickListener.onPositionClicked(eventViewHolder.clItem, generalItem.getEvent().getEventId(), generalItem.getEvent().getInvitations().get(i).getInvitationId(), from);
+                            }
+                        }
                     }
                 });
 
                 eventViewHolder.ivShare.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.ivShare, generalItem.getEvent().getEventId(), from);
+                        for (int i = 0; i < generalItem.getEvent().getInvitations().size(); i++) {
+                            if (generalItem.getEvent().getInvitations().get(i).getInvitee().getUserId() == 1) {
+                                clickListener.onPositionClicked(eventViewHolder.ivShare, generalItem.getEvent().getEventId(), generalItem.getEvent().getInvitations().get(i).getInvitationId(), from);
+                            }
+                        }
                     }
                 });
                 //endregion
@@ -115,14 +121,22 @@ public class AdapterUpcomingEvent extends RecyclerView.Adapter<RecyclerView.View
                 eventViewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.ivEdit, generalItem.getEvent().getEventId(), from);
+                        for (int i = 0; i < generalItem.getEvent().getInvitations().size(); i++) {
+                            if (generalItem.getEvent().getInvitations().get(i).getInvitee().getUserId() == 1) {
+                                clickListener.onPositionClicked(eventViewHolder.ivEdit, generalItem.getEvent().getEventId(), generalItem.getEvent().getInvitations().get(i).getInvitationId(), from);
+                            }
+                        }
                     }
                 });
 
                 eventViewHolder.ivMore.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.ivMore, generalItem.getEvent().getEventId(), from);
+                        for (int i = 0; i < generalItem.getEvent().getInvitations().size(); i++) {
+                            if (generalItem.getEvent().getInvitations().get(i).getInvitee().getUserId() == 1) {
+                                clickListener.onPositionClicked(eventViewHolder.ivMore, generalItem.getEvent().getEventId(), generalItem.getEvent().getInvitations().get(i).getInvitationId(), from);
+                            }
+                        }
                     }
                 });
                 //endregion
@@ -131,21 +145,29 @@ public class AdapterUpcomingEvent extends RecyclerView.Adapter<RecyclerView.View
                 eventViewHolder.tvAccept.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.tvAccept, generalItem.getEvent().getEventId(), from);
+                        for (int i = 0; i < generalItem.getEvent().getInvitations().size(); i++) {
+                            if (generalItem.getEvent().getInvitations().get(i).getInvitee().getUserId() == 1) {
+                                clickListener.onPositionClicked(eventViewHolder.tvAccept, generalItem.getEvent().getEventId(), generalItem.getEvent().getInvitations().get(i).getInvitationId(), from);
+                            }
+                        }
                     }
                 });
 
                 eventViewHolder.tvDecline.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onPositionClicked(eventViewHolder.tvDecline, generalItem.getEvent().getEventId(), from);
+                        for (int i = 0; i < generalItem.getEvent().getInvitations().size(); i++) {
+                            if (generalItem.getEvent().getInvitations().get(i).getInvitee().getUserId() == 1) {
+                                clickListener.onPositionClicked(eventViewHolder.tvDecline, generalItem.getEvent().getEventId(), generalItem.getEvent().getInvitations().get(i).getInvitationId(), from);
+                            }
+                        }
                     }
                 });
                 //endregion
                 break;
 
             case ListItem.TYPE_DATE:
-                DateItem dateItem = (DateItem) consolidatedList.get(i);
+                DateItem dateItem = (DateItem) consolidatedList.get(position);
                 DateViewHolder dateViewHolder = (DateViewHolder) viewHolder;
                 dateViewHolder.tvDay.setTypeface(utility.getFont(), Typeface.BOLD);
 
@@ -157,9 +179,9 @@ public class AdapterUpcomingEvent extends RecyclerView.Adapter<RecyclerView.View
                 }
 
                 Date dt = Calendar.getInstance(Locale.US).getTime();
-                if (eventDate.getDay() == dt.getDay() && eventDate.getMonth() == dt.getMonth() && eventDate.getYear() == dt.getYear()) {
+                if (eventDate.getDate() == dt.getDate() && eventDate.getMonth() == dt.getMonth() && eventDate.getYear() == dt.getYear()) {
                     dateViewHolder.tvDay.setText(activity.getResources().getString(R.string.event_today));
-                } else if (eventDate.getDay() == (dt.getDay() + 1) && eventDate.getMonth() == dt.getMonth() && eventDate.getYear() == dt.getYear()) {
+                } else if (eventDate.getDate() == (dt.getDate() + 1) && eventDate.getMonth() == dt.getMonth() && eventDate.getYear() == dt.getYear()) {
                     dateViewHolder.tvDay.setText(activity.getResources().getString(R.string.event_tomorrow));
                 } else {
                     dateViewHolder.tvDay.setText(dateItem.getDate());

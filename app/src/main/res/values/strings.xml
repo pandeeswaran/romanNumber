@@ -2,12 +2,15 @@
     <string name="app_name">Talktiva</string>
 
     //Create Event Activity Titles
-    <string name="ea_title">View Event</string>
+    <string name="ea_title">Event Details</string>
     <string name="cea_title1">New Event</string>
     <string name="cea_title2">Edit Event</string>
 
     //Create Event Activity Menu
     <string name="cea_menu_save">Save</string>
+
+    //Create Detail Event Activity Menu
+    <string name="dea_menu_edit">Edit</string>
 
     //Intent Parsing Strings
     <string name="cea_event_id">eventId</string>
@@ -46,11 +49,17 @@
     //Event Fragment Yours RecyclerView Item Button Text
     <string name="yf_rv_accept">Accept</string>
     <string name="yf_rv_decline">Decline</string>
+    <string name="yf_rv_cancel">Cancel</string>
 
     //Event Fragment Tab Titles
     <string name="ef_tab_pending">Pending</string>
     <string name="ef_tab_upcoming">Upcoming</string>
     <string name="ef_tab_yours">Yours</string>
+
+    //Event Details Tab Titles
+    <string name="dea_other">Other Attending Guests</string>
+    <string name="dea_accept">Accepted Guests</string>
+    <string name="dea_pending">Pending Guests</string>
 
     //Event Fragment Option Menu Title
     <string name="ef_menu_create">Create</string>
@@ -66,10 +75,8 @@
     <string name="event_invited">guests added</string>
     <string name="event_cancel">Cancel Event</string>
 
-    <string name="event_today">TODAY</string>
     <string name="event_tomorrow">TOMORROW</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="event_today">TODAY</string>
+    <string name="event_other">OTHER</string>
 
 </resources>

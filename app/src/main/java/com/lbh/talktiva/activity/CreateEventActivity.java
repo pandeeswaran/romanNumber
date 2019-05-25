@@ -89,10 +89,8 @@ public class CreateEventActivity extends AppCompatActivity {
     @BindView(R.id.cea_tv_del)
     TextView tvDelete;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd 'at' hh:mm a ZZZ", Locale.US);
     private ProgressDialog progressDialog;
     private Utility utility;
-    private MenuItem item;
     private Event curEvent;
 
     private Calendar currentDate, newDate;
@@ -169,7 +167,7 @@ public class CreateEventActivity extends AppCompatActivity {
                                     newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                                     newDate.set(Calendar.MINUTE, minute);
 
-                                    etDate.setText(dateFormat.format(newDate.getTime()));
+                                    etDate.setText(newDate.getTime().toLocaleString());
                                 }
                             }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
                         }
@@ -185,7 +183,7 @@ public class CreateEventActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.create_event_menu, menu);
-        item = menu.findItem(R.id.cea_menu_save);
+        MenuItem item = menu.findItem(R.id.cea_menu_save);
         SpannableString mNewTitle = new SpannableString(item.getTitle());
         mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFont()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         item.setTitle(mNewTitle);
@@ -201,7 +199,11 @@ public class CreateEventActivity extends AppCompatActivity {
             case R.id.cea_menu_save:
                 if (etName != null && etDate != null && etLocation != null) {
                     if (etName.getText().toString().trim().length() != 0 && etDate.getText().toString().trim().length() != 0 && etLocation.getText().toString().trim().length() != 0) {
-                        createEvent();
+                        if (intentData.equalsIgnoreCase("edit")) {
+                            finish();
+                        } else if (intentData.equalsIgnoreCase("new")) {
+                            createEvent();
+                        }
                     } else {
                         utility.showMsg("Please enter details.");
                     }
@@ -227,7 +229,7 @@ public class CreateEventActivity extends AppCompatActivity {
         if (intentData.equalsIgnoreCase("edit")) {
 
         } else {
-            item.setVisible(true);
+
         }
     }
 
@@ -235,7 +237,7 @@ public class CreateEventActivity extends AppCompatActivity {
     private void getEventDetails(int id) {
         progressDialog.show();
 
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        final ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
         Call<Event> call = apiInterface.getEventById(id);
         call.enqueue(new Callback<Event>() {
             @Override
@@ -246,7 +248,7 @@ public class CreateEventActivity extends AppCompatActivity {
                     dismissDialog();
 
                     etName.setText(response.body() != null ? response.body().getTitle() : "");
-                    etDate.setText(dateFormat.format(response.body() != null ? response.body().getEventDate() : null));
+                    etDate.setText(response.body() != null ? response.body().getEventDate().toLocaleString() : "");
                     etLocation.setText(response.body() != null ? response.body().getLocation() : "");
                     swPrivate.setChecked(response.body() != null ? response.body().getIsPrivate() : false);
                     swCanGuest.setChecked(response.body() != null ? response.body().getCanInviteGuests() : false);
@@ -332,7 +334,7 @@ public class CreateEventActivity extends AppCompatActivity {
         Date dt = Calendar.getInstance(Locale.US).getTime();
 
         try {
-            dt = new SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.US).parse(etDate.getText().toString().trim());
+            dt = new SimpleDateFormat("MMM-dd,yyyy 'at' hh:mm a z", Locale.US).parse(etDate.getText().toString().trim());
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -421,5 +423,11 @@ public class CreateEventActivity extends AppCompatActivity {
                 progressDialog.dismiss();
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }
