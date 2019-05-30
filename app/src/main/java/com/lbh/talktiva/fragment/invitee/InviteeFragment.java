@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 
 import com.lbh.talktiva.R;
 import com.lbh.talktiva.adapter.AdapterInvitee;
-import com.lbh.talktiva.helper.Utility;
 import com.lbh.talktiva.model.Invitations;
 
 import java.util.List;

@@ -44,7 +44,7 @@ public class AdapterInvitee extends RecyclerView.Adapter<AdapterInvitee.InviteeV
         String fullName = invitations.get(i).getInvitee().getFirstName().concat(" ").concat(invitations.get(i).getInvitee().getLastName());
         inviteeViewHolder.tvName.setText(fullName);
 
-        String address = invitations.get(i).getInvitee().getAddressList().get(0).getStreet().concat(" ").concat(invitations.get(i).getInvitee().getAddressList().get(0).getCity()).concat(" ").concat(invitations.get(i).getInvitee().getAddressList().get(0).getZip());
+        String address = invitations.get(i).getInvitee().getAddressList().get(0).getStreet().concat(", ").concat(invitations.get(i).getInvitee().getAddressList().get(0).getCity()).concat(", ").concat(invitations.get(i).getInvitee().getAddressList().get(0).getZip());
         inviteeViewHolder.tvAddress.setText(address);
     }
 

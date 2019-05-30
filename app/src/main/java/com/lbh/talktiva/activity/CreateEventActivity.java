@@ -363,24 +363,15 @@ public class CreateEventActivity extends AppCompatActivity {
 
         //region First Invitation
         List<Address> addressList1 = new ArrayList<>();
-        addressList1.add(new Address(3, "Street address", "Ahmedabad", "Gujarat", "12345"));
+        addressList1.add(new Address(4, "Street address 1", "Ahmedabad", "Gujarat", "12345"));
 
         Invitations invitations1 = new Invitations();
-        invitations1.setInvitee(new User(3, "Manish", "Singh", "manish@test.com", addressList1));
-        //endregion
-
-        //region Second Invitation
-        List<Address> addressList2 = new ArrayList<>();
-        addressList2.add(new Address(5, "Street address", "Ahmedabad", "Gujarat", "12345"));
-
-        Invitations invitations2 = new Invitations();
-        invitations2.setInvitee(new User(5, "Chirag", "Nayak", "chirag@test.com", addressList2));
+        invitations1.setInvitee(new User(3, "Anand", "Dave", "anand@test.com", addressList1));
         //endregion
 
         //region Preparing Invitations
         List<Invitations> invitations = new ArrayList<>();
         invitations.add(invitations1);
-        invitations.add(invitations2);
         //endregion
 
         return invitations;

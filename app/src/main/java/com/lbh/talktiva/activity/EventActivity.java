@@ -29,11 +29,14 @@ import com.lbh.talktiva.fragment.invitee.InviteeFragment;
 import com.lbh.talktiva.helper.CustomTypefaceSpan;
 import com.lbh.talktiva.helper.Utility;
 import com.lbh.talktiva.model.Event;
+import com.lbh.talktiva.model.Invitations;
 import com.lbh.talktiva.rest.ApiClient;
 import com.lbh.talktiva.rest.ApiInterface;
 import com.lbh.talktiva.results.ResultEvents;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -258,7 +261,19 @@ public class EventActivity extends AppCompatActivity {
             }
         });
 
-        viewPager.setAdapter(new EventDetailAdapter(getSupportFragmentManager(), from, event));
+        List<Invitations> acceptedInvitations, pendingInvitations;
+        acceptedInvitations = new ArrayList<>();
+        pendingInvitations = new ArrayList<>();
+
+        for (int j = 0; j < event.getInvitations().size(); j++) {
+            if (event.getInvitations().get(j).getStatus().equalsIgnoreCase("pending")) {
+                pendingInvitations.add(event.getInvitations().get(j));
+            } else {
+                acceptedInvitations.add(event.getInvitations().get(j));
+            }
+        }
+
+        viewPager.setAdapter(new EventDetailAdapter(getSupportFragmentManager(), from, acceptedInvitations, pendingInvitations));
         tabLayout.setupWithViewPager(viewPager);
 
         ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
@@ -343,13 +358,15 @@ public class EventActivity extends AppCompatActivity {
     }
 
     private class EventDetailAdapter extends FragmentPagerAdapter {
-        private Event event;
+
+        private List<Invitations> acceptedInvitations, pendingInvitations;
         private int from;
 
-        EventDetailAdapter(FragmentManager fm, int from, Event event) {
+        EventDetailAdapter(FragmentManager fm, int from, List<Invitations> acceptedInvitations, List<Invitations> pendingInvitations) {
             super(fm);
             this.from = from;
-            this.event = event;
+            this.pendingInvitations = pendingInvitations;
+            this.acceptedInvitations = acceptedInvitations;
         }
 
         @Override
@@ -357,20 +374,20 @@ public class EventActivity extends AppCompatActivity {
             switch (from) {
                 case 0:
                     if (position == 0) {
-                        return new InviteeFragment(event.getInvitations());
+                        return new InviteeFragment(acceptedInvitations);
                     }
                     break;
                 case 1:
                     if (position == 0) {
-                        return new InviteeFragment(event.getInvitations());
+                        return new InviteeFragment(acceptedInvitations);
                     }
                     break;
                 case 2:
                     switch (position) {
                         case 0:
-                            return new InviteeFragment(event.getInvitations());
+                            return new InviteeFragment(acceptedInvitations);
                         case 1:
-                            return new InviteeFragment(event.getInvitations());
+                            return new InviteeFragment(pendingInvitations);
                     }
                     break;
             }
@@ -409,9 +426,9 @@ public class EventActivity extends AppCompatActivity {
                     break;
                 case 2:
                     if (position == 0) {
-                        return getResources().getString(R.string.dea_accept).concat("(").concat(String.valueOf(event.getInvitations().size())).concat(")");
+                        return getResources().getString(R.string.dea_accept).concat("(").concat(String.valueOf(acceptedInvitations.size())).concat(")");
                     } else if (position == 1) {
-                        return getResources().getString(R.string.dea_pending).concat("(").concat(String.valueOf(event.getInvitations().size())).concat(")");
+                        return getResources().getString(R.string.dea_pending).concat("(").concat(String.valueOf(pendingInvitations.size())).concat(")");
                     }
                     break;
             }
