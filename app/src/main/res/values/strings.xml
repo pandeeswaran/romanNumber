@@ -2,8 +2,8 @@
     <string name="app_name">Talktiva</string>
 
     //Create Event Activity Titles
-    <string name="ea_title">Event Details</string>
-    <string name="cea_title1">New Event</string>
+    <string name="ea_title">View Event</string>
+    <string name="cea_title1">Create Event</string>
     <string name="cea_title2">Edit Event</string>
 
     //Create Event Activity Menu
@@ -12,15 +12,21 @@
     //Create Detail Event Activity Menu
     <string name="dea_menu_edit">Edit</string>
 
+    //Dialog Button Title
+    <string name="dd_setting">Setting</string>
+    <string name="dd_yes">YES</string>
+    <string name="dd_no">NO</string>
+    <string name="dd_ok">OK</string>
+
     //Intent Parsing Strings
-    <string name="cea_event_id">eventId</string>
-    <string name="cea_from">From</string>
-    <string name="cea_from_new">New</string>
-    <string name="cea_from_edit">Edit</string>
+    <string name="event">event</string>
+    <string name="from">from</string>
+    <string name="from_new">new</string>
+    <string name="from_edit">edit</string>
 
     //Network and Gps Error Message
     <string name="gps_msg">Your GPS seems to be disabled, do you want to enable it?</string>
-    <string name="internet_msg">Your INTERNET seems to be disabled, do you want to enable it?</string>
+    <string name="internet_msg">Your INTERNET seems to be disabled,\ndo you want to enable it?</string>
     <string name="network_msg">There is no network connection \nat the moment, try again later.</string>
     <string name="connection_msg">Opps!!! Connection is slow, please try again.</string>
     <string name="time_out_msg">Sorry!!! Connection time out, please try again.</string>
@@ -77,6 +83,8 @@
 
     <string name="event_tomorrow">TOMORROW</string>
     <string name="event_today">TODAY</string>
-    <string name="event_other">OTHER</string>
+    <string name="event_later">LATER</string>
+
+    <string name="event_user">User Image</string>
 
 </resources>

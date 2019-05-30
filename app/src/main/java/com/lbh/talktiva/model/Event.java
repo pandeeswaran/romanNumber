@@ -2,13 +2,14 @@ package com.lbh.talktiva.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
-public class Event {
+public class Event implements Serializable {
 
     @SerializedName("eventId")
     private int eventId;

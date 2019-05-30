@@ -16,12 +16,12 @@ import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.lbh.talktiva.R;
 
 import java.io.File;
@@ -31,6 +31,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Objects;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class Utility {
 
@@ -46,15 +50,17 @@ public class Utility {
         return Typeface.createFromAsset(context.getApplicationContext().getAssets(), "merriweather_regular.ttf");
     }
 
+    public void setTitleText(Toolbar toolbar, int id, String title) {
+        TextView textView = toolbar.findViewById(id);
+        textView.setTypeface(getFont());
+        textView.setText(title);
+    }
+
     public void setTitleFont(Toolbar toolbar) {
         for (int i = 0; i < toolbar.getChildCount(); i++) {
             View v = toolbar.getChildAt(i);
             if (v instanceof TextView && ((TextView) v).getText() == context.getTitle()) {
                 ((TextView) v).setTypeface(getFont());
-                ((TextView) v).setGravity(Gravity.CENTER);
-                Toolbar.LayoutParams layoutParams = (Toolbar.LayoutParams) v.getLayoutParams();
-                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                toolbar.requestLayout();
             }
         }
     }
@@ -108,12 +114,14 @@ public class Utility {
     }
 
     void requestInternet() {
-        dialogInternet = showAlert("Network Alert", context.getResources().getString(R.string.internet_msg), false, "Setting", new DialogInterface.OnClickListener() {
+        dialogInternet = showAlert(context.getResources().getString(R.string.internet_msg), false, VISIBLE, context.getResources().getString(R.string.dd_setting), new View.OnClickListener() {
+            @SuppressLint("InlinedApi")
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(View v) {
+                dialogInternet.dismiss();
                 context.startActivity(new Intent(Settings.ACTION_DATA_USAGE_SETTINGS));
             }
-        }, null, null);
+        }, GONE, null, null);
         dialogInternet.show();
     }
 
@@ -127,14 +135,41 @@ public class Utility {
     //endregion
 
     //region AlertDialog
-    public Dialog showAlert(String title, String msg, boolean bool, String positiveTitle, DialogInterface.OnClickListener positiveClickListener, String negativeTitle, DialogInterface.OnClickListener negativeClickListener) {
-        return new AlertDialog.Builder(context)
-                .setTitle(title)
-                .setMessage(msg)
-                .setCancelable(bool)
-                .setPositiveButton(positiveTitle, positiveClickListener)
-                .setNegativeButton(negativeTitle, negativeClickListener)
-                .create();
+    public Dialog showAlert(String msg, boolean bool, int positiveVisibility, String positiveTitle, View.OnClickListener positiveClickListener, int negativeVisibility, String negativeTitle, View.OnClickListener negativeClickListener) {
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_layout);
+        dialog.setCancelable(bool);
+        ((TextView) dialog.findViewById(R.id.dialog_msg)).setTypeface(getFont());
+        ((TextView) dialog.findViewById(R.id.dialog_msg)).setText(msg);
+        ((Button) dialog.findViewById(R.id.dialog_positive)).setTypeface(getFont());
+        ((Button) dialog.findViewById(R.id.dialog_positive)).setText(positiveTitle);
+        dialog.findViewById(R.id.dialog_positive).setVisibility(positiveVisibility);
+        dialog.findViewById(R.id.dialog_positive).setOnClickListener(positiveClickListener);
+        ((Button) dialog.findViewById(R.id.dialog_negative)).setTypeface(getFont());
+        ((Button) dialog.findViewById(R.id.dialog_negative)).setText(negativeTitle);
+        dialog.findViewById(R.id.dialog_negative).setVisibility(negativeVisibility);
+        dialog.findViewById(R.id.dialog_negative).setOnClickListener(negativeClickListener);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
+        return dialog;
+    }
+    //endregion
+
+    //region Progress Dialog
+    public Dialog showProgress() {
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.loader_layout);
+        dialog.setCancelable(false);
+        ((LottieAnimationView) dialog.findViewById(R.id.progress)).setAnimation("loader.json");
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
+        return dialog;
+    }
+
+    public void dismissDialog(Dialog progressDialog) {
+        if (progressDialog != null) {
+            if (progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        }
     }
     //endregion
 
@@ -187,7 +222,7 @@ public class Utility {
 
     //region Get data from system local storage privately
     public String getData(String fileName) {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         try {
             FileInputStream fileIn = context.openFileInput(fileName);
             InputStreamReader InputRead = new InputStreamReader(fileIn);
@@ -195,7 +230,7 @@ public class Utility {
             int charRead;
             while ((charRead = InputRead.read(inputBuffer)) > 0) {
                 String readstring = String.copyValueOf(inputBuffer, 0, charRead);
-                s += readstring;
+                s.append(readstring);
             }
             InputRead.close();
         } catch (FileNotFoundException e) {
@@ -203,17 +238,7 @@ public class Utility {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return s;
-    }
-    //endregion
-
-    //region Progress Dialog
-    public ProgressDialog getProgress() {
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Loading...");
-        progressDialog.setCancelable(false);
-        return progressDialog;
+        return s.toString();
     }
     //endregion
 }

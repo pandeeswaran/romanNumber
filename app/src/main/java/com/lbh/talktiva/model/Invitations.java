@@ -2,7 +2,9 @@ package com.lbh.talktiva.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Invitations {
+import java.io.Serializable;
+
+public class Invitations implements Serializable {
 
     @SerializedName("invitationId")
     private int invitationId;

@@ -57,22 +57,38 @@ public class EventFragment extends Fragment {
     public EventFragment() {
     }
 
-    protected BroadcastReceiver r = new BroadcastReceiver() {
+    protected BroadcastReceiver r0 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            viewPager.setCurrentItem(0);
+            LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).sendBroadcast(new Intent("Refresh0"));
+        }
+    };
+
+    protected BroadcastReceiver r1 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            viewPager.setCurrentItem(1);
+            LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).sendBroadcast(new Intent("Refresh1"));
+        }
+    };
+
+    protected BroadcastReceiver r2 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             viewPager.setCurrentItem(2);
-            LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent("Refresh"));
+            LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).sendBroadcast(new Intent("Refresh2"));
         }
     };
 
     //region Register And Unregister Broadcast Connectivity Receiver
     private void registerNetworkBroadcast() {
-        getActivity().registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        Objects.requireNonNull(getActivity()).registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void unregisterNetworkBroadcast() {
         try {
-            getActivity().unregisterReceiver(receiver);
+            Objects.requireNonNull(getActivity()).unregisterReceiver(receiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -84,14 +100,18 @@ public class EventFragment extends Fragment {
         super.onAttach(context);
         receiver = new NetworkChangeReceiver(getActivity());
         registerNetworkBroadcast();
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r, new IntentFilter("MyEventPage"));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r0, new IntentFilter("PendingEvent"));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r1, new IntentFilter("UpcomingEvent"));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r2, new IntentFilter("MyEvent"));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         unregisterNetworkBroadcast();
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r0);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r1);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r2);
     }
 
     @Override
@@ -106,9 +126,10 @@ public class EventFragment extends Fragment {
         ButterKnife.bind(this, view);
         setHasOptionsMenu(true);
 
-        ((HomeActivity) getActivity()).setSupportActionBar(toolbar);
-        utility.setTitleFont(toolbar);
-        getActivity().setTitle(getActivity().getResources().getString(R.string.ha_bnm_title_event));
+        ((HomeActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
+        Objects.requireNonNull(((HomeActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
+
+        utility.setTitleText(toolbar, R.id.ef_toolbar_tv_title, getActivity().getResources().getString(R.string.ha_bnm_title_event));
 
         viewPager.setAdapter(new EventPagerAdapter(getChildFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
@@ -138,16 +159,15 @@ public class EventFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.ef_menu_create:
-                Intent intent = new Intent(getActivity(), CreateEventActivity.class);
-                intent.putExtra(getResources().getString(R.string.cea_from), getResources().getString(R.string.cea_from_new));
-                intent.putExtra(getResources().getString(R.string.cea_event_id), 0);
-                Objects.requireNonNull(getActivity()).startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.ef_menu_create) {
+            Intent intent = new Intent(getActivity(), CreateEventActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString(getResources().getString(R.string.from), getResources().getString(R.string.from_new));
+            intent.putExtras(bundle);
+            Objects.requireNonNull(getActivity()).startActivity(intent);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     private class EventPagerAdapter extends FragmentPagerAdapter {
@@ -188,6 +208,4 @@ public class EventFragment extends Fragment {
             return super.getPageTitle(position);
         }
     }
-
-
 }

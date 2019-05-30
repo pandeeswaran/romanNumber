@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/cea_menu_save"
+        android:icon="@drawable/ic_save"
         android:title="@string/cea_menu_save"
         app:showAsAction="always" />
 

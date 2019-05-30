@@ -2,7 +2,9 @@ package com.lbh.talktiva.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Links {
+import java.io.Serializable;
+
+public class Links implements Serializable {
 
     @SerializedName("next")
     private String next;

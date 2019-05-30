@@ -2,9 +2,10 @@ package com.lbh.talktiva.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
 
     @SerializedName("userId")
     private int userId;
@@ -20,6 +21,14 @@ public class User {
 
     @SerializedName("addresses")
     private List<Address> addressList;
+
+    public User(int userId, String firstName, String lastName, String email, List<Address> addressList) {
+        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.addressList = addressList;
+    }
 
     public int getUserId() {
         return userId;
@@ -39,25 +48,5 @@ public class User {
 
     public List<Address> getAddressList() {
         return addressList;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setAddressList(List<Address> addressList) {
-        this.addressList = addressList;
     }
 }

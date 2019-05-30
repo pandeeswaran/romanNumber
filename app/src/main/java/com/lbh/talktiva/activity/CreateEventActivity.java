@@ -2,9 +2,8 @@ package com.lbh.talktiva.activity;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -19,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -39,11 +37,8 @@ import com.lbh.talktiva.rest.ApiClient;
 import com.lbh.talktiva.rest.ApiInterface;
 import com.lbh.talktiva.results.ResultEvents;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -52,11 +47,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import butterknife.OnTextChanged;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+@SuppressWarnings("deprecation")
 public class CreateEventActivity extends AppCompatActivity {
 
     @BindView(R.id.cea_toolbar)
@@ -86,34 +81,33 @@ public class CreateEventActivity extends AppCompatActivity {
     @BindView(R.id.cea_tv_count)
     TextView tvCount;
 
-    @BindView(R.id.cea_tv_del)
-    TextView tvDelete;
-
-    private ProgressDialog progressDialog;
+    private Dialog progressDialog;
     private Utility utility;
     private Event curEvent;
 
     private Calendar currentDate, newDate;
 
     private boolean canGuest, isPrivate;
-    private String intentData;
-    private int count;
+    private String from;
+    private int count = 0;
+
+    private List<Invitations> invitations;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
+        utility = new Utility(this);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        utility = new Utility(this);
-        utility.setTitleFont(toolbar);
-
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
         toolbar.setNavigationIcon(R.drawable.ic_back);
 
-        progressDialog = utility.getProgress();
+        progressDialog = utility.showProgress();
 
         etName.setTypeface(utility.getFont());
         etDate.setTypeface(utility.getFont());
@@ -123,45 +117,39 @@ public class CreateEventActivity extends AppCompatActivity {
         tvInvitee.setTypeface(utility.getFont());
         tvCountFig.setTypeface(utility.getFont(), Typeface.BOLD);
         tvCount.setTypeface(utility.getFont());
-        tvDelete.setTypeface(utility.getFont());
 
-        intentData = getIntent().getStringExtra(getResources().getString(R.string.cea_from));
+        Bundle bundle = getIntent().getExtras();
 
-        if (getIntent().getIntExtra(getResources().getString(R.string.cea_event_id), 0) != 0) {
-            getEventDetails(getIntent().getIntExtra(getResources().getString(R.string.cea_event_id), 0));
-        } else {
-            count = 0;
-        }
+        from = bundle != null ? bundle.getString(getResources().getString(R.string.from)) : null;
 
         swCanGuest.setChecked(false);
         swPrivate.setChecked(true);
 
-        switch (intentData) {
-            case "New":
-                setTitle(getResources().getString(R.string.cea_title1));
-                tvDelete.setVisibility(View.GONE);
+        switch (from) {
+            case "new":
+                utility.setTitleText(toolbar, R.id.cea_toolbar_tv_title, getResources().getString(R.string.cea_title1));
                 tvCountFig.setText(String.valueOf(count));
                 break;
-            case "Edit":
-                setTitle(getResources().getString(R.string.cea_title2));
-                tvDelete.setVisibility(View.VISIBLE);
-                tvCountFig.setText(String.valueOf(count));
+
+            case "edit":
+                utility.setTitleText(toolbar, R.id.cea_toolbar_tv_title, getResources().getString(R.string.cea_title2));
+                curEvent = (Event) (bundle != null ? bundle.getSerializable(getResources().getString(R.string.event)) : null);
+                getEventDetails(Objects.requireNonNull(curEvent));
                 break;
         }
 
         etDate.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public boolean onTouch(View v, final MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     currentDate = Calendar.getInstance(Locale.US);
-
-                    new DatePickerDialog(CreateEventActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    DatePickerDialog datePickerDialog = new DatePickerDialog(CreateEventActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                             newDate = Calendar.getInstance();
                             newDate.set(year, month, dayOfMonth);
 
-                            new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                            TimePickerDialog timePickerDialog = new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
                                 @Override
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                     newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -169,9 +157,27 @@ public class CreateEventActivity extends AppCompatActivity {
 
                                     etDate.setText(newDate.getTime().toLocaleString());
                                 }
-                            }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
+                            }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false);
+                            switch (from) {
+                                case "new":
+                                    timePickerDialog.updateTime(Calendar.getInstance().getTime().getHours(), Calendar.getInstance().getTime().getMinutes());
+                                    break;
+                                case "edit":
+                                    timePickerDialog.updateTime(curEvent.getEventDate().getHours(), curEvent.getEventDate().getMinutes());
+                                    break;
+                            }
+                            timePickerDialog.show();
                         }
-                    }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
+                    }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH));
+                    switch (from) {
+                        case "new":
+                            datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+                            break;
+                        case "edit":
+                            datePickerDialog.getDatePicker().setMinDate(curEvent.getEventDate().getTime());
+                            break;
+                    }
+                    datePickerDialog.show();
                     return true;
                 } else {
                     return false;
@@ -190,6 +196,7 @@ public class CreateEventActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @SuppressLint("NewApi")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -197,16 +204,29 @@ public class CreateEventActivity extends AppCompatActivity {
                 onBackPressed();
                 return true;
             case R.id.cea_menu_save:
-                if (etName != null && etDate != null && etLocation != null) {
-                    if (etName.getText().toString().trim().length() != 0 && etDate.getText().toString().trim().length() != 0 && etLocation.getText().toString().trim().length() != 0) {
-                        if (intentData.equalsIgnoreCase("edit")) {
-                            finish();
-                        } else if (intentData.equalsIgnoreCase("new")) {
-                            createEvent();
+                if (etName != null && etName.getText().toString().trim().length() != 0) {
+                    if (etDate != null && etDate.getText().toString().trim().length() != 0) {
+                        if (etLocation != null && etLocation.getText().toString().trim().length() != 0) {
+                            if (invitations != null && invitations.size() != 0) {
+                                switch (from) {
+                                    case "new":
+                                        createEvent();
+                                        return true;
+                                    case "edit":
+                                        updateEvent(curEvent.getEventId());
+                                        return true;
+                                }
+                            } else {
+                                utility.showMsgSnack(requireViewById(item.getItemId()), "Please add guests.", null, null);
+                            }
+                        } else {
+                            utility.showMsgSnack(requireViewById(item.getItemId()), "Please enter event location.", null, null);
                         }
                     } else {
-                        utility.showMsg("Please enter details.");
+                        utility.showMsgSnack(requireViewById(item.getItemId()), "Please select event date.", null, null);
                     }
+                } else {
+                    utility.showMsgSnack(requireViewById(item.getItemId()), "Please enter event name.", null, null);
                 }
                 return true;
             default:
@@ -215,134 +235,56 @@ public class CreateEventActivity extends AppCompatActivity {
     }
 
     @OnCheckedChanged(R.id.cea_sw_private)
-    void setSwPrivateOnCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+    void setSwPrivateOnCheckedChanged(boolean isChecked) {
         isPrivate = isChecked;
     }
 
     @OnCheckedChanged(R.id.cea_sw_cg)
-    void setSwCanGuestCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+    void setSwCanGuestCheckedChanged(boolean isChecked) {
         canGuest = isChecked;
     }
 
-    @OnTextChanged(value = R.id.cea_et_name, callback = OnTextChanged.Callback.TEXT_CHANGED)
-    void setEtNameOnTextChange(CharSequence s, int start, int before, int count) {
-        if (intentData.equalsIgnoreCase("edit")) {
 
-        } else {
-
+    @OnClick(R.id.cea_tv_invitee)
+    void setTvInviteeOnClick(View view) {
+        switch (from) {
+            case "new":
+                if (invitations == null) {
+                    invitations = getInvitations();
+                    count = invitations.size();
+                    tvCountFig.setText(String.valueOf(count));
+                } else {
+                    utility.showMsg("Invitations added successfully.");
+                }
+                break;
+            case "edit":
+                if (invitations != null) {
+                    utility.showMsg("Invitations already selected.");
+                }
+                break;
         }
     }
 
-
-    private void getEventDetails(int id) {
-        progressDialog.show();
-
-        final ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-        Call<Event> call = apiInterface.getEventById(id);
-        call.enqueue(new Callback<Event>() {
-            @Override
-            public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
-                if (response.isSuccessful()) {
-                    curEvent = new Event();
-                    curEvent = response.body();
-                    dismissDialog();
-
-                    etName.setText(response.body() != null ? response.body().getTitle() : "");
-                    etDate.setText(response.body() != null ? response.body().getEventDate().toLocaleString() : "");
-                    etLocation.setText(response.body() != null ? response.body().getLocation() : "");
-                    swPrivate.setChecked(response.body() != null ? response.body().getIsPrivate() : false);
-                    swCanGuest.setChecked(response.body() != null ? response.body().getCanInviteGuests() : false);
-                    count = response.body() != null ? response.body().getInvitations().size() : 0;
-                    tvCountFig.setText(String.valueOf(count));
-                } else {
-                    dismissDialog();
-                    utility.showMsg(response.message());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
-                dismissDialog();
-                utility.showMsg(t.getMessage());
-            }
-        });
+    private void getEventDetails(Event event) {
+        etName.setText(event.getTitle());
+        newDate = Calendar.getInstance();
+        newDate.setTimeInMillis(event.getEventDate().getTime());
+        etDate.setText(event.getEventDate().toLocaleString());
+        etLocation.setText(event.getLocation());
+        swPrivate.setChecked(event.getIsPrivate());
+        swCanGuest.setChecked(event.getCanInviteGuests());
+        invitations = event.getInvitations();
+        count = invitations.size();
+        tvCountFig.setText(String.valueOf(count));
     }
 
     private void createEvent() {
         progressDialog.show();
 
-        //region Address for user-1
-        Address address1 = new Address();
-        address1.setAddressId(5);
-        address1.setStreet("Street address");
-        address1.setCity("Ahmedabad");
-        address1.setState("Gujarat");
-        address1.setZip("12345");
-        //endregion
-
-        //region Add address to addressList for user-1
-        List<Address> addressList1 = new ArrayList<>();
-        addressList1.add(address1);
-        //endregion
-
-        //region Invitee for invitation-1
-        User user1 = new User();
-        user1.setUserId(5);
-        user1.setFirstName("Manish");
-        user1.setLastName("Singh");
-        user1.setEmail("manish@test.com");
-        user1.setAddressList(addressList1);
-        //endregion
-
-        //region Address for user-2
-        Address address2 = new Address();
-        address2.setAddressId(7);
-        address2.setStreet("Street address");
-        address2.setCity("Ahmedabad");
-        address2.setState("Gujarat");
-        address2.setZip("12345");
-        //endregion
-
-        //region Add address to addressList for user-2
-        List<Address> addressList2 = new ArrayList<>();
-        addressList2.add(address2);
-        //endregion
-
-        //region Invitee for invitation-2
-        User user2 = new User();
-        user2.setUserId(7);
-        user2.setFirstName("Chirag");
-        user2.setLastName("Nayak");
-        user2.setEmail("chirag@test.com");
-        user2.setAddressList(addressList2);
-        //endregion
-
-        //region Two invitations for new event
-        Invitations invitations1 = new Invitations();
-        invitations1.setInvitee(user1);
-
-        Invitations invitations2 = new Invitations();
-        invitations2.setInvitee(user2);
-        //endregion
-
-        //region Preparing invitations for new event
-        List<Invitations> invitations = new ArrayList<>();
-        invitations.add(invitations1);
-        invitations.add(invitations2);
-        //endregion
-
-        Date dt = Calendar.getInstance(Locale.US).getTime();
-
-        try {
-            dt = new SimpleDateFormat("MMM-dd,yyyy 'at' hh:mm a z", Locale.US).parse(etDate.getText().toString().trim());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //region Preparing new event
+        //region Preparing new curEvent
         CreateEvent event = new CreateEvent();
         event.setCanInviteGuests(canGuest);
-        event.setEventDate(dt.getTime() / 1000);
+        event.setEventDate(newDate.getTime().getTime() / 1000);
         event.setLocation(etLocation.getText().toString().trim());
         event.setIsPrivate(isPrivate);
         event.setTitle(etName.getText().toString().trim());
@@ -358,76 +300,94 @@ public class CreateEventActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
                 if (response.isSuccessful()) {
-                    dismissDialog();
-                    utility.showMsg("Event Created Successfully");
+                    utility.dismissDialog(progressDialog);
                     finish();
-                    LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEventPage"));
+                    utility.showMsg("Event Created Successfully");
+                    LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEvent"));
                 } else {
-                    dismissDialog();
+                    utility.dismissDialog(progressDialog);
                     utility.showMsg(response.message());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
-                dismissDialog();
+                utility.dismissDialog(progressDialog);
                 utility.showMsg(t.getMessage());
             }
         });
-
     }
 
-    @OnClick(R.id.cea_tv_del)
-    void setTvDeleteOnClick(View v) {
-        utility.showAlert("Cancel Event", "Are you sure want to cancel this event?", false, "Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(final DialogInterface dialog, int which) {
-                progressDialog.show();
+    private void updateEvent(int id) {
+        progressDialog.show();
 
-                ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-                Call<ResultEvents> call = apiInterface.deleteEvent(curEvent.getEventId());
-                call.enqueue(new Callback<ResultEvents>() {
-                    @Override
-                    public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
-                        if (response.isSuccessful()) {
-                            dialog.dismiss();
-                            dismissDialog();
-                            finish();
-                            LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEventPage"));
-                        } else {
-                            dialog.dismiss();
-                            dismissDialog();
-                            utility.showMsg(response.message());
-                        }
-                    }
+        //region Preparing new curEvent
+        CreateEvent event = new CreateEvent();
+        event.setEventId(id);
+        event.setCanInviteGuests(canGuest);
+        event.setEventDate(newDate.getTime().getTime() / 1000);
+        event.setLocation(etLocation.getText().toString().trim());
+        event.setIsPrivate(isPrivate);
+        event.setTitle(etName.getText().toString().trim());
+        event.setInvitations(invitations);
+        event.setStatus("ACTIVE");
+        //endregion
 
-                    @Override
-                    public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
-                        dialog.dismiss();
-                        dismissDialog();
-                        utility.showMsg(t.getMessage());
-                    }
-                });
-            }
-        }, "No", new DialogInterface.OnClickListener() {
+        Log.d("Event Json : ", new Gson().toJson(event));
+
+        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        Call<ResultEvents> call = apiInterface.editEvent(event);
+        call.enqueue(new Callback<ResultEvents>() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+            public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
+                if (response.isSuccessful()) {
+                    utility.dismissDialog(progressDialog);
+                    finish();
+                    utility.showMsg("Event Updated Successfully");
+                    LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEvent"));
+                } else {
+                    utility.dismissDialog(progressDialog);
+                    utility.showMsg(response.message());
+                }
             }
-        }).show();
+
+            @Override
+            public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
+                utility.dismissDialog(progressDialog);
+                utility.showMsg(t.getMessage());
+            }
+        });
     }
 
-    private void dismissDialog() {
-        if (progressDialog != null) {
-            if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
-        }
+    private List<Invitations> getInvitations() {
+
+        //region First Invitation
+        List<Address> addressList1 = new ArrayList<>();
+        addressList1.add(new Address(3, "Street address", "Ahmedabad", "Gujarat", "12345"));
+
+        Invitations invitations1 = new Invitations();
+        invitations1.setInvitee(new User(3, "Manish", "Singh", "manish@test.com", addressList1));
+        //endregion
+
+        //region Second Invitation
+        List<Address> addressList2 = new ArrayList<>();
+        addressList2.add(new Address(5, "Street address", "Ahmedabad", "Gujarat", "12345"));
+
+        Invitations invitations2 = new Invitations();
+        invitations2.setInvitee(new User(5, "Chirag", "Nayak", "chirag@test.com", addressList2));
+        //endregion
+
+        //region Preparing Invitations
+        List<Invitations> invitations = new ArrayList<>();
+        invitations.add(invitations1);
+        invitations.add(invitations2);
+        //endregion
+
+        return invitations;
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         finish();
     }
 }

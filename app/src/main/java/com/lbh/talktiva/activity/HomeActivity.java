@@ -19,10 +19,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lbh.talktiva.R;
@@ -33,7 +31,6 @@ import com.lbh.talktiva.helper.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,8 +48,8 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.ha_bnv)
     BottomNavigationView bottomNavigationView;
 
-    private Dialog dialog, dialogClose, dialogPermission;
     private BroadcastReceiver receiver;
+    private Dialog dialogPermission, dialogClose;
     private Utility utility;
 
     @Override
@@ -88,15 +85,15 @@ public class HomeActivity extends AppCompatActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.ha_bnm_home:
-                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home), HomeActivity.this));
+                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home)));
                             return true;
                         case R.id.ha_bnm_chat:
-                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat), HomeActivity.this));
+                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat)));
                             return true;
                         case R.id.ha_bnm_add:
                             return true;
                         case R.id.ha_bnm_notification:
-                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications), HomeActivity.this));
+                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications)));
                             return true;
                         case R.id.ha_bnm_event:
                             loadFragment(new EventFragment());
@@ -141,19 +138,19 @@ public class HomeActivity extends AppCompatActivity {
                     registerNetworkBroadcast();
                     //endregion
                 } else {
-                    dialogPermission = utility.showAlert("Permission Request", "\nRequired permissions are not granted, ask again?\n", false, "Yes", new DialogInterface.OnClickListener() {
+                    dialogPermission = utility.showAlert("Required permissions are not granted, ask again?", false, View.VISIBLE,"Yes", new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
                             for (int i = 0; deniedPermissions.size() > i; i++) {
                                 if (ActivityCompat.shouldShowRequestPermissionRationale(HomeActivity.this, deniedPermissions.get(i))) {
                                     checkAndRequestPermission();
                                 }
                             }
                         }
-                    }, "Settings", new DialogInterface.OnClickListener() {
+                    }, View.VISIBLE, "Settings", new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
+                        public void onClick(View v) {
+                            dialogPermission.dismiss();
                             Intent intent = new Intent();
                             intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                             Uri uri = Uri.fromParts("package", getPackageName(), null);
@@ -189,15 +186,15 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        dialogClose = utility.showAlert("Alert", "\nAre you sure you want to exit?\n", true, "Yes", new DialogInterface.OnClickListener() {
+        dialogClose = utility.showAlert("Are you sure you want to exit?", true, View.VISIBLE,"Yes", new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(View v) {
                 finishAffinity();
             }
-        }, "No", new DialogInterface.OnClickListener() {
+        }, View.VISIBLE,"No", new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+            public void onClick(View v) {
+                dialogClose.dismiss();
             }
         });
         dialogClose.show();

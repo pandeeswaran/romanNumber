@@ -2,7 +2,9 @@ package com.lbh.talktiva.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Address {
+import java.io.Serializable;
+
+public class Address implements Serializable {
     @SerializedName("addressId")
     private int addressId;
 
@@ -17,6 +19,14 @@ public class Address {
 
     @SerializedName("zip")
     private String zip;
+
+    public Address(int addressId, String street, String city, String state, String zip) {
+        this.addressId = addressId;
+        this.street = street;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+    }
 
     public int getAddressId() {
         return addressId;
@@ -36,25 +46,5 @@ public class Address {
 
     public String getZip() {
         return zip;
-    }
-
-    public void setAddressId(int addressId) {
-        this.addressId = addressId;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public void setZip(String zip) {
-        this.zip = zip;
     }
 }

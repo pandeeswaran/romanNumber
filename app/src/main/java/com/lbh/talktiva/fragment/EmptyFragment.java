@@ -1,6 +1,5 @@
 package com.lbh.talktiva.fragment;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -19,6 +18,8 @@ import com.lbh.talktiva.activity.HomeActivity;
 import com.lbh.talktiva.helper.NetworkChangeReceiver;
 import com.lbh.talktiva.helper.Utility;
 
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -30,16 +31,12 @@ public class EmptyFragment extends Fragment {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    private static Activity activity;
-
     private BroadcastReceiver receiver;
-    private Utility utility;
 
     public EmptyFragment() {
     }
 
-    public static EmptyFragment newInstance(String param1, Activity context) {
-        activity = context;
+    public static EmptyFragment newInstance(String param1) {
         EmptyFragment fragment = new EmptyFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -49,12 +46,12 @@ public class EmptyFragment extends Fragment {
 
     //region Register And Unregister Broadcast Connectivity Receiver
     private void registerNetworkBroadcast() {
-        getActivity().registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        Objects.requireNonNull(getActivity()).registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void unregisterNetworkBroadcast() {
         try {
-            getActivity().unregisterReceiver(receiver);
+            Objects.requireNonNull(getActivity()).unregisterReceiver(receiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -83,18 +80,19 @@ public class EmptyFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_empty, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        utility = new Utility(activity);
+        Utility utility = new Utility(getActivity());
         ButterKnife.bind(this, view);
 
-        ((HomeActivity) activity).setSupportActionBar(toolbar);
-        utility.setTitleFont(toolbar);
-        activity.setTitle(mParam1);
+        ((HomeActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
+        Objects.requireNonNull(((HomeActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
+
+        utility.setTitleText(toolbar, R.id.toolbar_tv_title, mParam1);
     }
 }

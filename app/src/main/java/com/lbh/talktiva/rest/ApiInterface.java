@@ -9,6 +9,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface ApiInterface {
@@ -28,6 +29,10 @@ public interface ApiInterface {
     @Headers("Content-Type:application/json;charset=UTF-8")
     @POST("api/v1/events")
     Call<ResultEvents> createEvent(@Body CreateEvent event);
+
+    @Headers("Content-Type:application/json;charset=UTF-8")
+    @PUT("api/v1/events")
+    Call<ResultEvents> editEvent(@Body CreateEvent event);
 
     @GET("api/v1/events/{id}/cancel")
     Call<ResultEvents> deleteEvent(@Path("id") int id);

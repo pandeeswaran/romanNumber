@@ -1,15 +1,17 @@
 package com.lbh.talktiva.activity;
 
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -64,6 +66,12 @@ public class EventActivity extends AppCompatActivity {
     @BindView(R.id.ea_tv_add)
     TextView tvAdd;
 
+    @BindView(R.id.ea_iv_decline)
+    ImageView ivDecline;
+
+    @BindView(R.id.ea_iv_accept)
+    ImageView ivAccept;
+
     @BindView(R.id.ea_iv_share)
     ImageView ivShare;
 
@@ -73,14 +81,8 @@ public class EventActivity extends AppCompatActivity {
     @BindView(R.id.ea_iv_coming_count)
     TextView tvCount;
 
-    @BindView(R.id.yf_rv_iv_more)
+    @BindView(R.id.ea_iv_more)
     ImageView ivMore;
-
-    @BindView(R.id.ea_tv_accept)
-    TextView tvAccept;
-
-    @BindView(R.id.ea_tv_decline)
-    TextView tvDecline;
 
     @BindView(R.id.ea_tl)
     TabLayout tabLayout;
@@ -88,7 +90,13 @@ public class EventActivity extends AppCompatActivity {
     @BindView(R.id.ea_vp)
     ViewPager viewPager;
 
-    private ProgressDialog progressDialog;
+    @BindView(R.id.ae_cl_other)
+    ConstraintLayout constraintLayout;
+
+    @BindView(R.id.ea_tv_other)
+    TextView tvOther;
+
+    private Dialog progressDialog, cancelDialog, declineDialog;
     private Utility utility;
     private Event event;
 
@@ -99,149 +107,171 @@ public class EventActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
         utility = new Utility(this);
+        progressDialog = utility.showProgress();
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        utility.setTitleFont(toolbar);
 
+        tvOther.setTypeface(utility.getFont());
+
+        utility.setTitleText(toolbar, R.id.ea_toolbar_tv_title, getResources().getString(R.string.ea_title));
+
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
         toolbar.setNavigationIcon(R.drawable.ic_back);
-
-        setTitle(getResources().getString(R.string.ea_title));
-
-        progressDialog = utility.getProgress();
 
         tvDate.setTypeface(utility.getFont(), Typeface.BOLD);
         tvTitle.setTypeface(utility.getFont(), Typeface.BOLD);
-        tvFullDate.setTypeface(utility.getFont(), Typeface.BOLD);
+        tvFullDate.setTypeface(utility.getFont());
         tvAdd.setTypeface(utility.getFont());
-        tvAccept.setTypeface(utility.getFont());
-        tvDecline.setTypeface(utility.getFont());
-        tvDecline.setBackgroundResource(R.drawable.event_cancel_bg);
         tvCount.setTypeface(utility.getFont(), Typeface.BOLD);
 
-        from = getIntent().getIntExtra(getResources().getString(R.string.cea_from), 0);
+        Bundle bundle = getIntent().getExtras();
+        from = bundle != null ? bundle.getInt(getResources().getString(R.string.from)) : 0;
+        event = (Event) (bundle != null ? bundle.getSerializable(getResources().getString(R.string.event)) : null);
 
         switch (from) {
             case 0:
-                tvDecline.setText(getResources().getString(R.string.yf_rv_decline));
-                tvDecline.setBackgroundResource(R.drawable.event_item_date_bg);
-                tvDecline.setTextColor(getResources().getColor(R.color.black));
+                constraintLayout.setVisibility(View.VISIBLE);
+                tabLayout.setVisibility(View.GONE);
                 break;
             case 1:
-                tvDecline.setText(getResources().getString(R.string.yf_rv_decline));
-                tvDecline.setBackgroundResource(R.drawable.event_cancel_bg);
-                tvDecline.setTextColor(getResources().getColor(R.color.white));
+                constraintLayout.setVisibility(View.VISIBLE);
+                tabLayout.setVisibility(View.GONE);
                 break;
             case 2:
-                tvDecline.setText(getResources().getString(R.string.yf_rv_cancel));
-                tvDecline.setBackgroundResource(R.drawable.event_item_date_bg);
-                tvDecline.setTextColor(getResources().getColor(R.color.black));
+                constraintLayout.setVisibility(View.GONE);
+                tabLayout.setVisibility(View.VISIBLE);
                 break;
         }
 
-        getEventById(getIntent().getIntExtra(getResources().getString(R.string.cea_event_id), 0));
+        getEventById(Objects.requireNonNull(event));
     }
 
-    private void getEventById(int id) {
-        progressDialog.show();
+    @SuppressWarnings("deprecation")
+    private void getEventById(final Event event) {
+        tvDate.setText(new SimpleDateFormat("MMM", Locale.US).format(event.getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(event.getEventDate())));
+        tvTitle.setText(event.getTitle());
+        tvFullDate.setText(event.getEventDate().toLocaleString());
+        tvAdd.setText(event.getLocation());
+        tvCount.setText(String.valueOf(0));
 
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-        Call<Event> call = apiInterface.getEventById(id);
-        call.enqueue(new Callback<Event>() {
-            @Override
-            public void onResponse(@NonNull Call<Event> call, @NonNull final Response<Event> response) {
-                if (response.isSuccessful()) {
-                    dismissDialog();
-
-                    event = response.body();
-
-                    tvDate.setText(new SimpleDateFormat("MMM", Locale.US).format(response.body().getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(response.body().getEventDate())));
-                    tvTitle.setText(response.body().getTitle());
-                    tvFullDate.setText(response.body().getEventDate().toLocaleString());
-                    tvAdd.setText(response.body().getLocation());
-                    tvCount.setText(String.valueOf(response.body().getInvitations().size()));
-
-                    switch (from) {
-                        case 0:
-                            if (response.body().getIsPrivate()) {
-                                ivPrivate.setVisibility(View.VISIBLE);
-                            } else {
-                                ivPrivate.setVisibility(View.GONE);
-                            }
-                            ivMore.setVisibility(View.GONE);
-                            tvAccept.setVisibility(View.VISIBLE);
-                            tvDecline.setVisibility(View.VISIBLE);
-                            break;
-                        case 1:
-                            if (response.body().getIsPrivate()) {
-                                ivPrivate.setVisibility(View.VISIBLE);
-                            } else {
-                                ivPrivate.setVisibility(View.GONE);
-                            }
-                            ivMore.setVisibility(View.VISIBLE);
-                            tvAccept.setVisibility(View.GONE);
-                            tvDecline.setVisibility(View.VISIBLE);
-                            break;
-                        case 2:
-                            if (response.body().getIsPrivate()) {
-                                ivPrivate.setVisibility(View.VISIBLE);
-                            } else {
-                                ivPrivate.setVisibility(View.GONE);
-                            }
-                            ivMore.setVisibility(View.VISIBLE);
-                            tvAccept.setVisibility(View.GONE);
-                            tvDecline.setVisibility(View.VISIBLE);
-                            break;
-                    }
-
-                    tvAccept.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            for (int i = 0; i < response.body().getInvitations().size(); i++) {
-                                if (response.body().getInvitations().get(i).getInvitee().getUserId() == 1) {
-                                    acceptEvent(response.body().getEventId(), response.body().getInvitations().get(i).getInvitationId(), true);
-                                }
-                            }
-                        }
-                    });
-
-                    tvDecline.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            for (int i = 0; i < response.body().getInvitations().size(); i++) {
-                                if (response.body().getInvitations().get(i).getInvitee().getUserId() == 1) {
-                                    acceptEvent(response.body().getEventId(), response.body().getInvitations().get(i).getInvitationId(), false);
-                                }
-                            }
-                        }
-                    });
-
-                    viewPager.setAdapter(new EventDetailAdapter(getSupportFragmentManager(), from));
-                    tabLayout.setupWithViewPager(viewPager);
-
-                    ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
-                    for (int j = 0; j < vg.getChildCount(); j++) {
-                        ViewGroup vgTab = (ViewGroup) vg.getChildAt(j);
-                        int tabChildCount = vgTab.getChildCount();
-                        for (int i = 0; i < tabChildCount; i++) {
-                            View tabViewChild = vgTab.getChildAt(i);
-                            if (tabViewChild instanceof TextView) {
-                                ((TextView) tabViewChild).setTypeface(utility.getFont());
-                            }
-                        }
-                    }
+        switch (from) {
+            case 0:
+                if (event.getIsPrivate()) {
+                    ivPrivate.setVisibility(View.VISIBLE);
                 } else {
-                    dismissDialog();
-                    utility.showMsg(response.message());
+                    ivPrivate.setVisibility(View.GONE);
+                }
+                ivMore.setVisibility(View.GONE);
+                ivAccept.setVisibility(View.VISIBLE);
+                ivDecline.setVisibility(View.VISIBLE);
+                break;
+            case 1:
+                if (event.getIsPrivate()) {
+                    ivPrivate.setVisibility(View.VISIBLE);
+                } else {
+                    ivPrivate.setVisibility(View.GONE);
+                }
+                ivMore.setVisibility(View.VISIBLE);
+                ivAccept.setVisibility(View.GONE);
+                ivDecline.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                if (event.getIsPrivate()) {
+                    ivPrivate.setVisibility(View.VISIBLE);
+                } else {
+                    ivPrivate.setVisibility(View.GONE);
+                }
+                ivAccept.setVisibility(View.GONE);
+                ivMore.setVisibility(View.VISIBLE);
+                ivDecline.setVisibility(View.VISIBLE);
+                break;
+        }
+
+        ivAccept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for (int i = 0; i < event.getInvitations().size(); i++) {
+                    if (event.getInvitations().get(i).getInvitee().getUserId() == 1) {
+                        acceptEvent(event.getEventId(), event.getInvitations().get(i).getInvitationId(), true);
+                    }
                 }
             }
+        });
 
+        ivDecline.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
-                dismissDialog();
-                utility.showMsg(t.getMessage());
+            public void onClick(View v) {
+                switch (from) {
+                    case 0:
+                        declineDialog = utility.showAlert("Are you sure want to decline this event?", false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                for (int i = 0; i < event.getInvitations().size(); i++) {
+                                    if (event.getInvitations().get(i).getInvitee().getUserId() == 1) {
+                                        acceptEvent(event.getEventId(), event.getInvitations().get(i).getInvitationId(), false);
+                                    }
+                                }
+                            }
+                        }, View.VISIBLE, "No", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View V) {
+                                declineDialog.dismiss();
+                            }
+                        });
+                        declineDialog.show();
+                        break;
+                    case 1:
+                        declineDialog = utility.showAlert("Are you sure want to decline this event?", false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                for (int i = 0; i < event.getInvitations().size(); i++) {
+                                    if (event.getInvitations().get(i).getInvitee().getUserId() == 1) {
+                                        acceptEvent(event.getEventId(), event.getInvitations().get(i).getInvitationId(), false);
+                                    }
+                                }
+                            }
+                        }, View.VISIBLE, "No", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View V) {
+                                declineDialog.dismiss();
+                            }
+                        });
+                        declineDialog.show();
+                        break;
+                    case 2:
+                        cancelDialog = utility.showAlert("Are you sure want to cancel this event?", false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                cancelEvent(event.getEventId());
+                            }
+                        }, View.VISIBLE, "No", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View V) {
+                                cancelDialog.dismiss();
+                            }
+                        });
+                        cancelDialog.show();
+                        break;
+                }
             }
         });
+
+        viewPager.setAdapter(new EventDetailAdapter(getSupportFragmentManager(), from, event));
+        tabLayout.setupWithViewPager(viewPager);
+
+        ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
+        for (int j = 0; j < vg.getChildCount(); j++) {
+            ViewGroup vgTab = (ViewGroup) vg.getChildAt(j);
+            int tabChildCount = vgTab.getChildCount();
+            for (int i = 0; i < tabChildCount; i++) {
+                View tabViewChild = vgTab.getChildAt(i);
+                if (tabViewChild instanceof TextView) {
+                    ((TextView) tabViewChild).setTypeface(utility.getFont());
+                }
+            }
+        }
     }
 
     @Override
@@ -269,20 +299,14 @@ public class EventActivity extends AppCompatActivity {
                 return true;
             case R.id.dea_menu_edit:
                 Intent intent = new Intent(EventActivity.this, CreateEventActivity.class);
-                intent.putExtra(getResources().getString(R.string.cea_from), from);
-                intent.putExtra(getResources().getString(R.string.cea_event_id), event.getEventId());
+                Bundle bundle = new Bundle();
+                bundle.putString(getResources().getString(R.string.from), getResources().getString(R.string.from_edit));
+                bundle.putSerializable(getResources().getString(R.string.event), event);
+                intent.putExtras(bundle);
                 startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void dismissDialog() {
-        if (progressDialog != null) {
-            if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
         }
     }
 
@@ -296,6 +320,14 @@ public class EventActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
                 if (response.isSuccessful()) {
                     finish();
+                    switch (from) {
+                        case 0:
+                            LocalBroadcastManager.getInstance(EventActivity.this).sendBroadcast(new Intent("PendingEvent"));
+                            break;
+                        case 1:
+                            LocalBroadcastManager.getInstance(EventActivity.this).sendBroadcast(new Intent("UpcomingEvent"));
+                            break;
+                    }
                 } else {
                     progressDialog.dismiss();
                     utility.showMsg(response.message());
@@ -311,11 +343,13 @@ public class EventActivity extends AppCompatActivity {
     }
 
     private class EventDetailAdapter extends FragmentPagerAdapter {
-        int from;
+        private Event event;
+        private int from;
 
-        EventDetailAdapter(FragmentManager fm, int from) {
+        EventDetailAdapter(FragmentManager fm, int from, Event event) {
             super(fm);
             this.from = from;
+            this.event = event;
         }
 
         @Override
@@ -366,18 +400,18 @@ public class EventActivity extends AppCompatActivity {
             switch (from) {
                 case 0:
                     if (position == 0) {
-                        return getResources().getString(R.string.dea_other);
+                        return " ";
                     }
                 case 1:
                     if (position == 0) {
-                        return getResources().getString(R.string.dea_other);
+                        return " ";
                     }
                     break;
                 case 2:
                     if (position == 0) {
-                        return getResources().getString(R.string.dea_accept);
+                        return getResources().getString(R.string.dea_accept).concat("(").concat(String.valueOf(event.getInvitations().size())).concat(")");
                     } else if (position == 1) {
-                        return getResources().getString(R.string.dea_pending);
+                        return getResources().getString(R.string.dea_pending).concat("(").concat(String.valueOf(event.getInvitations().size())).concat(")");
                     }
                     break;
             }
@@ -387,7 +421,35 @@ public class EventActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         finish();
+    }
+
+    private void cancelEvent(int id) {
+        progressDialog.show();
+
+        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        Call<ResultEvents> call = apiInterface.deleteEvent(id);
+        call.enqueue(new Callback<ResultEvents>() {
+            @Override
+            public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
+                if (response.isSuccessful()) {
+                    cancelDialog.dismiss();
+                    utility.dismissDialog(progressDialog);
+                    finish();
+                    LocalBroadcastManager.getInstance(EventActivity.this).sendBroadcast(new Intent("MyEventPage"));
+                } else {
+                    cancelDialog.dismiss();
+                    utility.dismissDialog(progressDialog);
+                    utility.showMsg(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
+                cancelDialog.dismiss();
+                utility.dismissDialog(progressDialog);
+                utility.showMsg(t.getMessage());
+            }
+        });
     }
 }

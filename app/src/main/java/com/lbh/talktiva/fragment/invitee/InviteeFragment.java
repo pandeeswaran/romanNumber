@@ -28,7 +28,6 @@ public class InviteeFragment extends Fragment {
     RecyclerView recyclerView;
 
     private List<Invitations> invitationsList;
-    private Utility utility;
 
     public InviteeFragment() {
     }
@@ -39,7 +38,7 @@ public class InviteeFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_invitee, container, false);
     }
 
@@ -47,7 +46,6 @@ public class InviteeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        utility = new Utility(getActivity());
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
