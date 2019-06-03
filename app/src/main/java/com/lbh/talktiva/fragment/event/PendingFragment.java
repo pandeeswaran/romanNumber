@@ -49,7 +49,7 @@ public class PendingFragment extends Fragment {
     @BindView(R.id.pf_rv)
     RecyclerView recyclerView;
 
-    private Dialog progressDialog;
+    private Dialog progressDialog, internetDialog;
     private Utility utility;
 
     public PendingFragment() {
@@ -73,11 +73,6 @@ public class PendingFragment extends Fragment {
         utility = new Utility(getActivity());
         progressDialog = utility.showProgress();
         ButterKnife.bind(this, view);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
         setData();
     }
 
@@ -159,14 +154,44 @@ public class PendingFragment extends Fragment {
                     });
                 } else {
                     utility.dismissDialog(progressDialog);
-                    utility.showMsg(response.message());
+                    if (response.code() >= 300 && response.code() < 400) {
+                        internetDialog = utility.showError(getResources().getString(R.string.network_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                internetDialog.dismiss();
+                            }
+                        });
+                    } else if (response.code() >= 400 && response.code() < 500) {
+                        internetDialog = utility.showError(getResources().getString(R.string.authentication_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                internetDialog.dismiss();
+                            }
+                        });
+                    } else if (response.code() >= 500) {
+                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                internetDialog.dismiss();
+                            }
+                        });
+                    }
+                    internetDialog.show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
                 utility.dismissDialog(progressDialog);
-                utility.showMsg(t.getMessage());
+                if (t.getMessage().equalsIgnoreCase("timeout")) {
+                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            internetDialog.dismiss();
+                        }
+                    });
+                    internetDialog.show();
+                }
             }
         });
     }

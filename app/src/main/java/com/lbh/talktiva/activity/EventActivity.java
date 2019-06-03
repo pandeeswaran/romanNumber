@@ -99,7 +99,7 @@ public class EventActivity extends AppCompatActivity {
     @BindView(R.id.ea_tv_other)
     TextView tvOther;
 
-    private Dialog progressDialog, cancelDialog, declineDialog;
+    private Dialog progressDialog, cancelDialog, declineDialog, internetDialog;
     private Utility utility;
     private Event event;
 
@@ -208,7 +208,7 @@ public class EventActivity extends AppCompatActivity {
             public void onClick(View v) {
                 switch (from) {
                     case 0:
-                        declineDialog = utility.showAlert("Are you sure want to decline this event?", false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                        declineDialog = utility.showAlert(getResources().getString(R.string.decline_msg), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 for (int i = 0; i < event.getInvitations().size(); i++) {
@@ -220,13 +220,13 @@ public class EventActivity extends AppCompatActivity {
                         }, View.VISIBLE, "No", new View.OnClickListener() {
                             @Override
                             public void onClick(View V) {
-                                declineDialog.dismiss();
+                                utility.dismissDialog(declineDialog);
                             }
                         });
                         declineDialog.show();
                         break;
                     case 1:
-                        declineDialog = utility.showAlert("Are you sure want to decline this event?", false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                        declineDialog = utility.showAlert(getResources().getString(R.string.decline_msg), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 for (int i = 0; i < event.getInvitations().size(); i++) {
@@ -238,13 +238,13 @@ public class EventActivity extends AppCompatActivity {
                         }, View.VISIBLE, "No", new View.OnClickListener() {
                             @Override
                             public void onClick(View V) {
-                                declineDialog.dismiss();
+                                utility.dismissDialog(declineDialog);
                             }
                         });
                         declineDialog.show();
                         break;
                     case 2:
-                        cancelDialog = utility.showAlert("Are you sure want to cancel this event?", false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                        cancelDialog = utility.showAlert(getResources().getString(R.string.cancel_msg), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 cancelEvent(event.getEventId());
@@ -252,7 +252,7 @@ public class EventActivity extends AppCompatActivity {
                         }, View.VISIBLE, "No", new View.OnClickListener() {
                             @Override
                             public void onClick(View V) {
-                                cancelDialog.dismiss();
+                                utility.dismissDialog(cancelDialog);
                             }
                         });
                         cancelDialog.show();
@@ -344,15 +344,45 @@ public class EventActivity extends AppCompatActivity {
                             break;
                     }
                 } else {
-                    progressDialog.dismiss();
-                    utility.showMsg(response.message());
+                    utility.dismissDialog(progressDialog);
+                    if (response.code() >= 300 && response.code() < 400) {
+                        internetDialog = utility.showError(getResources().getString(R.string.network_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                utility.dismissDialog(internetDialog);
+                            }
+                        });
+                    } else if (response.code() >= 400 && response.code() < 500) {
+                        internetDialog = utility.showError(getResources().getString(R.string.authentication_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                utility.dismissDialog(internetDialog);
+                            }
+                        });
+                    } else if (response.code() >= 500) {
+                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                utility.dismissDialog(internetDialog);
+                            }
+                        });
+                    }
+                    internetDialog.show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
-                progressDialog.dismiss();
-                utility.showMsg(t.getMessage());
+                utility.dismissDialog(progressDialog);
+                if (t.getMessage().equalsIgnoreCase("timeout")) {
+                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            utility.dismissDialog(internetDialog);
+                        }
+                    });
+                    internetDialog.show();
+                }
             }
         });
     }
@@ -450,22 +480,53 @@ public class EventActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
                 if (response.isSuccessful()) {
-                    cancelDialog.dismiss();
+                    utility.dismissDialog(cancelDialog);
                     utility.dismissDialog(progressDialog);
                     finish();
+                    utility.showMsg(getResources().getString(R.string.event_cancel_msg));
                     LocalBroadcastManager.getInstance(EventActivity.this).sendBroadcast(new Intent("MyEventPage"));
                 } else {
-                    cancelDialog.dismiss();
+                    utility.dismissDialog(cancelDialog);
                     utility.dismissDialog(progressDialog);
-                    utility.showMsg(response.message());
+                    if (response.code() >= 300 && response.code() < 400) {
+                        internetDialog = utility.showError(getResources().getString(R.string.network_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                utility.dismissDialog(internetDialog);
+                            }
+                        });
+                    } else if (response.code() >= 400 && response.code() < 500) {
+                        internetDialog = utility.showError(getResources().getString(R.string.authentication_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                utility.dismissDialog(internetDialog);
+                            }
+                        });
+                    } else if (response.code() >= 500) {
+                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                utility.dismissDialog(internetDialog);
+                            }
+                        });
+                    }
+                    internetDialog.show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
-                cancelDialog.dismiss();
+                utility.dismissDialog(cancelDialog);
                 utility.dismissDialog(progressDialog);
-                utility.showMsg(t.getMessage());
+                if (t.getMessage().equalsIgnoreCase("timeout")) {
+                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            utility.dismissDialog(internetDialog);
+                        }
+                    });
+                    internetDialog.show();
+                }
             }
         });
     }

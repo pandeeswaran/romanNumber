@@ -13,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.constraint.Constraints;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -172,6 +173,20 @@ public class Utility {
         }
     }
     //endregion
+
+    public Dialog showError(String msg, String action, View.OnClickListener clickListener) {
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_error);
+        dialog.setCancelable(false);
+        ((TextView) dialog.findViewById(R.id.de_tv)).setTypeface(getFont());
+        ((TextView) dialog.findViewById(R.id.de_tv)).setText(msg);
+        ((Button) dialog.findViewById(R.id.de_btn)).setTypeface(getFont());
+        ((Button) dialog.findViewById(R.id.de_btn)).setText(action);
+        dialog.findViewById(R.id.de_btn).setOnClickListener(clickListener);
+        Objects.requireNonNull(dialog.getWindow()).setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.MATCH_PARENT);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
+        return dialog;
+    }
 
     //region Toast Msg Show
     public void showMsg(int id) {

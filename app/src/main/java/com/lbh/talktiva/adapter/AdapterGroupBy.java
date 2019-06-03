@@ -60,6 +60,8 @@ public class AdapterGroupBy extends RecyclerView.Adapter<AdapterGroupBy.DateView
             dateViewHolder.textView.setText(activity.getResources().getString(R.string.event_later));
         }
 
+        
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         dateViewHolder.recyclerView.setLayoutManager(layoutManager);

@@ -10,10 +10,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -23,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.lbh.talktiva.R;
@@ -48,8 +47,10 @@ public class EventFragment extends Fragment {
     @BindView(R.id.ef_tab)
     TabLayout tabLayout;
 
-    @BindView(R.id.ef_vp)
-    ViewPager viewPager;
+    @BindView(R.id.ef_container)
+    FrameLayout frameLayout;
+
+    public static final String TAG = "EventFragment";
 
     private BroadcastReceiver receiver;
     private Utility utility;
@@ -60,7 +61,7 @@ public class EventFragment extends Fragment {
     protected BroadcastReceiver r0 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            viewPager.setCurrentItem(0);
+            Objects.requireNonNull(tabLayout.getTabAt(0)).select();
             LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).sendBroadcast(new Intent("Refresh0"));
         }
     };
@@ -68,7 +69,7 @@ public class EventFragment extends Fragment {
     protected BroadcastReceiver r1 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            viewPager.setCurrentItem(1);
+            Objects.requireNonNull(tabLayout.getTabAt(1)).select();
             LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).sendBroadcast(new Intent("Refresh1"));
         }
     };
@@ -76,7 +77,7 @@ public class EventFragment extends Fragment {
     protected BroadcastReceiver r2 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            viewPager.setCurrentItem(2);
+            Objects.requireNonNull(tabLayout.getTabAt(2)).select();
             LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).sendBroadcast(new Intent("Refresh2"));
         }
     };
@@ -131,8 +132,34 @@ public class EventFragment extends Fragment {
 
         utility.setTitleText(toolbar, R.id.ef_toolbar_tv_title, getActivity().getResources().getString(R.string.ha_bnm_title_event));
 
-        viewPager.setAdapter(new EventPagerAdapter(getChildFragmentManager()));
-        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_pending)), 0);
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_upcoming)), 1);
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_yours)), 2);
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        loadFragment(new PendingFragment());
+                        break;
+                    case 1:
+                        loadFragment(new UpcomingFragment());
+                        break;
+                    case 2:
+                        loadFragment(new YourFragment());
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
 
         ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
         for (int j = 0; j < vg.getChildCount(); j++) {
@@ -145,6 +172,17 @@ public class EventFragment extends Fragment {
                 }
             }
         }
+
+        if (tabLayout.getTabAt(0).isSelected()) {
+            loadFragment(new PendingFragment());
+        }
+    }
+
+    private void loadFragment(Fragment fragment) {
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.ef_container, fragment);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.commit();
     }
 
     @Override
@@ -168,44 +206,5 @@ public class EventFragment extends Fragment {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private class EventPagerAdapter extends FragmentPagerAdapter {
-
-        EventPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return new PendingFragment();
-                case 1:
-                    return new UpcomingFragment();
-                case 2:
-                    return new YourFragment();
-            }
-            return null;
-        }
-
-        @Override
-        public int getCount() {
-            return 3;
-        }
-
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return getResources().getString(R.string.ef_tab_pending);
-                case 1:
-                    return getResources().getString(R.string.ef_tab_upcoming);
-                case 2:
-                    return getResources().getString(R.string.ef_tab_yours);
-            }
-            return super.getPageTitle(position);
-        }
     }
 }

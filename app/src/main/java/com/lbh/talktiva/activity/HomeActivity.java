@@ -3,7 +3,6 @@ package com.lbh.talktiva.activity;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -85,19 +84,24 @@ public class HomeActivity extends AppCompatActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.ha_bnm_home:
-                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home)));
+                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home)), getResources().getString(R.string.ha_bnm_title_home));
                             return true;
                         case R.id.ha_bnm_chat:
-                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat)));
+                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat)), getResources().getString(R.string.ha_bnm_title_chat));
                             return true;
                         case R.id.ha_bnm_add:
                             return true;
                         case R.id.ha_bnm_notification:
-                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications)));
+                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications)), getResources().getString(R.string.ha_bnm_title_notifications));
                             return true;
                         case R.id.ha_bnm_event:
-                            loadFragment(new EventFragment());
-                            return true;
+                            EventFragment myFragment = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
+                            if (myFragment != null && myFragment.isVisible()) {
+                                return false;
+                            } else {
+                                loadFragment(new EventFragment(), EventFragment.TAG);
+                                return true;
+                            }
                     }
                     return false;
                 }
@@ -138,7 +142,7 @@ public class HomeActivity extends AppCompatActivity {
                     registerNetworkBroadcast();
                     //endregion
                 } else {
-                    dialogPermission = utility.showAlert("Required permissions are not granted, ask again?", false, View.VISIBLE,"Yes", new View.OnClickListener() {
+                    dialogPermission = utility.showAlert("Required permissions are not granted, ask again?", false, View.VISIBLE, "Yes", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             for (int i = 0; deniedPermissions.size() > i; i++) {
@@ -186,12 +190,12 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        dialogClose = utility.showAlert("Are you sure you want to exit?", true, View.VISIBLE,"Yes", new View.OnClickListener() {
+        dialogClose = utility.showAlert("Are you sure you want to exit?", true, View.VISIBLE, "Yes", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finishAffinity();
             }
-        }, View.VISIBLE,"No", new View.OnClickListener() {
+        }, View.VISIBLE, "No", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialogClose.dismiss();
@@ -200,9 +204,9 @@ public class HomeActivity extends AppCompatActivity {
         dialogClose.show();
     }
 
-    private void loadFragment(Fragment fragment) {
+    private void loadFragment(Fragment fragment, String tag) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.ha_fl_container, fragment);
+        transaction.replace(R.id.ha_fl_container, fragment, tag);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         transaction.commit();
     }
