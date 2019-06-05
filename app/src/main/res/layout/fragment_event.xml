@@ -37,7 +37,7 @@
             app:tabGravity="fill"
             app:tabIndicator="@drawable/custom_indicator"
             app:tabMode="fixed"
-            app:tabRippleColor="@color/colorPrimary"
+            app:tabRippleColor="@color/light_grey"
             app:tabSelectedTextColor="@color/colorPrimary"
             app:tabTextAppearance="?android:textAppearanceSmall"
             app:tabTextColor="@color/grey" />
