@@ -1,5 +1,6 @@
 package com.talktiva.pilot.fragment.event;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,7 +28,6 @@ import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
 import com.talktiva.pilot.results.ResultEvents;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -90,33 +90,40 @@ public class PendingFragment extends Fragment {
                     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                     recyclerView.setLayoutManager(layoutManager);
 
-                    HashMap<String, List<Event>> groupByEvents = new HashMap<>();
+                    @SuppressLint("UseSparseArrays") HashMap<Integer, List<Event>> groupByEvents = new HashMap<>();
                     for (Event event : Objects.requireNonNull(response.body()).getEvents()) {
                         Date curDate = Calendar.getInstance().getTime();
-                        String string;
+                        int day;
                         if (curDate.getDate() == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
-                            string = getResources().getString(R.string.event_today);
-                        } else if (curDate.getDate() == (event.getEventDate().getDate() + 1) && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
-                            string = getResources().getString(R.string.event_tomorrow);
+                            day = 0;
+                        } else if ((curDate.getDate() + 1) == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
+                            day = 1;
                         } else {
-                            string = getResources().getString(R.string.event_later);
+                            day = 2;
                         }
-                        if (groupByEvents.containsKey(string)) {
-                            Objects.requireNonNull(groupByEvents.get(string)).add(event);
+                        if (groupByEvents.containsKey(day)) {
+                            Objects.requireNonNull(groupByEvents.get(day)).add(event);
                         } else {
                             List<Event> list = new ArrayList<>();
                             list.add(event);
-                            groupByEvents.put(string, list);
+                            groupByEvents.put(day, list);
                         }
                     }
 
                     List<GroupByEvent> groupByEventList = new ArrayList<>();
-                    for (String day : groupByEvents.keySet()) {
+                    for (Integer day : groupByEvents.keySet()) {
                         GroupByEvent groupByEvent = new GroupByEvent();
                         groupByEvent.setDay(day);
                         groupByEvent.setEvents(Objects.requireNonNull(groupByEvents.get(day)));
                         groupByEventList.add(groupByEvent);
                     }
+
+                    Collections.sort(groupByEventList, new Comparator<GroupByEvent>() {
+                        @Override
+                        public int compare(GroupByEvent o1, GroupByEvent o2) {
+                            return o1.getDay().compareTo(o2.getDay());
+                        }
+                    });
 
                     AdapterGroupBy adapterGroupBy = new AdapterGroupBy(getActivity(), groupByEventList, 0);
                     recyclerView.setAdapter(adapterGroupBy);

@@ -43,11 +43,21 @@ public class AdapterGroupBy extends RecyclerView.Adapter<AdapterGroupBy.DateView
         return new DateViewHolder(LayoutInflater.from(activity).inflate(R.layout.event_item_day_layout, viewGroup, false));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onBindViewHolder(@NonNull DateViewHolder dateViewHolder, int i) {
         dateViewHolder.textView.setTypeface(utility.getFont());
-        dateViewHolder.textView.setText(groupByEvents.get(i).getDay());
+
+        switch (groupByEvents.get(i).getDay()) {
+            case 0:
+                dateViewHolder.textView.setText(activity.getResources().getString(R.string.event_today));
+                break;
+            case 1:
+                dateViewHolder.textView.setText(activity.getResources().getString(R.string.event_tomorrow));
+                break;
+            case 2:
+                dateViewHolder.textView.setText(activity.getResources().getString(R.string.event_later));
+                break;
+        }
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
