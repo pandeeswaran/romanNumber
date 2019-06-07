@@ -65,6 +65,12 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
             eventViewHolder.ivPrivate.setVisibility(View.GONE);
         }
 
+        if (events.get(position).getCanInviteGuests()) {
+            eventViewHolder.ivShare.setVisibility(View.VISIBLE);
+        } else {
+            eventViewHolder.ivShare.setVisibility(View.GONE);
+        }
+
         switch (from) {
             case 0:
                 eventViewHolder.ivMore.setVisibility(View.GONE);

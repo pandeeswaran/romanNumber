@@ -13,8 +13,6 @@ import com.talktiva.pilot.R;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.GroupByEvent;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -49,17 +47,7 @@ public class AdapterGroupBy extends RecyclerView.Adapter<AdapterGroupBy.DateView
     @Override
     public void onBindViewHolder(@NonNull DateViewHolder dateViewHolder, int i) {
         dateViewHolder.textView.setTypeface(utility.getFont());
-
-        Date curDate = Calendar.getInstance().getTime();
-
-        if (groupByEvents.get(i).getDate().getDate() == curDate.getDate() && groupByEvents.get(i).getDate().getMonth() == curDate.getMonth() && groupByEvents.get(i).getDate().getYear() == curDate.getYear()) {
-            dateViewHolder.textView.setText(activity.getResources().getString(R.string.event_today));
-        } else if (groupByEvents.get(i).getDate().getDate() == (curDate.getDate() + 1) && groupByEvents.get(i).getDate().getMonth() == curDate.getMonth() && groupByEvents.get(i).getDate().getYear() == curDate.getYear()) {
-            dateViewHolder.textView.setText(activity.getResources().getString(R.string.event_tomorrow));
-        } else {
-            dateViewHolder.textView.setText(activity.getResources().getString(R.string.event_later));
-        }
-
+        dateViewHolder.textView.setText(groupByEvents.get(i).getDay());
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);

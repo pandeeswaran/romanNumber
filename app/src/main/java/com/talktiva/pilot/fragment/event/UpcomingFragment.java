@@ -30,6 +30,7 @@ import com.talktiva.pilot.results.ResultEvents;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -75,6 +76,7 @@ public class UpcomingFragment extends Fragment {
         setData();
     }
 
+    @SuppressWarnings("deprecation")
     private void setData() {
         progressDialog.show();
 
@@ -90,36 +92,33 @@ public class UpcomingFragment extends Fragment {
                     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                     recyclerView.setLayoutManager(layoutManager);
 
-                    HashMap<Date, List<Event>> groupByEvents = new HashMap<>();
+                    HashMap<String, List<Event>> groupByEvents = new HashMap<>();
                     for (Event event : Objects.requireNonNull(response.body()).getEvents()) {
-                        try {
-                            Date date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).parse(new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(event.getEventDate()));
-                            if (groupByEvents.containsKey(date)) {
-                                Objects.requireNonNull(groupByEvents.get(date)).add(event);
-                            } else {
-                                List<Event> list = new ArrayList<>();
-                                list.add(event);
-                                groupByEvents.put(date, list);
-                            }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                        Date curDate = Calendar.getInstance().getTime();
+                        String string;
+                        if (curDate.getDate() == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
+                            string = getResources().getString(R.string.event_today);
+                        } else if (curDate.getDate() == (event.getEventDate().getDate() + 1) && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
+                            string = getResources().getString(R.string.event_tomorrow);
+                        } else {
+                            string = getResources().getString(R.string.event_later);
+                        }
+                        if (groupByEvents.containsKey(string)) {
+                            Objects.requireNonNull(groupByEvents.get(string)).add(event);
+                        } else {
+                            List<Event> list = new ArrayList<>();
+                            list.add(event);
+                            groupByEvents.put(string, list);
                         }
                     }
 
                     List<GroupByEvent> groupByEventList = new ArrayList<>();
-                    for (Date date : groupByEvents.keySet()) {
+                    for (String day : groupByEvents.keySet()) {
                         GroupByEvent groupByEvent = new GroupByEvent();
-                        groupByEvent.setDate(date);
-                        groupByEvent.setEvents(Objects.requireNonNull(groupByEvents.get(date)));
+                        groupByEvent.setDay(day);
+                        groupByEvent.setEvents(Objects.requireNonNull(groupByEvents.get(day)));
                         groupByEventList.add(groupByEvent);
                     }
-
-                    Collections.sort(groupByEventList, new Comparator<GroupByEvent>() {
-                        @Override
-                        public int compare(GroupByEvent lhs, GroupByEvent rhs) {
-                            return lhs.getDate().compareTo(rhs.getDate());
-                        }
-                    });
 
                     AdapterGroupBy adapterGroupBy = new AdapterGroupBy(getActivity(), groupByEventList, 1);
                     recyclerView.setAdapter(adapterGroupBy);

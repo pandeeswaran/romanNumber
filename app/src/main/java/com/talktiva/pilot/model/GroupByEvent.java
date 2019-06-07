@@ -5,15 +5,15 @@ import java.util.List;
 
 public class GroupByEvent {
 
-    private Date date;
+    private String day;
     private List<Event> events;
 
-    public Date getDate() {
-        return date;
+    public String getDay() {
+        return day;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setDay(String day) {
+        this.day = day;
     }
 
     public List<Event> getEvents() {

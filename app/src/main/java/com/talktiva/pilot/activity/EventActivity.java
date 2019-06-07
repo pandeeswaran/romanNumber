@@ -1,7 +1,10 @@
 package com.talktiva.pilot.activity;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -105,6 +108,13 @@ public class EventActivity extends AppCompatActivity {
     private int from, eventId;
     private Event event;
 
+    protected BroadcastReceiver r = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            getEventById(eventId);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,8 +123,6 @@ public class EventActivity extends AppCompatActivity {
         progressDialog = utility.showProgress();
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-
-        tvOther.setTypeface(utility.getFont());
 
         utility.setTitleText(toolbar, R.id.ea_toolbar_tv_title, getResources().getString(R.string.ea_title));
 
@@ -128,27 +136,12 @@ public class EventActivity extends AppCompatActivity {
         tvFullDate.setTypeface(utility.getFont());
         tvAdd.setTypeface(utility.getFont());
         tvCount.setTypeface(utility.getFont(), Typeface.BOLD);
+        tvOther.setTypeface(utility.getFont());
 
         Bundle bundle = getIntent().getExtras();
         from = bundle != null ? bundle.getInt(getResources().getString(R.string.from)) : 0;
         Event event = (Event) (bundle != null ? bundle.getSerializable(getResources().getString(R.string.event)) : null);
         eventId = event.getEventId();
-
-        switch (from) {
-            case 0:
-                constraintLayout.setVisibility(View.VISIBLE);
-                tabLayout.setVisibility(View.GONE);
-                break;
-            case 1:
-                constraintLayout.setVisibility(View.VISIBLE);
-                tabLayout.setVisibility(View.GONE);
-                break;
-            case 2:
-                constraintLayout.setVisibility(View.GONE);
-                tabLayout.setVisibility(View.VISIBLE);
-                break;
-        }
-
         getEventById(eventId);
     }
 
@@ -167,6 +160,18 @@ public class EventActivity extends AppCompatActivity {
         }
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(EventActivity.this).registerReceiver(r, new IntentFilter("ViewEvent"));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(EventActivity.this).unregisterReceiver(r);
     }
 
     @Override
@@ -303,45 +308,56 @@ public class EventActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     event = response.body();
 
-                    tvDate.setText(new SimpleDateFormat("MMM", Locale.US).format(event.getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(event.getEventDate())));
-                    tvTitle.setText(event.getTitle());
-                    tvFullDate.setText(event.getEventDate().toLocaleString());
-                    tvAdd.setText(event.getCreatorFirstName().concat(" ").concat(event.getCreatorLasttName()).concat(" | ").concat(event.getLocation()));
-                    tvCount.setText(String.valueOf(0));
+                    List<Invitation> acceptedInvitations, pendingInvitations;
+                    acceptedInvitations = new ArrayList<>();
+                    pendingInvitations = new ArrayList<>();
+
+                    for (int j = 0; j < event.getInvitations().size(); j++) {
+                        if (event.getInvitations().get(j).getStatus().equalsIgnoreCase("pending")) {
+                            pendingInvitations.add(event.getInvitations().get(j));
+                        } else {
+                            acceptedInvitations.add(event.getInvitations().get(j));
+                        }
+                    }
+
+                    if (event.getIsPrivate()) {
+                        ivPrivate.setVisibility(View.VISIBLE);
+                    } else {
+                        ivPrivate.setVisibility(View.GONE);
+                    }
+
+                    if (event.getCanInviteGuests()) {
+                        ivShare.setVisibility(View.VISIBLE);
+                    } else {
+                        ivShare.setVisibility(View.GONE);
+                    }
 
                     switch (from) {
                         case 0:
-                            if (event.getIsPrivate()) {
-                                ivPrivate.setVisibility(View.VISIBLE);
-                            } else {
-                                ivPrivate.setVisibility(View.GONE);
-                            }
                             ivChat.setVisibility(View.VISIBLE);
                             ivMore.setVisibility(View.GONE);
                             ivAccept.setVisibility(View.VISIBLE);
                             ivDecline.setVisibility(View.VISIBLE);
+                            tvOther.setText(getResources().getString(R.string.dea_accept).concat(" (").concat(String.valueOf(acceptedInvitations.size())).concat(")"));
+                            constraintLayout.setVisibility(View.VISIBLE);
+                            tabLayout.setVisibility(View.GONE);
                             break;
                         case 1:
-                            if (event.getIsPrivate()) {
-                                ivPrivate.setVisibility(View.VISIBLE);
-                            } else {
-                                ivPrivate.setVisibility(View.GONE);
-                            }
                             ivChat.setVisibility(View.VISIBLE);
                             ivMore.setVisibility(View.VISIBLE);
                             ivAccept.setVisibility(View.GONE);
                             ivDecline.setVisibility(View.VISIBLE);
+                            tvOther.setText(getResources().getString(R.string.dea_accept).concat(" (").concat(String.valueOf(acceptedInvitations.size())).concat(")"));
+                            constraintLayout.setVisibility(View.VISIBLE);
+                            tabLayout.setVisibility(View.GONE);
                             break;
                         case 2:
-                            if (event.getIsPrivate()) {
-                                ivPrivate.setVisibility(View.VISIBLE);
-                            } else {
-                                ivPrivate.setVisibility(View.GONE);
-                            }
                             ivChat.setVisibility(View.GONE);
-                            ivAccept.setVisibility(View.GONE);
                             ivMore.setVisibility(View.VISIBLE);
+                            ivAccept.setVisibility(View.GONE);
                             ivDecline.setVisibility(View.VISIBLE);
+                            constraintLayout.setVisibility(View.GONE);
+                            tabLayout.setVisibility(View.VISIBLE);
                             break;
                     }
 
@@ -402,18 +418,6 @@ public class EventActivity extends AppCompatActivity {
                         }
                     });
 
-                    List<Invitation> acceptedInvitations, pendingInvitations;
-                    acceptedInvitations = new ArrayList<>();
-                    pendingInvitations = new ArrayList<>();
-
-                    for (int j = 0; j < event.getInvitations().size(); j++) {
-                        if (event.getInvitations().get(j).getStatus().equalsIgnoreCase("pending")) {
-                            pendingInvitations.add(event.getInvitations().get(j));
-                        } else {
-                            acceptedInvitations.add(event.getInvitations().get(j));
-                        }
-                    }
-
                     viewPager.setAdapter(new EventDetailAdapter(getSupportFragmentManager(), from, acceptedInvitations, pendingInvitations));
                     tabLayout.setupWithViewPager(viewPager);
 
@@ -428,6 +432,12 @@ public class EventActivity extends AppCompatActivity {
                             }
                         }
                     }
+
+                    tvDate.setText(new SimpleDateFormat("MMM", Locale.US).format(event.getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(event.getEventDate())));
+                    tvTitle.setText(event.getTitle());
+                    tvFullDate.setText(event.getEventDate().toLocaleString());
+                    tvAdd.setText(event.getCreatorFirstName().concat(" ").concat(event.getCreatorLasttName()).concat(" | ").concat(event.getLocation()));
+                    tvCount.setText(String.valueOf(event.getLikeCount()));
                     utility.dismissDialog(progressDialog);
                 } else {
                     utility.dismissDialog(progressDialog);
@@ -531,9 +541,9 @@ public class EventActivity extends AppCompatActivity {
                     break;
                 case 2:
                     if (position == 0) {
-                        return getResources().getString(R.string.dea_accept).concat("(").concat(String.valueOf(acceptedInvitations.size())).concat(")");
+                        return getResources().getString(R.string.dea_accept).concat(" (").concat(String.valueOf(acceptedInvitations.size())).concat(")");
                     } else if (position == 1) {
-                        return getResources().getString(R.string.dea_pending).concat("(").concat(String.valueOf(pendingInvitations.size())).concat(")");
+                        return getResources().getString(R.string.dea_pending).concat(" (").concat(String.valueOf(pendingInvitations.size())).concat(")");
                     }
                     break;
             }

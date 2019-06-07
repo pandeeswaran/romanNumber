@@ -11,8 +11,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,7 +44,6 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,11 +58,20 @@ public class CreateEventActivity extends AppCompatActivity {
     @BindView(R.id.cea_et_name)
     EditText etName;
 
+    @BindView(R.id.cea_tv_name)
+    TextView tvName;
+
     @BindView(R.id.cea_et_date)
     EditText etDate;
 
+    @BindView(R.id.cea_tv_date)
+    TextView tvDate;
+
     @BindView(R.id.cea_et_location)
     EditText etLocation;
+
+    @BindView(R.id.cea_tv_location)
+    TextView tvLocation;
 
     @BindView(R.id.cea_tv_private)
     TextView tvPrivate;
@@ -84,20 +94,18 @@ public class CreateEventActivity extends AppCompatActivity {
     @BindView(R.id.cea_tv_count)
     TextView tvCount;
 
-    private Dialog progressDialog, internetDialog;
+    private Dialog progressDialog, internetDialog, errorDialog;
     private Utility utility;
     private Event curEvent;
 
     private Calendar currentDate, newDate;
 
-    private boolean canGuest, isPrivate;
     private String from;
     private int count = 0;
 
     private List<Invitation> invitations;
     private Invitation invitation;
-
-    private int eventId;
+    private MenuItem menuItem;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -111,7 +119,7 @@ public class CreateEventActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        toolbar.setNavigationIcon(R.drawable.ic_back);
+        toolbar.setNavigationIcon(R.drawable.ic_cancel);
 
         progressDialog = utility.showProgress();
 
@@ -123,12 +131,12 @@ public class CreateEventActivity extends AppCompatActivity {
         tvInvitee.setTypeface(utility.getFont());
         tvCountFig.setTypeface(utility.getFont(), Typeface.BOLD);
         tvCount.setTypeface(utility.getFont());
+        tvName.setTypeface(utility.getFont());
+        tvDate.setTypeface(utility.getFont());
+        tvLocation.setTypeface(utility.getFont());
 
         Bundle bundle = getIntent().getExtras();
         from = bundle != null ? bundle.getString(getResources().getString(R.string.from)) : null;
-
-        swCanGuest.setChecked(false);
-        swPrivate.setChecked(true);
 
         switch (from) {
             case "new":
@@ -189,15 +197,72 @@ public class CreateEventActivity extends AppCompatActivity {
                 }
             }
         });
+
+        etName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().trim().length() > 0) {
+                    tvName.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        etDate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().trim().length() > 0) {
+                    tvDate.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        etLocation.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().trim().length() > 0) {
+                    tvLocation.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.create_event_menu, menu);
-        MenuItem item = menu.findItem(R.id.cea_menu_save);
-        SpannableString mNewTitle = new SpannableString(item.getTitle());
+        menuItem = menu.findItem(R.id.cea_menu_save);
+        SpannableString mNewTitle = new SpannableString(menuItem.getTitle());
         mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFont()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        item.setTitle(mNewTitle);
+        menuItem.setTitle(mNewTitle);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -212,41 +277,27 @@ public class CreateEventActivity extends AppCompatActivity {
                 if (etName != null && etName.getText().toString().trim().length() != 0) {
                     if (etDate != null && etDate.getText().toString().trim().length() != 0) {
                         if (etLocation != null && etLocation.getText().toString().trim().length() != 0) {
-                            if (invitations != null && invitations.size() != 0) {
-                                switch (from) {
-                                    case "new":
-                                        createEvent();
-                                        return true;
-                                    case "edit":
-                                        updateEvent(curEvent.getEventId());
-                                        return true;
-                                }
-                            } else {
-                                utility.showMsg(getResources().getString(R.string.val_guest));
+                            switch (from) {
+                                case "new":
+                                    createEvent();
+                                    return true;
+                                case "edit":
+                                    updateEvent(curEvent.getEventId());
+                                    return true;
                             }
                         } else {
-                            utility.showMsg(getResources().getString(R.string.val_add));
+                            tvLocation.setVisibility(View.VISIBLE);
                         }
                     } else {
-                        utility.showMsg(getResources().getString(R.string.val_date));
+                        tvDate.setVisibility(View.VISIBLE);
                     }
                 } else {
-                    utility.showMsg(getResources().getString(R.string.val_name));
+                    tvName.setVisibility(View.VISIBLE);
                 }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @OnCheckedChanged(R.id.cea_sw_private)
-    void setSwPrivateOnCheckedChanged(boolean isChecked) {
-        isPrivate = isChecked;
-    }
-
-    @OnCheckedChanged(R.id.cea_sw_cg)
-    void setSwCanGuestCheckedChanged(boolean isChecked) {
-        canGuest = isChecked;
     }
 
     @OnClick(R.id.cea_tv_invitee)
@@ -258,12 +309,30 @@ public class CreateEventActivity extends AppCompatActivity {
                     count = invitations.size();
                     tvCountFig.setText(String.valueOf(count));
                 } else {
-                    utility.showMsg("Invitation added successfully.");
+                    errorDialog = utility.showAlert("Guest added successfully.", false, View.VISIBLE, getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            errorDialog.dismiss();
+                        }
+                    }, View.GONE, null, null);
+                    errorDialog.show();
                 }
                 break;
             case "edit":
                 if (invitations != null) {
-                    utility.showMsg("Invitation already selected.");
+                    if (invitations.size() != 0) {
+                        errorDialog = utility.showAlert("Guest already selected.", false, View.VISIBLE, getResources().getString(R.string.dd_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                errorDialog.dismiss();
+                            }
+                        }, View.GONE, null, null);
+                        errorDialog.show();
+                    } else {
+                        invitations = getInvitations();
+                        count = invitations.size();
+                        tvCountFig.setText(String.valueOf(count));
+                    }
                 }
                 break;
         }
@@ -293,11 +362,19 @@ public class CreateEventActivity extends AppCompatActivity {
 
         //region Preparing new curEvent
         RequestEvent event = new RequestEvent();
-        event.setCanInviteGuests(canGuest);
+        if (swCanGuest.isChecked()) {
+            event.setCanInviteGuests(true);
+        } else {
+            event.setCanInviteGuests(false);
+        }
         event.setEventDate(newDate.getTime().getTime() / 1000);
         event.setInvitations(invitations);
         event.setLocation(etLocation.getText().toString().trim());
-        event.setIsPrivate(isPrivate);
+        if (swPrivate.isChecked()) {
+            event.setIsPrivate(true);
+        } else {
+            event.setIsPrivate(false);
+        }
         event.setTitle(etName.getText().toString().trim());
         //endregion
 
@@ -316,6 +393,7 @@ public class CreateEventActivity extends AppCompatActivity {
                 } else {
                     utility.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 500) {
+                        Log.d("Error", "onResponse: " + response.errorBody().toString());
                         utility.showMsg(response.message());
                     } else if (response.code() >= 500) {
                         internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), new View.OnClickListener() {
@@ -351,11 +429,19 @@ public class CreateEventActivity extends AppCompatActivity {
         //region Preparing new curEvent
         RequestEvent event = new RequestEvent();
         event.setEventId(id);
-        event.setCanInviteGuests(canGuest);
+        if (swCanGuest.isChecked()) {
+            event.setCanInviteGuests(true);
+        } else {
+            event.setCanInviteGuests(false);
+        }
         event.setEventDate(newDate.getTime().getTime() / 1000);
         event.setInvitations(invitations);
         event.setLocation(etLocation.getText().toString().trim());
-        event.setIsPrivate(isPrivate);
+        if (swPrivate.isChecked()) {
+            event.setIsPrivate(true);
+        } else {
+            event.setIsPrivate(false);
+        }
         event.setTitle(etName.getText().toString().trim());
         //endregion
 
@@ -369,8 +455,8 @@ public class CreateEventActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     utility.dismissDialog(progressDialog);
                     finish();
-                    finish();
                     utility.showMsg(getResources().getString(R.string.event_update_msg));
+                    LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("ViewEvent"));
                     LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEvent"));
                 } else {
                     utility.dismissDialog(progressDialog);
@@ -423,6 +509,90 @@ public class CreateEventActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finish();
+        if (from.equalsIgnoreCase("edit")) {
+            if (!etName.getText().toString().trim().equalsIgnoreCase(curEvent.getTitle())) {
+                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        utility.dismissDialog(internetDialog);
+                    }
+                });
+                internetDialog.show();
+            } else if (!etDate.getText().toString().trim().equalsIgnoreCase(curEvent.getEventDate().toLocaleString())) {
+                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        utility.dismissDialog(internetDialog);
+                    }
+                });
+                internetDialog.show();
+            } else if (!etLocation.getText().toString().trim().equalsIgnoreCase(curEvent.getLocation())) {
+                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        utility.dismissDialog(internetDialog);
+                    }
+                });
+                internetDialog.show();
+            } else if (swPrivate.isChecked() != curEvent.getIsPrivate()) {
+                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        utility.dismissDialog(internetDialog);
+                    }
+                });
+                internetDialog.show();
+            } else if (swCanGuest.isChecked() != curEvent.getCanInviteGuests()) {
+                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        utility.dismissDialog(internetDialog);
+                    }
+                });
+                internetDialog.show();
+            } else if (invitations.size() != curEvent.getInvitations().size()) {
+                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        utility.dismissDialog(internetDialog);
+                    }
+                });
+                internetDialog.show();
+            } else {
+                finish();
+            }
+        } else {
+            finish();
+        }
     }
 }

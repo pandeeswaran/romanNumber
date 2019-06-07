@@ -44,8 +44,11 @@ public class AdapterInvitee extends RecyclerView.Adapter<AdapterInvitee.InviteeV
         String fullName = invitations.get(i).getInviteeFirstName().concat(" ").concat(invitations.get(i).getInviteeLasttName());
         inviteeViewHolder.tvName.setText(fullName);
 
-//        String address = invitations.get(i).getInvitee().getAddressList().get(0).getStreet().concat(", ").concat(invitations.get(i).getInvitee().getAddressList().get(0).getCity()).concat(", ").concat(invitations.get(i).getInvitee().getAddressList().get(0).getZip());
-//        inviteeViewHolder.tvAddress.setText(address);
+        if (invitations.size() == i + 1) {
+            inviteeViewHolder.view.setVisibility(View.GONE);
+        } else {
+            inviteeViewHolder.view.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -61,6 +64,9 @@ public class AdapterInvitee extends RecyclerView.Adapter<AdapterInvitee.InviteeV
 
         @BindView(R.id.textView2)
         TextView tvAddress;
+
+        @BindView(R.id.view)
+        View view;
 
         InviteeViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -73,7 +73,6 @@
     <string name="ef_tab_yours">Yours</string>
 
     //Event Details Tab Titles
-    <string name="dea_other">Other Attending Guests</string>
     <string name="dea_accept">Accepted Guests</string>
     <string name="dea_pending">Pending Guests</string>
 
@@ -101,14 +100,16 @@
     <string name="decline_msg">Are you sure you want to decline this event?</string>
     <string name="cancel_msg">Are you sure you want to cancel this event?</string>
     <string name="logout_msg">Are you sure you want to log out?</string>
+    <string name="discard">Discard Changes?</string>
 
     <string name="event_success_msg">Event created successfully</string>
     <string name="event_update_msg">Event updated successfully</string>
     <string name="event_cancel_msg">Event canceled successfully</string>
 
-    <string name="val_name">Kindly enter the Event Name.</string>
-    <string name="val_date">Kindly select the Event Date.</string>
-    <string name="val_add">Kindly enter the Event Address.</string>
+    <string name="val_name">Kindly enter the event name.</string>
+    <string name="val_date">Kindly select the event date.</string>
+    <string name="val_location">Kindly enter the event location.</string>
     <string name="val_guest">Kindly add guests.</string>
 
+    <string name="sample_add">10 Taylor Ct, Ridgefield CT 06877</string>
 </resources>

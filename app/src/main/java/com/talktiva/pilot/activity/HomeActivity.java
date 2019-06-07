@@ -39,10 +39,10 @@ public class HomeActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 123;
     private final String[] appPermissions = {
             Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.ACCESS_FINE_LOCATION};
+            Manifest.permission.ACCESS_NETWORK_STATE};
+
+//    Manifest.permission.READ_CALENDAR,
+//    Manifest.permission.WRITE_CALENDAR
 
     @BindView(R.id.ha_bnv)
     BottomNavigationView bottomNavigationView;
@@ -59,55 +59,7 @@ public class HomeActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         if (checkAndRequestPermission()) {
-            for (int i = 0; i < bottomNavigationView.getChildCount(); i++) {
-                View child = bottomNavigationView.getChildAt(i);
-                if (child instanceof BottomNavigationMenuView) {
-                    BottomNavigationMenuView menu = (BottomNavigationMenuView) child;
-                    for (int j = 0; j < menu.getChildCount(); j++) {
-                        View item = menu.getChildAt(j);
-                        View smallItemText = item.findViewById(android.support.design.R.id.smallLabel);
-                        if (smallItemText instanceof TextView) {
-                            ((TextView) smallItemText).setTypeface(utility.getFont());
-                            ((TextView) smallItemText).setTextSize(10);
-                        }
-                        View largeItemText = item.findViewById(android.support.design.R.id.largeLabel);
-                        if (largeItemText instanceof TextView) {
-                            ((TextView) largeItemText).setTypeface(utility.getFont());
-                            ((TextView) largeItemText).setTextSize(10);
-                        }
-                    }
-                }
-            }
-
-            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                    switch (menuItem.getItemId()) {
-                        case R.id.ha_bnm_home:
-                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home)), getResources().getString(R.string.ha_bnm_title_home));
-                            return true;
-                        case R.id.ha_bnm_chat:
-                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat)), getResources().getString(R.string.ha_bnm_title_chat));
-                            return true;
-                        case R.id.ha_bnm_add:
-                            return true;
-                        case R.id.ha_bnm_notification:
-                            loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications)), getResources().getString(R.string.ha_bnm_title_notifications));
-                            return true;
-                        case R.id.ha_bnm_event:
-                            EventFragment myFragment = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
-                            if (myFragment != null && myFragment.isVisible()) {
-                                return false;
-                            } else {
-                                loadFragment(new EventFragment(), EventFragment.TAG);
-                                return true;
-                            }
-                    }
-                    return false;
-                }
-            });
-
-            bottomNavigationView.setSelectedItemId(R.id.ha_bnm_home);
+            setUpHome();
         }
     }
 
@@ -138,60 +90,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 }
                 if (deniedPermissions.isEmpty()) {
-                    //region Broadcast Receiver Initialisation
-                    receiver = new NetworkChangeReceiver(this);
-                    registerNetworkBroadcast();
-                    //endregion
-
-                    for (int i = 0; i < bottomNavigationView.getChildCount(); i++) {
-                        View child = bottomNavigationView.getChildAt(i);
-                        if (child instanceof BottomNavigationMenuView) {
-                            BottomNavigationMenuView menu = (BottomNavigationMenuView) child;
-                            for (int j = 0; j < menu.getChildCount(); j++) {
-                                View item = menu.getChildAt(j);
-                                View smallItemText = item.findViewById(android.support.design.R.id.smallLabel);
-                                if (smallItemText instanceof TextView) {
-                                    ((TextView) smallItemText).setTypeface(utility.getFont());
-                                    ((TextView) smallItemText).setTextSize(10);
-                                }
-                                View largeItemText = item.findViewById(android.support.design.R.id.largeLabel);
-                                if (largeItemText instanceof TextView) {
-                                    ((TextView) largeItemText).setTypeface(utility.getFont());
-                                    ((TextView) largeItemText).setTextSize(10);
-                                }
-                            }
-                        }
-                    }
-
-                    bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-                        @Override
-                        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                            switch (menuItem.getItemId()) {
-                                case R.id.ha_bnm_home:
-                                    loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home)), getResources().getString(R.string.ha_bnm_title_home));
-                                    return true;
-                                case R.id.ha_bnm_chat:
-                                    loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat)), getResources().getString(R.string.ha_bnm_title_chat));
-                                    return true;
-                                case R.id.ha_bnm_add:
-                                    return true;
-                                case R.id.ha_bnm_notification:
-                                    loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications)), getResources().getString(R.string.ha_bnm_title_notifications));
-                                    return true;
-                                case R.id.ha_bnm_event:
-                                    EventFragment myFragment = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
-                                    if (myFragment != null && myFragment.isVisible()) {
-                                        return false;
-                                    } else {
-                                        loadFragment(new EventFragment(), EventFragment.TAG);
-                                        return true;
-                                    }
-                            }
-                            return false;
-                        }
-                    });
-
-                    bottomNavigationView.setSelectedItemId(R.id.ha_bnm_home);
+                    setUpHome();
                 } else {
                     dialogPermission = utility.showAlert("Required permissions are not granted, ask again?", false, View.VISIBLE, "Yes", new View.OnClickListener() {
                         @Override
@@ -260,5 +159,62 @@ public class HomeActivity extends AppCompatActivity {
         transaction.replace(R.id.ha_fl_container, fragment, tag);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         transaction.commit();
+    }
+
+    private void setUpHome() {
+        //region Broadcast Receiver Initialisation
+        receiver = new NetworkChangeReceiver(this);
+        registerNetworkBroadcast();
+        //endregion
+
+        for (int i = 0; i < bottomNavigationView.getChildCount(); i++) {
+            View child = bottomNavigationView.getChildAt(i);
+            if (child instanceof BottomNavigationMenuView) {
+                BottomNavigationMenuView menu = (BottomNavigationMenuView) child;
+                for (int j = 0; j < menu.getChildCount(); j++) {
+                    View item = menu.getChildAt(j);
+                    View smallItemText = item.findViewById(android.support.design.R.id.smallLabel);
+                    if (smallItemText instanceof TextView) {
+                        ((TextView) smallItemText).setTypeface(utility.getFont());
+                        ((TextView) smallItemText).setTextSize(10);
+                    }
+                    View largeItemText = item.findViewById(android.support.design.R.id.largeLabel);
+                    if (largeItemText instanceof TextView) {
+                        ((TextView) largeItemText).setTypeface(utility.getFont());
+                        ((TextView) largeItemText).setTextSize(10);
+                    }
+                }
+            }
+        }
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.ha_bnm_home:
+                        loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home)), getResources().getString(R.string.ha_bnm_title_home));
+                        return true;
+                    case R.id.ha_bnm_chat:
+                        loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat)), getResources().getString(R.string.ha_bnm_title_chat));
+                        return true;
+                    case R.id.ha_bnm_add:
+                        return true;
+                    case R.id.ha_bnm_notification:
+                        loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications)), getResources().getString(R.string.ha_bnm_title_notifications));
+                        return true;
+                    case R.id.ha_bnm_event:
+                        EventFragment myFragment = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
+                        if (myFragment != null && myFragment.isVisible()) {
+                            return false;
+                        } else {
+                            loadFragment(new EventFragment(), EventFragment.TAG);
+                            return true;
+                        }
+                }
+                return false;
+            }
+        });
+
+        bottomNavigationView.setSelectedItemId(R.id.ha_bnm_home);
     }
 }
