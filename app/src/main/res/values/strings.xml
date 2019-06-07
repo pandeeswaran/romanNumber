@@ -9,7 +9,11 @@
     <string name="token_anand">eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJsYXN0TmFtZSI6IkRhdmUiLCJ1c2VyX25hbWUiOiJhbmFuZCIsInVzZXJJZCI6NCwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sImNsaWVudF9pZCI6InRhbGt0aXZhQXBwIiwiZmlyc3ROYW1lIjoiQW5hbmQiLCJhdWQiOlsibXMvbm90aWZpY2F0aW9uIiwibXMvdXNlciIsIm1zL2V2ZW50Il0sInBhc3N3b3JkIjoiJDJhJDEwJHpRbERGeTFWREJkQkJCRzVOVTlpNU9wb0dYQkFpdWF2RnMyV1RiaGkxamQvYmkzMzBMUjBLIiwic2NvcGUiOlsiUk9MRV9VU0VSIl0sImV4cCI6MTU2MTc4NzE3NSwianRpIjoiM2UyMGIwOTUtM2EzYi00YmRmLTgxNTItODJjZDVkZmI4ZWZiIiwiZW1haWwiOiJhbmFuZEB0ZXN0LmNvbSIsInVzZXJuYW1lIjoiYW5hbmQifQ.B2pQ6TOIUH05idCgYLJIOQtlUXtkGpOwsmjIv1ZM_BeGDaRLyUFdmIrsoAVGUYgYopd-9nGzxsJqFu2DwI0-U1iICGoWN2bmmCbtrvKxbrm4E9D-kXqzlpQ5croSXmY5l0fplWG-hGw3OE9DNvFI5eiWkf2DPi8Nn-AtdQKU0E4SrixbkuIM_62m2XJq5hJEXarn6BW2wJJ--z9EWJaN-fJilYvO6DQdNUM85GRHkcbGnVXGXWaiyV3UjltnnznF6foqh1NSAA-YOkjFGfRAXOphtPl2i9TVdWf-MD98b2jREsRLxM7wRU_S4c5CMb1CyB0Ct6bwNSW6Y79-PAwB5w</string>
 
     //Create Event Activity Titles
-    <string name="ea_title">View Event</string>
+    <string name="ea_title_0">View Pending Event</string>
+    <string name="ea_title_1">View Upcoming Event</string>
+    <string name="ea_title_2">View My Event</string>
+
+
     <string name="cea_title1">Create Event</string>
     <string name="cea_title2">Edit Event</string>
 

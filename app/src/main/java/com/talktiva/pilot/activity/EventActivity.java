@@ -124,8 +124,6 @@ public class EventActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        utility.setTitleText(toolbar, R.id.ea_toolbar_tv_title, getResources().getString(R.string.ea_title));
-
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
@@ -140,8 +138,21 @@ public class EventActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         from = bundle != null ? bundle.getInt(getResources().getString(R.string.from)) : 0;
+
+        switch (from) {
+            case 0:
+                utility.setTitleText(toolbar, R.id.ea_toolbar_tv_title, getResources().getString(R.string.ea_title_0));
+                break;
+            case 1:
+                utility.setTitleText(toolbar, R.id.ea_toolbar_tv_title, getResources().getString(R.string.ea_title_1));
+                break;
+            case 2:
+                utility.setTitleText(toolbar, R.id.ea_toolbar_tv_title, getResources().getString(R.string.ea_title_2));
+                break;
+        }
+
         Event event = (Event) (bundle != null ? bundle.getSerializable(getResources().getString(R.string.event)) : null);
-        eventId = event.getEventId();
+        eventId = Objects.requireNonNull(event).getEventId();
         getEventById(eventId);
     }
 
