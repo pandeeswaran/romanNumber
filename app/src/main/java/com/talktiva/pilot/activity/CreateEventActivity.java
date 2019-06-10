@@ -16,11 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -106,7 +104,6 @@ public class CreateEventActivity extends AppCompatActivity {
 
     private List<Invitation> invitations;
     private Invitation invitation;
-    private MenuItem menuItem;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -260,7 +257,7 @@ public class CreateEventActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.create_event_menu, menu);
-        menuItem = menu.findItem(R.id.cea_menu_save);
+        MenuItem menuItem = menu.findItem(R.id.cea_menu_save);
         SpannableString mNewTitle = new SpannableString(menuItem.getTitle());
         mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFont()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         menuItem.setTitle(mNewTitle);
@@ -302,7 +299,7 @@ public class CreateEventActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.cea_tv_invitee)
-    void setTvInviteeOnClick(View view) {
+    void setTvInviteeOnClick() {
         switch (from) {
             case "new":
                 if (invitations == null) {
