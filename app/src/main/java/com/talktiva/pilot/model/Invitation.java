@@ -8,10 +8,10 @@ import java.util.Date;
 public class Invitation implements Serializable {
 
     @SerializedName("invitationId")
-    private int invitationId;
+    private Integer invitationId;
 
     @SerializedName("inviteeId")
-    private int inviteeId;
+    private Integer inviteeId;
 
     @SerializedName("status")
     private String status;
@@ -34,15 +34,18 @@ public class Invitation implements Serializable {
     @SerializedName("inviteeLasttName")
     private String inviteeLasttName;
 
-    public int getInvitationId() {
+    @SerializedName("inviteeAddress")
+    private String inviteeAddress;
+
+    public Integer getInvitationId() {
         return invitationId;
     }
 
-    public void setInvitationId(int invitationId) {
+    public void setInvitationId(Integer invitationId) {
         this.invitationId = invitationId;
     }
 
-    public int getInviteeId() {
+    public Integer getInviteeId() {
         return inviteeId;
     }
 
@@ -84,5 +87,9 @@ public class Invitation implements Serializable {
 
     public String getInviteeLasttName() {
         return inviteeLasttName;
+    }
+
+    public String getInviteeAddress() {
+        return inviteeAddress;
     }
 }

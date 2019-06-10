@@ -1,13 +1,14 @@
 package com.talktiva.pilot.adapter;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.helper.Utility;
@@ -60,7 +61,7 @@ public class AdapterGroupBy extends RecyclerView.Adapter<AdapterGroupBy.DateView
         }
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        layoutManager.setOrientation(RecyclerView.VERTICAL);
         dateViewHolder.recyclerView.setLayoutManager(layoutManager);
 
         AdapterEvent adapterEvent = new AdapterEvent(activity, groupByEvents.get(i).getEvents(), clickListener, from);

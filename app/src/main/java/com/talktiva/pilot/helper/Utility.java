@@ -13,10 +13,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.provider.Settings;
-import android.support.constraint.Constraints;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
+
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.Constraints;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -89,11 +92,7 @@ public class Utility {
         new AlertDialog.Builder(context)
                 .setTitle(context.getResources().getString(R.string.app_name))
                 .setMessage(R.string.gps_msg)
-                .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        context.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
+                .setPositiveButton("Settings", (dialog, which) -> context.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
                 .setNegativeButton("Cancel", null)
                 .create()
                 .show();
@@ -114,14 +113,11 @@ public class Utility {
         return false;
     }
 
+    @SuppressLint("InlinedApi")
     void requestInternet() {
-        dialogInternet = showAlert(context.getResources().getString(R.string.internet_msg), false, VISIBLE, context.getResources().getString(R.string.dd_setting), new View.OnClickListener() {
-            @SuppressLint("InlinedApi")
-            @Override
-            public void onClick(View v) {
-                dialogInternet.dismiss();
-                context.startActivity(new Intent(Settings.ACTION_DATA_USAGE_SETTINGS));
-            }
+        dialogInternet = showAlert(context.getResources().getString(R.string.internet_msg), false, VISIBLE, context.getResources().getString(R.string.dd_setting), v -> {
+            dialogInternet.dismiss();
+            context.startActivity(new Intent(Settings.ACTION_DATA_USAGE_SETTINGS));
         }, GONE, null, null);
         dialogInternet.show();
     }
@@ -150,6 +146,7 @@ public class Utility {
         ((Button) dialog.findViewById(R.id.dialog_negative)).setText(negativeTitle);
         dialog.findViewById(R.id.dialog_negative).setVisibility(negativeVisibility);
         dialog.findViewById(R.id.dialog_negative).setOnClickListener(negativeClickListener);
+        Objects.requireNonNull(dialog.getWindow()).setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT);
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
         return dialog;
     }

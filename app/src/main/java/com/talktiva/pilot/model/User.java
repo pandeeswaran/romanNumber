@@ -8,7 +8,7 @@ import java.util.Date;
 public class User implements Serializable {
 
     @SerializedName("userId")
-    private int userId;
+    private Integer userId;
 
     @SerializedName("firstName")
     private String firstName;

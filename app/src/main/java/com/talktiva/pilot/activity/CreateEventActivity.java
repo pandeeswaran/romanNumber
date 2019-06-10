@@ -7,10 +7,6 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -25,6 +21,11 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
 import com.talktiva.pilot.R;
@@ -138,7 +139,7 @@ public class CreateEventActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         from = bundle != null ? bundle.getString(getResources().getString(R.string.from)) : null;
 
-        switch (from) {
+        switch (Objects.requireNonNull(from)) {
             case "new":
                 utility.setTitleText(toolbar, R.id.cea_toolbar_tv_title, getResources().getString(R.string.cea_title1));
                 tvCountFig.setText(String.valueOf(count));
@@ -146,55 +147,55 @@ public class CreateEventActivity extends AppCompatActivity {
 
             case "edit":
                 utility.setTitleText(toolbar, R.id.cea_toolbar_tv_title, getResources().getString(R.string.cea_title2));
-                curEvent = (Event) (bundle != null ? bundle.getSerializable(getResources().getString(R.string.event)) : null);
+                curEvent = (Event) bundle.getSerializable(getResources().getString(R.string.event));
                 getEventDetails(Objects.requireNonNull(curEvent));
                 break;
         }
 
-        etDate.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, final MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    currentDate = Calendar.getInstance(Locale.US);
-                    DatePickerDialog datePickerDialog = new DatePickerDialog(CreateEventActivity.this, new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                            newDate = Calendar.getInstance();
-                            newDate.set(year, month, dayOfMonth);
+        etDate.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                switch (from) {
+                    case "new":
+                        currentDate = Calendar.getInstance(Locale.US);
+                        break;
+                    case "edit":
+                        currentDate = Calendar.getInstance(Locale.US);
+                        currentDate.setTimeInMillis(curEvent.getEventDate().getTime());
+                        break;
+                }
 
-                            TimePickerDialog timePickerDialog = new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                                @Override
-                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                    newDate.set(Calendar.MINUTE, minute);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(CreateEventActivity.this, (view, year, month, dayOfMonth) -> {
+                    newDate = Calendar.getInstance();
+                    newDate.set(year, month, dayOfMonth);
 
-                                    etDate.setText(newDate.getTime().toLocaleString());
-                                }
-                            }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false);
-                            switch (from) {
-                                case "new":
-                                    timePickerDialog.updateTime(Calendar.getInstance().getTime().getHours(), Calendar.getInstance().getTime().getMinutes());
-                                    break;
-                                case "edit":
-                                    timePickerDialog.updateTime(curEvent.getEventDate().getHours(), curEvent.getEventDate().getMinutes());
-                                    break;
-                            }
-                            timePickerDialog.show();
-                        }
-                    }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH));
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(CreateEventActivity.this, (view1, hourOfDay, minute) -> {
+                        newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        newDate.set(Calendar.MINUTE, minute);
+
+                        etDate.setText(newDate.getTime().toLocaleString());
+                    }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false);
                     switch (from) {
                         case "new":
-                            datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+                            timePickerDialog.updateTime(Calendar.getInstance().getTime().getHours(), Calendar.getInstance().getTime().getMinutes());
                             break;
                         case "edit":
-                            datePickerDialog.getDatePicker().setMinDate(curEvent.getEventDate().getTime());
+                            timePickerDialog.updateTime(curEvent.getEventDate().getHours(), curEvent.getEventDate().getMinutes());
                             break;
                     }
-                    datePickerDialog.show();
-                    return true;
-                } else {
-                    return false;
+                    timePickerDialog.show();
+                }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH));
+                switch (from) {
+                    case "new":
+                        datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+                        break;
+                    case "edit":
+                        datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+                        break;
                 }
+                datePickerDialog.show();
+                return true;
+            } else {
+                return false;
             }
         });
 
@@ -309,24 +310,14 @@ public class CreateEventActivity extends AppCompatActivity {
                     count = invitations.size();
                     tvCountFig.setText(String.valueOf(count));
                 } else {
-                    errorDialog = utility.showAlert("Guest added successfully.", false, View.VISIBLE, getResources().getString(R.string.dd_ok), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            errorDialog.dismiss();
-                        }
-                    }, View.GONE, null, null);
+                    errorDialog = utility.showAlert("Guest added successfully.", false, View.VISIBLE, getResources().getString(R.string.dd_ok), v -> errorDialog.dismiss(), View.GONE, null, null);
                     errorDialog.show();
                 }
                 break;
             case "edit":
                 if (invitations != null) {
                     if (invitations.size() != 0) {
-                        errorDialog = utility.showAlert("Guest already selected.", false, View.VISIBLE, getResources().getString(R.string.dd_ok), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                errorDialog.dismiss();
-                            }
-                        }, View.GONE, null, null);
+                        errorDialog = utility.showAlert("Guest already selected.", false, View.VISIBLE, getResources().getString(R.string.dd_ok), v -> errorDialog.dismiss(), View.GONE, null, null);
                         errorDialog.show();
                     } else {
                         invitations = getInvitations();
@@ -362,19 +353,33 @@ public class CreateEventActivity extends AppCompatActivity {
 
         //region Preparing new curEvent
         RequestEvent event = new RequestEvent();
+
         if (swCanGuest.isChecked()) {
             event.setCanInviteGuests(true);
         } else {
             event.setCanInviteGuests(false);
         }
+
         event.setEventDate(newDate.getTime().getTime() / 1000);
-        event.setInvitations(invitations);
+
+        if (invitations != null) {
+            if (invitations.size() != 0) {
+                event.setInvitations(invitations);
+            } else {
+                event.setInvitations(null);
+            }
+        } else {
+            event.setInvitations(null);
+        }
+
         event.setLocation(etLocation.getText().toString().trim());
+
         if (swPrivate.isChecked()) {
             event.setIsPrivate(true);
         } else {
             event.setIsPrivate(false);
         }
+
         event.setTitle(etName.getText().toString().trim());
         //endregion
 
@@ -393,15 +398,10 @@ public class CreateEventActivity extends AppCompatActivity {
                 } else {
                     utility.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 500) {
-                        Log.d("Error", "onResponse: " + response.errorBody().toString());
+                        Log.d("Error", "onResponse: " + Objects.requireNonNull(response.errorBody()).toString());
                         utility.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                utility.dismissDialog(internetDialog);
-                            }
-                        });
+                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), v -> utility.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -411,12 +411,7 @@ public class CreateEventActivity extends AppCompatActivity {
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
                 utility.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            utility.dismissDialog(internetDialog);
-                        }
-                    });
+                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -429,19 +424,33 @@ public class CreateEventActivity extends AppCompatActivity {
         //region Preparing new curEvent
         RequestEvent event = new RequestEvent();
         event.setEventId(id);
+
         if (swCanGuest.isChecked()) {
             event.setCanInviteGuests(true);
         } else {
             event.setCanInviteGuests(false);
         }
+
         event.setEventDate(newDate.getTime().getTime() / 1000);
-        event.setInvitations(invitations);
+
+        if (invitations != null) {
+            if (invitations.size() != 0) {
+                event.setInvitations(invitations);
+            } else {
+                event.setInvitations(null);
+            }
+        } else {
+            event.setInvitations(null);
+        }
+
         event.setLocation(etLocation.getText().toString().trim());
+
         if (swPrivate.isChecked()) {
             event.setIsPrivate(true);
         } else {
             event.setIsPrivate(false);
         }
+
         event.setTitle(etName.getText().toString().trim());
         //endregion
 
@@ -463,12 +472,7 @@ public class CreateEventActivity extends AppCompatActivity {
                     if (response.code() >= 300 && response.code() < 500) {
                         utility.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                utility.dismissDialog(internetDialog);
-                            }
-                        });
+                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), v -> utility.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -478,12 +482,7 @@ public class CreateEventActivity extends AppCompatActivity {
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
                 utility.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            utility.dismissDialog(internetDialog);
-                        }
-                    });
+                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -494,12 +493,14 @@ public class CreateEventActivity extends AppCompatActivity {
         List<Invitation> invitations = new ArrayList<>();
         //region First Invitation
         invitation = new Invitation();
+        invitation.setInvitationId(null);
         invitation.setInviteeId(6);
         invitations.add(invitation);
         //endregion
 
         //region Second Invitation
         invitation = new Invitation();
+        invitation.setInvitationId(null);
         invitation.setInviteeId(8);
         invitations.add(invitation);
         //endregion
@@ -509,90 +510,38 @@ public class CreateEventActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (from.equalsIgnoreCase("edit")) {
-            if (!etName.getText().toString().trim().equalsIgnoreCase(curEvent.getTitle())) {
-                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finish();
-                    }
-                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        utility.dismissDialog(internetDialog);
-                    }
-                });
-                internetDialog.show();
-            } else if (!etDate.getText().toString().trim().equalsIgnoreCase(curEvent.getEventDate().toLocaleString())) {
-                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finish();
-                    }
-                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        utility.dismissDialog(internetDialog);
-                    }
-                });
-                internetDialog.show();
-            } else if (!etLocation.getText().toString().trim().equalsIgnoreCase(curEvent.getLocation())) {
-                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finish();
-                    }
-                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        utility.dismissDialog(internetDialog);
-                    }
-                });
-                internetDialog.show();
-            } else if (swPrivate.isChecked() != curEvent.getIsPrivate()) {
-                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finish();
-                    }
-                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        utility.dismissDialog(internetDialog);
-                    }
-                });
-                internetDialog.show();
-            } else if (swCanGuest.isChecked() != curEvent.getCanInviteGuests()) {
-                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finish();
-                    }
-                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        utility.dismissDialog(internetDialog);
-                    }
-                });
-                internetDialog.show();
-            } else if (invitations.size() != curEvent.getInvitations().size()) {
-                internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finish();
-                    }
-                }, View.VISIBLE, getResources().getString(R.string.dd_no), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        utility.dismissDialog(internetDialog);
-                    }
-                });
-                internetDialog.show();
-            } else {
-                finish();
-            }
-        } else {
-            finish();
+        switch (from) {
+            case "new":
+                if (etName.getText().toString().trim().length() != 0 || etDate.getText().toString().trim().length() != 0 || etLocation.getText().toString().trim().length() != 0) {
+                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog.show();
+                } else {
+                    finish();
+                }
+                break;
+            case "edit":
+                if (!etName.getText().toString().trim().equalsIgnoreCase(curEvent.getTitle())) {
+                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog.show();
+                } else if (!etDate.getText().toString().trim().equalsIgnoreCase(curEvent.getEventDate().toLocaleString())) {
+                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog.show();
+                } else if (!etLocation.getText().toString().trim().equalsIgnoreCase(curEvent.getLocation())) {
+                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog.show();
+                } else if (swPrivate.isChecked() != curEvent.getIsPrivate()) {
+                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog.show();
+                } else if (swCanGuest.isChecked() != curEvent.getCanInviteGuests()) {
+                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog.show();
+                } else if (invitations.size() != curEvent.getInvitations().size()) {
+                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog.show();
+                } else {
+                    finish();
+                }
+                break;
         }
     }
 }

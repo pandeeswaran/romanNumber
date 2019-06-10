@@ -10,18 +10,19 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.design.internal.BottomNavigationMenuView;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.fragment.EmptyFragment;
 import com.talktiva.pilot.fragment.EventFragment;
@@ -92,25 +93,19 @@ public class HomeActivity extends AppCompatActivity {
                 if (deniedPermissions.isEmpty()) {
                     setUpHome();
                 } else {
-                    dialogPermission = utility.showAlert("Required permissions are not granted, ask again?", false, View.VISIBLE, "Yes", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            for (int i = 0; deniedPermissions.size() > i; i++) {
-                                if (ActivityCompat.shouldShowRequestPermissionRationale(HomeActivity.this, deniedPermissions.get(i))) {
-                                    checkAndRequestPermission();
-                                }
+                    dialogPermission = utility.showAlert("Required permissions are not granted, ask again?", false, View.VISIBLE, "Yes", v -> {
+                        for (int i = 0; deniedPermissions.size() > i; i++) {
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(HomeActivity.this, deniedPermissions.get(i))) {
+                                checkAndRequestPermission();
                             }
                         }
-                    }, View.VISIBLE, "Settings", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dialogPermission.dismiss();
-                            Intent intent = new Intent();
-                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                            Uri uri = Uri.fromParts("package", getPackageName(), null);
-                            intent.setData(uri);
-                            startActivity(intent);
-                        }
+                    }, View.VISIBLE, "Settings", v -> {
+                        dialogPermission.dismiss();
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivity(intent);
                     });
                     dialogPermission.show();
                 }
@@ -140,17 +135,7 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        dialogClose = utility.showAlert("Are you sure you want to exit?", true, View.VISIBLE, "Yes", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finishAffinity();
-            }
-        }, View.VISIBLE, "No", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialogClose.dismiss();
-            }
-        });
+        dialogClose = utility.showAlert("Are you sure you want to exit?", true, View.VISIBLE, "Yes", v -> finishAffinity(), View.VISIBLE, "No", v -> dialogClose.dismiss());
         dialogClose.show();
     }
 
@@ -173,12 +158,12 @@ public class HomeActivity extends AppCompatActivity {
                 BottomNavigationMenuView menu = (BottomNavigationMenuView) child;
                 for (int j = 0; j < menu.getChildCount(); j++) {
                     View item = menu.getChildAt(j);
-                    View smallItemText = item.findViewById(android.support.design.R.id.smallLabel);
+                    View smallItemText = item.findViewById(R.id.smallLabel);
                     if (smallItemText instanceof TextView) {
                         ((TextView) smallItemText).setTypeface(utility.getFont());
                         ((TextView) smallItemText).setTextSize(10);
                     }
-                    View largeItemText = item.findViewById(android.support.design.R.id.largeLabel);
+                    View largeItemText = item.findViewById(R.id.largeLabel);
                     if (largeItemText instanceof TextView) {
                         ((TextView) largeItemText).setTypeface(utility.getFont());
                         ((TextView) largeItemText).setTextSize(10);
@@ -187,32 +172,29 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
 
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.ha_bnm_home:
-                        loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home)), getResources().getString(R.string.ha_bnm_title_home));
+        bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.ha_bnm_home:
+                    loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_home)), getResources().getString(R.string.ha_bnm_title_home));
+                    return true;
+                case R.id.ha_bnm_chat:
+                    loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat)), getResources().getString(R.string.ha_bnm_title_chat));
+                    return true;
+                case R.id.ha_bnm_add:
+                    return true;
+                case R.id.ha_bnm_notification:
+                    loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications)), getResources().getString(R.string.ha_bnm_title_notifications));
+                    return true;
+                case R.id.ha_bnm_event:
+                    EventFragment myFragment = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
+                    if (myFragment != null && myFragment.isVisible()) {
+                        return false;
+                    } else {
+                        loadFragment(new EventFragment(), EventFragment.TAG);
                         return true;
-                    case R.id.ha_bnm_chat:
-                        loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_chat)), getResources().getString(R.string.ha_bnm_title_chat));
-                        return true;
-                    case R.id.ha_bnm_add:
-                        return true;
-                    case R.id.ha_bnm_notification:
-                        loadFragment(EmptyFragment.newInstance(getResources().getString(R.string.ha_bnm_title_notifications)), getResources().getString(R.string.ha_bnm_title_notifications));
-                        return true;
-                    case R.id.ha_bnm_event:
-                        EventFragment myFragment = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
-                        if (myFragment != null && myFragment.isVisible()) {
-                            return false;
-                        } else {
-                            loadFragment(new EventFragment(), EventFragment.TAG);
-                            return true;
-                        }
-                }
-                return false;
+                    }
             }
+            return false;
         });
 
         bottomNavigationView.setSelectedItemId(R.id.ha_bnm_home);

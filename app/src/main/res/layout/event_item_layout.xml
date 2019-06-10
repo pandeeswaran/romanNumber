@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/yf_rv_cl"
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textColor="@color/colorPrimary"
-        android:textSize="12sp"
+        android:textSize="@dimen/normal_lable_font_size"
         app:layout_constraintBottom_toTopOf="@id/yf_rv_tv_full_date"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/yf_rv_tv_date"
@@ -45,7 +45,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textSize="12sp"
+        android:textSize="@dimen/normal_lable_font_size"
         app:layout_constraintBottom_toTopOf="@id/yf_rv_tv_add"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/yf_rv_tv_date"
@@ -56,11 +56,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textSize="12sp"
+        android:textSize="@dimen/normal_lable_font_size"
         app:layout_constraintBottom_toBottomOf="@id/yf_rv_tv_date"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/yf_rv_iv_private"
         app:layout_constraintStart_toEndOf="@id/yf_rv_tv_date"
         app:layout_constraintTop_toBottomOf="@id/yf_rv_tv_full_date" />
 
@@ -68,21 +69,20 @@
         android:id="@+id/yf_rv_iv_private"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/yf_rv_private"
         android:padding="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/yf_rv_iv_share"
-        app:layout_constraintTop_toBottomOf="@id/yf_rv_tv_date"
+        app:layout_constraintTop_toTopOf="@+id/yf_rv_tv_add"
         app:srcCompat="@drawable/ic_private" />
 
     <ImageView
         android:id="@+id/yf_rv_iv_share"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="8dp"
         android:background="@android:color/transparent"
         android:clickable="true"
@@ -90,9 +90,8 @@
         android:focusable="true"
         android:foreground="?android:selectableItemBackground"
         android:padding="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/yf_rv_iv_like"
-        app:layout_constraintTop_toBottomOf="@id/yf_rv_tv_date"
+        app:layout_constraintTop_toTopOf="@+id/yf_rv_tv_add"
         app:srcCompat="@drawable/ic_share"
         tools:ignore="UnusedAttribute" />
 
@@ -100,16 +99,15 @@
         android:id="@+id/yf_rv_iv_like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:background="@android:color/transparent"
         android:clickable="true"
         android:contentDescription="@string/yf_rv_like"
         android:focusable="true"
         android:foreground="?android:selectableItemBackground"
         android:padding="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/yf_rv_iv_like_count"
-        app:layout_constraintTop_toBottomOf="@id/yf_rv_tv_date"
+        app:layout_constraintTop_toTopOf="@+id/yf_rv_tv_add"
         app:srcCompat="@drawable/ic_like" />
 
     <TextView
@@ -119,7 +117,7 @@
         android:layout_marginEnd="8dp"
         android:gravity="center"
         android:textColor="@color/colorPrimary"
-        android:textSize="18sp"
+        android:textSize="@dimen/count_font_size"
         app:layout_constraintBottom_toBottomOf="@id/yf_rv_iv_like"
         app:layout_constraintEnd_toStartOf="@id/yf_rv_iv_more"
         app:layout_constraintTop_toTopOf="@id/yf_rv_iv_like" />
@@ -128,17 +126,16 @@
         android:id="@+id/yf_rv_iv_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:background="@android:color/transparent"
         android:clickable="true"
         android:contentDescription="@string/yf_rv_more"
         android:focusable="true"
         android:foreground="?android:selectableItemBackground"
         android:padding="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/yf_rv_tv_date"
+        app:layout_constraintTop_toTopOf="@+id/yf_rv_tv_add"
         app:srcCompat="@drawable/ic_more"
         tools:ignore="UnusedAttribute" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

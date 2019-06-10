@@ -9,10 +9,10 @@ import java.util.List;
 public class Event implements Serializable {
 
     @SerializedName("eventId")
-    private int eventId;
+    private Integer eventId;
 
     @SerializedName("createdBy")
-    private int createdBy;
+    private Integer createdBy;
 
     @SerializedName("createdOn")
     private Date createdOn;

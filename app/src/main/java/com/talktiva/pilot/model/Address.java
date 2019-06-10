@@ -8,7 +8,7 @@ import java.util.Date;
 public class Address implements Serializable {
 
     @SerializedName("addressId")
-    private int addressId;
+    private Integer addressId;
 
     @SerializedName("street")
     private String street;

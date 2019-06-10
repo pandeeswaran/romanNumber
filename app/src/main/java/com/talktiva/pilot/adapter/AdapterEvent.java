@@ -2,9 +2,10 @@ package com.talktiva.pilot.adapter;
 
 import android.app.Activity;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,33 +84,13 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
                 break;
         }
 
-        eventViewHolder.clItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clickListener.onPositionClicked(eventViewHolder.clItem, events.get(eventViewHolder.getAdapterPosition()), from);
-            }
-        });
+        eventViewHolder.clItem.setOnClickListener(v -> clickListener.onPositionClicked(eventViewHolder.clItem, events.get(eventViewHolder.getAdapterPosition()), from));
 
-        eventViewHolder.ivShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clickListener.onPositionClicked(eventViewHolder.ivShare, events.get(eventViewHolder.getAdapterPosition()), from);
-            }
-        });
+        eventViewHolder.ivShare.setOnClickListener(v -> clickListener.onPositionClicked(eventViewHolder.ivShare, events.get(eventViewHolder.getAdapterPosition()), from));
 
-        eventViewHolder.ivLike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clickListener.onPositionClicked(eventViewHolder.ivLike, events.get(eventViewHolder.getAdapterPosition()), from);
-            }
-        });
+        eventViewHolder.ivLike.setOnClickListener(v -> clickListener.onPositionClicked(eventViewHolder.ivLike, events.get(eventViewHolder.getAdapterPosition()), from));
 
-        eventViewHolder.ivMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clickListener.onPositionClicked(eventViewHolder.ivMore, events.get(eventViewHolder.getAdapterPosition()), from);
-            }
-        });
+        eventViewHolder.ivMore.setOnClickListener(v -> clickListener.onPositionClicked(eventViewHolder.ivMore, events.get(eventViewHolder.getAdapterPosition()), from));
     }
 
     @Override

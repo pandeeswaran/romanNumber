@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,7 +7,7 @@
     android:background="@color/white"
     tools:context=".activity.EventActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/ea_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -30,281 +30,284 @@
                 android:layout_gravity="center"
                 android:textColor="@color/white" />
 
-        </android.support.v7.widget.Toolbar>
-    </android.support.design.widget.AppBarLayout>
+        </androidx.appcompat.widget.Toolbar>
 
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/ea_cl"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:background="@color/white">
 
-            <TextView
-                android:id="@+id/ea_tv_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/event_item_date_bg"
-                android:gravity="center"
-                android:paddingStart="18dp"
-                android:paddingTop="12dp"
-                android:paddingEnd="18dp"
-                android:paddingBottom="12dp"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ea_tv_title" />
-
-            <TextView
-                android:id="@+id/ea_tv_title"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/ea_cl"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/font"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toStartOf="@id/ea_iv_private"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/ea_iv_private"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="18dp"
-                android:contentDescription="@string/yf_rv_private"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/ea_tv_title"
-                app:layout_constraintEnd_toStartOf="@id/ea_iv_chat"
-                app:layout_constraintTop_toTopOf="@id/ea_tv_title"
-                app:layout_constraintVertical_bias="1.0"
-                app:srcCompat="@drawable/ic_private" />
-
-            <ImageView
-                android:id="@+id/ea_iv_chat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="18dp"
-                android:contentDescription="@string/yf_rv_chat"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/ea_tv_title"
-                app:layout_constraintEnd_toStartOf="@id/ea_iv_decline"
-                app:layout_constraintTop_toTopOf="@id/ea_tv_title"
-                app:layout_constraintVertical_bias="1.0"
-                app:srcCompat="@drawable/ic_chat2" />
-
-            <TextView
-                android:id="@+id/ea_tv_full_date"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:gravity="bottom"
-                android:textColor="@color/font"
-                android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/ea_tv_date"
-                app:layout_constraintTop_toTopOf="@id/ea_tv_date" />
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/ea_tv_add"
+                <TextView
+                    android:id="@+id/ea_tv_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/event_item_date_bg"
+                    android:gravity="center"
+                    android:paddingStart="18dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="18dp"
+                    android:paddingBottom="12dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ea_tv_title" />
+
+                <TextView
+                    android:id="@+id/ea_tv_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/font"
+                    android:textSize="@dimen/normal_lable_font_size"
+                    app:layout_constraintEnd_toStartOf="@+id/ea_iv_private"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/ea_iv_private"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="@string/yf_rv_private"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="@id/ea_tv_title"
+                    app:layout_constraintEnd_toStartOf="@+id/ea_iv_chat"
+                    app:layout_constraintTop_toTopOf="@id/ea_tv_title"
+                    app:layout_constraintVertical_bias="1.0"
+                    app:srcCompat="@drawable/ic_private" />
+
+                <ImageView
+                    android:id="@+id/ea_iv_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="@string/yf_rv_chat"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="@id/ea_tv_title"
+                    app:layout_constraintEnd_toStartOf="@+id/ea_iv_decline"
+                    app:layout_constraintTop_toTopOf="@id/ea_tv_title"
+                    app:layout_constraintVertical_bias="1.0"
+                    app:srcCompat="@drawable/ic_chat2" />
+
+                <TextView
+                    android:id="@+id/ea_tv_full_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:ellipsize="end"
+                    android:gravity="bottom"
+                    android:maxEms="20"
+                    android:maxLines="1"
+                    android:textColor="@color/font"
+                    android:textSize="@dimen/normal_lable_font_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/ea_tv_date"
+                    app:layout_constraintTop_toTopOf="@id/ea_tv_date" />
+
+                <TextView
+                    android:id="@+id/ea_tv_add"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:ellipsize="end"
+                    android:gravity="top"
+                    android:maxEms="20"
+                    android:maxLines="1"
+                    android:textColor="@color/font"
+                    android:textSize="@dimen/normal_lable_font_size"
+                    app:layout_constraintBottom_toBottomOf="@+id/ea_tv_date"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@id/ea_tv_date"
+                    app:layout_constraintTop_toBottomOf="@+id/ea_tv_full_date" />
+
+                <ImageView
+                    android:id="@+id/ea_iv_decline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:contentDescription="@string/yf_rv_decline"
+                    android:focusable="true"
+                    android:foreground="?android:selectableItemBackground"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="@id/ea_tv_title"
+                    app:layout_constraintEnd_toStartOf="@id/ea_iv_accept"
+                    app:layout_constraintTop_toTopOf="@id/ea_tv_title"
+                    app:srcCompat="@drawable/ic_decline"
+                    tools:ignore="UnusedAttribute" />
+
+                <ImageView
+                    android:id="@+id/ea_iv_accept"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:contentDescription="@string/yf_rv_accept"
+                    android:focusable="true"
+                    android:foreground="?android:selectableItemBackground"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="@id/ea_tv_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/ea_tv_title"
+                    app:srcCompat="@drawable/ic_accept"
+                    tools:ignore="UnusedAttribute" />
+
+                <ImageView
+                    android:id="@+id/ea_iv_share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:contentDescription="@string/yf_rv_share"
+                    android:focusable="true"
+                    android:foreground="?android:selectableItemBackground"
+                    android:padding="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/ea_iv_like"
+                    app:layout_constraintTop_toBottomOf="@id/ea_tv_date"
+                    app:srcCompat="@drawable/ic_share"
+                    tools:ignore="UnusedAttribute" />
+
+                <ImageView
+                    android:id="@+id/ea_iv_like"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:contentDescription="@string/yf_rv_like"
+                    android:focusable="true"
+                    android:foreground="?android:selectableItemBackground"
+                    android:padding="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/ea_iv_coming_count"
+                    app:layout_constraintTop_toBottomOf="@id/ea_tv_date"
+                    app:srcCompat="@drawable/ic_like"
+                    tools:ignore="UnusedAttribute" />
+
+                <TextView
+                    android:id="@+id/ea_iv_coming_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:gravity="center"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/count_font_size"
+                    app:layout_constraintBottom_toBottomOf="@id/ea_iv_like"
+                    app:layout_constraintEnd_toStartOf="@id/ea_iv_more"
+                    app:layout_constraintTop_toTopOf="@id/ea_iv_like"
+                    app:layout_constraintVertical_bias="0.666" />
+
+                <ImageView
+                    android:id="@+id/ea_iv_more"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:contentDescription="@string/yf_rv_more"
+                    android:focusable="true"
+                    android:foreground="?android:selectableItemBackground"
+                    android:padding="4dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ea_tv_date"
+                    app:srcCompat="@drawable/ic_more"
+                    tools:ignore="UnusedAttribute" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/ae_cl_other"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:ellipsize="end"
-                android:gravity="top"
-                android:maxLines="1"
-                android:textColor="@color/font"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="@+id/ea_tv_date"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ea_cl">
+
+                <TextView
+                    android:id="@+id/ea_tv_other"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/normal_lable_font_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.75dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/grey"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ea_tv_other" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/ea_tl"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@id/ea_tv_date"
-                app:layout_constraintTop_toBottomOf="@+id/ea_tv_full_date" />
-
-            <ImageView
-                android:id="@+id/ea_iv_decline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="18dp"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:contentDescription="@string/yf_rv_decline"
-                android:focusable="true"
-                android:foreground="?android:selectableItemBackground"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/ea_tv_title"
-                app:layout_constraintEnd_toStartOf="@id/ea_iv_accept"
-                app:layout_constraintTop_toTopOf="@id/ea_tv_title"
-                app:srcCompat="@drawable/ic_decline"
-                tools:ignore="UnusedAttribute" />
-
-            <ImageView
-                android:id="@+id/ea_iv_accept"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:contentDescription="@string/yf_rv_accept"
-                android:focusable="true"
-                android:foreground="?android:selectableItemBackground"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/ea_tv_title"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/ea_tv_title"
-                app:srcCompat="@drawable/ic_accept"
-                tools:ignore="UnusedAttribute" />
-
-            <ImageView
-                android:id="@+id/ea_iv_share"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="12dp"
-                android:layout_marginBottom="8dp"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:contentDescription="@string/yf_rv_share"
-                android:focusable="true"
-                android:foreground="?android:selectableItemBackground"
-                android:padding="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/ea_iv_like"
-                app:layout_constraintTop_toBottomOf="@id/ea_tv_date"
-                app:srcCompat="@drawable/ic_share"
-                tools:ignore="UnusedAttribute" />
-
-            <ImageView
-                android:id="@+id/ea_iv_like"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:contentDescription="@string/yf_rv_like"
-                android:focusable="true"
-                android:foreground="?android:selectableItemBackground"
-                android:padding="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/ea_iv_coming_count"
-                app:layout_constraintTop_toBottomOf="@id/ea_tv_date"
-                app:srcCompat="@drawable/ic_like"
-                tools:ignore="UnusedAttribute" />
-
-            <TextView
-                android:id="@+id/ea_iv_coming_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:gravity="center"
-                android:textColor="@color/colorPrimary"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="@id/ea_iv_like"
-                app:layout_constraintEnd_toStartOf="@id/ea_iv_more"
-                app:layout_constraintTop_toTopOf="@id/ea_iv_like"
-                app:layout_constraintVertical_bias="0.666" />
-
-            <ImageView
-                android:id="@+id/ea_iv_more"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:contentDescription="@string/yf_rv_more"
-                android:focusable="true"
-                android:foreground="?android:selectableItemBackground"
-                android:padding="4dp"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ea_tv_date"
-                app:srcCompat="@drawable/ic_more"
-                tools:ignore="UnusedAttribute" />
-
-        </android.support.constraint.ConstraintLayout>
-
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/ae_cl_other"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ea_cl">
-
-            <TextView
-                android:id="@+id/ea_tv_other"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:textColor="@color/colorPrimary"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/ae_cl_other"
+                app:tabGravity="fill"
+                app:tabMode="fixed"
+                app:tabRippleColor="@color/light_grey"
+                app:tabSelectedTextColor="@color/colorPrimary"
+                app:tabTextAppearance="?android:textAppearanceSmall"
+                app:tabTextColor="@color/grey" />
 
-            <View
-                android:id="@+id/view"
-                android:layout_width="match_parent"
-                android:layout_height="0.75dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="8dp"
-                android:background="@color/grey"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ea_tv_other" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </android.support.constraint.ConstraintLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/ea_tl"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ae_cl_other"
-            app:tabGravity="fill"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/colorPrimary"
-            app:tabTextAppearance="?android:textAppearanceSmall"
-            app:tabTextColor="@color/grey" />
+    <FrameLayout
+        android:id="@+id/ea_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/ea_vp"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ea_tl" />
-
-    </android.support.constraint.ConstraintLayout>
-
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

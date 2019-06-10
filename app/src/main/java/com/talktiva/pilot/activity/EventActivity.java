@@ -7,17 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.view.Menu;
@@ -27,6 +16,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.google.android.material.tabs.TabLayout;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.fragment.invitee.InviteeFragment;
 import com.talktiva.pilot.helper.CustomTypefaceSpan;
@@ -92,9 +90,6 @@ public class EventActivity extends AppCompatActivity {
 
     @BindView(R.id.ea_tl)
     TabLayout tabLayout;
-
-    @BindView(R.id.ea_vp)
-    ViewPager viewPager;
 
     @BindView(R.id.ae_cl_other)
     ConstraintLayout constraintLayout;
@@ -191,6 +186,7 @@ public class EventActivity extends AppCompatActivity {
             case android.R.id.home:
                 onBackPressed();
                 return true;
+
             case R.id.dea_menu_edit:
                 Intent intent = new Intent(EventActivity.this, CreateEventActivity.class);
                 Bundle bundle = new Bundle();
@@ -199,6 +195,7 @@ public class EventActivity extends AppCompatActivity {
                 intent.putExtras(bundle);
                 startActivity(intent);
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -227,12 +224,8 @@ public class EventActivity extends AppCompatActivity {
                     if (response.code() >= 300 && response.code() < 500) {
                         utility.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                utility.dismissDialog(internetDialog);
-                            }
-                        });
+                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try),
+                                v -> utility.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -242,12 +235,7 @@ public class EventActivity extends AppCompatActivity {
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
                 utility.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            utility.dismissDialog(internetDialog);
-                        }
-                    });
+                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -279,12 +267,7 @@ public class EventActivity extends AppCompatActivity {
                     if (response.code() >= 300 && response.code() < 500) {
                         utility.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                utility.dismissDialog(internetDialog);
-                            }
-                        });
+                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), v -> utility.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -295,12 +278,7 @@ public class EventActivity extends AppCompatActivity {
                 utility.dismissDialog(cancelDialog);
                 utility.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            utility.dismissDialog(internetDialog);
-                        }
-                    });
+                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -319,7 +297,7 @@ public class EventActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     event = response.body();
 
-                    List<Invitation> acceptedInvitations, pendingInvitations;
+                    final List<Invitation> acceptedInvitations, pendingInvitations;
                     acceptedInvitations = new ArrayList<>();
                     pendingInvitations = new ArrayList<>();
 
@@ -372,65 +350,51 @@ public class EventActivity extends AppCompatActivity {
                             break;
                     }
 
-                    ivAccept.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            acceptEvent(event.getEventId(), true);
+                    ivAccept.setOnClickListener(v -> acceptEvent(event.getEventId(), true));
+
+                    ivDecline.setOnClickListener(v -> {
+                        switch (from) {
+                            case 0:
+                                declineDialog = utility.showAlert(getResources().getString(R.string.decline_msg), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v1 -> acceptEvent(event.getEventId(), false), View.VISIBLE, "No", V -> utility.dismissDialog(declineDialog));
+                                declineDialog.show();
+                                break;
+                            case 1:
+                                declineDialog = utility.showAlert(getResources().getString(R.string.decline_msg), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v12 -> acceptEvent(event.getEventId(), false), View.VISIBLE, "No", V -> utility.dismissDialog(declineDialog));
+                                declineDialog.show();
+                                break;
+                            case 2:
+                                cancelDialog = utility.showAlert(getResources().getString(R.string.cancel_msg), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v13 -> cancelEvent(event.getEventId()), View.VISIBLE, "No", V -> utility.dismissDialog(cancelDialog));
+                                cancelDialog.show();
+                                break;
                         }
                     });
 
-                    ivDecline.setOnClickListener(new View.OnClickListener() {
+                    if (tabLayout.getTabCount() != 2) {
+                        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.dea_accept).concat(" (").concat(String.valueOf(acceptedInvitations.size())).concat(")")), 0);
+                        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.dea_pending).concat(" (").concat(String.valueOf(pendingInvitations.size())).concat(")")), 1);
+                    }
+
+                    tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                         @Override
-                        public void onClick(View v) {
-                            switch (from) {
+                        public void onTabSelected(TabLayout.Tab tab) {
+                            switch (tab.getPosition()) {
                                 case 0:
-                                    declineDialog = utility.showAlert(getResources().getString(R.string.decline_msg), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            acceptEvent(event.getEventId(), false);
-                                        }
-                                    }, View.VISIBLE, "No", new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View V) {
-                                            utility.dismissDialog(declineDialog);
-                                        }
-                                    });
-                                    declineDialog.show();
+                                    loadFragment(new InviteeFragment(acceptedInvitations));
                                     break;
                                 case 1:
-                                    declineDialog = utility.showAlert(getResources().getString(R.string.decline_msg), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            acceptEvent(event.getEventId(), false);
-                                        }
-                                    }, View.VISIBLE, "No", new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View V) {
-                                            utility.dismissDialog(declineDialog);
-                                        }
-                                    });
-                                    declineDialog.show();
-                                    break;
-                                case 2:
-                                    cancelDialog = utility.showAlert(getResources().getString(R.string.cancel_msg), false, View.VISIBLE, getResources().getString(R.string.dd_yes), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            cancelEvent(event.getEventId());
-                                        }
-                                    }, View.VISIBLE, "No", new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View V) {
-                                            utility.dismissDialog(cancelDialog);
-                                        }
-                                    });
-                                    cancelDialog.show();
+                                    loadFragment(new InviteeFragment(pendingInvitations));
                                     break;
                             }
                         }
-                    });
 
-                    viewPager.setAdapter(new EventDetailAdapter(getSupportFragmentManager(), from, acceptedInvitations, pendingInvitations));
-                    tabLayout.setupWithViewPager(viewPager);
+                        @Override
+                        public void onTabUnselected(TabLayout.Tab tab) {
+                        }
+
+                        @Override
+                        public void onTabReselected(TabLayout.Tab tab) {
+                        }
+                    });
 
                     ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
                     for (int j = 0; j < vg.getChildCount(); j++) {
@@ -444,23 +408,23 @@ public class EventActivity extends AppCompatActivity {
                         }
                     }
 
+                    if (Objects.requireNonNull(tabLayout.getTabAt(0)).isSelected()) {
+                        loadFragment(new InviteeFragment(acceptedInvitations));
+                    }
+
                     tvDate.setText(new SimpleDateFormat("MMM", Locale.US).format(event.getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(event.getEventDate())));
                     tvTitle.setText(event.getTitle());
                     tvFullDate.setText(event.getEventDate().toLocaleString());
                     tvAdd.setText(event.getCreatorFirstName().concat(" ").concat(event.getCreatorLasttName()).concat(" | ").concat(event.getLocation()));
                     tvCount.setText(String.valueOf(event.getLikeCount()));
+
                     utility.dismissDialog(progressDialog);
                 } else {
                     utility.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 500) {
                         utility.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                utility.dismissDialog(internetDialog);
-                            }
-                        });
+                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), v -> utility.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -471,94 +435,17 @@ public class EventActivity extends AppCompatActivity {
                 utility.dismissDialog(cancelDialog);
                 utility.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            utility.dismissDialog(internetDialog);
-                        }
-                    });
+                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
         });
     }
 
-    private class EventDetailAdapter extends FragmentPagerAdapter {
-
-        private List<Invitation> acceptedInvitations, pendingInvitations;
-        private int from;
-
-        EventDetailAdapter(FragmentManager fm, int from, List<Invitation> acceptedInvitations, List<Invitation> pendingInvitations) {
-            super(fm);
-            this.from = from;
-            this.pendingInvitations = pendingInvitations;
-            this.acceptedInvitations = acceptedInvitations;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (from) {
-                case 0:
-                    if (position == 0) {
-                        return new InviteeFragment(acceptedInvitations);
-                    }
-                    break;
-                case 1:
-                    if (position == 0) {
-                        return new InviteeFragment(acceptedInvitations);
-                    }
-                    break;
-                case 2:
-                    switch (position) {
-                        case 0:
-                            return new InviteeFragment(acceptedInvitations);
-                        case 1:
-                            return new InviteeFragment(pendingInvitations);
-                    }
-                    break;
-            }
-            return null;
-        }
-
-        @Override
-        public int getCount() {
-            int count = 0;
-            switch (from) {
-                case 0:
-                    count = 1;
-                    break;
-                case 1:
-                    count = 1;
-                    break;
-                case 2:
-                    count = 2;
-                    break;
-            }
-            return count;
-        }
-
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (from) {
-                case 0:
-                    if (position == 0) {
-                        return " ";
-                    }
-                case 1:
-                    if (position == 0) {
-                        return " ";
-                    }
-                    break;
-                case 2:
-                    if (position == 0) {
-                        return getResources().getString(R.string.dea_accept).concat(" (").concat(String.valueOf(acceptedInvitations.size())).concat(")");
-                    } else if (position == 1) {
-                        return getResources().getString(R.string.dea_pending).concat(" (").concat(String.valueOf(pendingInvitations.size())).concat(")");
-                    }
-                    break;
-            }
-            return super.getPageTitle(position);
-        }
+    private void loadFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.ea_container, fragment);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.commit();
     }
 }

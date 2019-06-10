@@ -6,13 +6,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.google.android.material.tabs.TabLayout;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.view.LayoutInflater;
@@ -42,11 +45,20 @@ import butterknife.ButterKnife;
 public class EventFragment extends Fragment {
 
     public static final String TAG = "EventFragment";
+
     @BindView(R.id.ef_toolbar)
     Toolbar toolbar;
+
     @BindView(R.id.ef_tab)
     TabLayout tabLayout;
-    protected BroadcastReceiver r0 = new BroadcastReceiver() {
+
+    @BindView(R.id.ef_container)
+    FrameLayout frameLayout;
+
+    private BroadcastReceiver receiver;
+    private Utility utility;
+
+    private BroadcastReceiver r0 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Objects.requireNonNull(tabLayout.getTabAt(0)).isSelected()) {
@@ -57,7 +69,8 @@ public class EventFragment extends Fragment {
             }
         }
     };
-    protected BroadcastReceiver r1 = new BroadcastReceiver() {
+
+    private BroadcastReceiver r1 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Objects.requireNonNull(tabLayout.getTabAt(1)).isSelected()) {
@@ -68,7 +81,8 @@ public class EventFragment extends Fragment {
             }
         }
     };
-    protected BroadcastReceiver r2 = new BroadcastReceiver() {
+
+    private BroadcastReceiver r2 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Objects.requireNonNull(tabLayout.getTabAt(2)).isSelected()) {
@@ -79,10 +93,6 @@ public class EventFragment extends Fragment {
             }
         }
     };
-    @BindView(R.id.ef_container)
-    FrameLayout frameLayout;
-    private BroadcastReceiver receiver;
-    private Utility utility;
 
     public EventFragment() {
     }

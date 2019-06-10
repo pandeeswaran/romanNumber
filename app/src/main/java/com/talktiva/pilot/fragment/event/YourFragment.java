@@ -7,12 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +51,8 @@ public class YourFragment extends Fragment {
 
     private Dialog progressDialog, internetDialog;
     private Utility utility;
-    protected BroadcastReceiver r = new BroadcastReceiver() {
+
+    private BroadcastReceiver r = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             setData();
@@ -84,10 +86,8 @@ public class YourFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
                 if (response.isSuccessful()) {
-                    utility.dismissDialog(progressDialog);
-
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-                    layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                    layoutManager.setOrientation(RecyclerView.VERTICAL);
                     recyclerView.setLayoutManager(layoutManager);
 
                     @SuppressLint("UseSparseArrays") HashMap<Integer, List<Event>> groupByEvents = new HashMap<>();
@@ -118,59 +118,38 @@ public class YourFragment extends Fragment {
                         groupByEventList.add(groupByEvent);
                     }
 
-                    Collections.sort(groupByEventList, new Comparator<GroupByEvent>() {
-                        @Override
-                        public int compare(GroupByEvent o1, GroupByEvent o2) {
-                            return o1.getDay().compareTo(o2.getDay());
-                        }
-                    });
+                    Collections.sort(groupByEventList, (o1, o2) -> o1.getDay().compareTo(o2.getDay()));
 
                     AdapterGroupBy adapterGroupBy = new AdapterGroupBy(getActivity(), groupByEventList, 2);
                     recyclerView.setAdapter(adapterGroupBy);
                     adapterGroupBy.notifyDataSetChanged();
 
-                    adapterGroupBy.setOnPositionClicked(new ClickListener() {
-                        @Override
-                        public void onPositionClicked(View view, Event event, int from) {
-                            switch (view.getId()) {
-                                case R.id.yf_rv_cl:
-                                    Intent intent = new Intent(getActivity(), EventActivity.class);
-                                    Bundle bundle = new Bundle();
-                                    bundle.putInt(getResources().getString(R.string.from), from);
-                                    bundle.putSerializable(getResources().getString(R.string.event), event);
-                                    intent.putExtras(bundle);
-                                    startActivity(intent);
-                                    break;
-                                case R.id.yf_rv_iv_share:
-                                    break;
-                                case R.id.yf_rv_iv_more:
-                                    break;
-                            }
+                    adapterGroupBy.setOnPositionClicked((view, event, from) -> {
+                        switch (view.getId()) {
+                            case R.id.yf_rv_cl:
+                                Intent intent = new Intent(getActivity(), EventActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putInt(getResources().getString(R.string.from), from);
+                                bundle.putSerializable(getResources().getString(R.string.event), event);
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+                                break;
+                            case R.id.yf_rv_iv_share:
+                                break;
+                            case R.id.yf_rv_iv_more:
+                                break;
                         }
                     });
+
+                    utility.dismissDialog(progressDialog);
                 } else {
                     utility.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 400) {
-                        internetDialog = utility.showError(getResources().getString(R.string.network_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                internetDialog.dismiss();
-                            }
-                        });
+                        internetDialog = utility.showError(getResources().getString(R.string.network_msg), getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss());
                     } else if (response.code() >= 400 && response.code() < 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.authentication_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                internetDialog.dismiss();
-                            }
-                        });
+                        internetDialog = utility.showError(getResources().getString(R.string.authentication_msg), getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss());
                     } else if (response.code() >= 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                internetDialog.dismiss();
-                            }
-                        });
+                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), v -> internetDialog.dismiss());
                     }
                     internetDialog.show();
                 }
@@ -180,12 +159,7 @@ public class YourFragment extends Fragment {
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
                 utility.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            internetDialog.dismiss();
-                        }
-                    });
+                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss());
                     internetDialog.show();
                 }
             }
