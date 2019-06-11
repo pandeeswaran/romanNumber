@@ -166,10 +166,15 @@ public class CreateEventActivity extends AppCompatActivity {
                     newDate.set(year, month, dayOfMonth);
 
                     TimePickerDialog timePickerDialog = new TimePickerDialog(CreateEventActivity.this, (view1, hourOfDay, minute) -> {
+                        Calendar c = Calendar.getInstance();
                         newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         newDate.set(Calendar.MINUTE, minute);
-
-                        etDate.setText(newDate.getTime().toLocaleString());
+                        if (newDate.getTimeInMillis() >= c.getTimeInMillis()) {
+                            etDate.setText(newDate.getTime().toLocaleString());
+                        } else {
+                            errorDialog = utility.showAlert(getResources().getString(R.string.error_date), false, View.VISIBLE, getResources().getString(R.string.dd_ok), v2 -> errorDialog.dismiss(), View.GONE, null, null);
+                            errorDialog.show();
+                        }
                     }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false);
                     switch (from) {
                         case "new":

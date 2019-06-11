@@ -6,10 +6,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +49,9 @@ public class PendingFragment extends Fragment {
     @BindView(R.id.pf_rv)
     RecyclerView recyclerView;
 
+    @BindView(R.id.pf_tv)
+    TextView textView;
+
     private Dialog progressDialog, internetDialog;
     private Utility utility;
 
@@ -71,6 +76,7 @@ public class PendingFragment extends Fragment {
         utility = new Utility(getActivity());
         progressDialog = utility.showProgress();
         ButterKnife.bind(this, view);
+        textView.setTypeface(utility.getFont(), Typeface.BOLD);
         setData();
     }
 
@@ -84,60 +90,70 @@ public class PendingFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
                 if (response.isSuccessful()) {
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-                    layoutManager.setOrientation(RecyclerView.VERTICAL);
-                    recyclerView.setLayoutManager(layoutManager);
+                    ResultEvents resultEvents = Objects.requireNonNull(response.body());
+                    if (resultEvents.getEvents() != null && resultEvents.getEvents().size() != 0) {
+                        textView.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
 
-                    @SuppressLint("UseSparseArrays") HashMap<Integer, List<Event>> groupByEvents = new HashMap<>();
-                    for (Event event : Objects.requireNonNull(response.body()).getEvents()) {
-                        Date curDate = Calendar.getInstance().getTime();
-                        int day;
-                        if (curDate.getDate() == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
-                            day = 0;
-                        } else if ((curDate.getDate() + 1) == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
-                            day = 1;
-                        } else {
-                            day = 2;
+                        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+                        layoutManager.setOrientation(RecyclerView.VERTICAL);
+                        recyclerView.setLayoutManager(layoutManager);
+
+                        @SuppressLint("UseSparseArrays") HashMap<Integer, List<Event>> groupByEvents = new HashMap<>();
+                        for (Event event : resultEvents.getEvents()) {
+                            Date curDate = Calendar.getInstance().getTime();
+                            int day;
+                            if (curDate.getDate() == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
+                                day = 0;
+                            } else if ((curDate.getDate() + 1) == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
+                                day = 1;
+                            } else {
+                                day = 2;
+                            }
+                            if (groupByEvents.containsKey(day)) {
+                                Objects.requireNonNull(groupByEvents.get(day)).add(event);
+                            } else {
+                                List<Event> list = new ArrayList<>();
+                                list.add(event);
+                                groupByEvents.put(day, list);
+                            }
                         }
-                        if (groupByEvents.containsKey(day)) {
-                            Objects.requireNonNull(groupByEvents.get(day)).add(event);
-                        } else {
-                            List<Event> list = new ArrayList<>();
-                            list.add(event);
-                            groupByEvents.put(day, list);
+
+                        List<GroupByEvent> groupByEventList = new ArrayList<>();
+                        for (Integer day : groupByEvents.keySet()) {
+                            GroupByEvent groupByEvent = new GroupByEvent();
+                            groupByEvent.setDay(day);
+                            groupByEvent.setEvents(Objects.requireNonNull(groupByEvents.get(day)));
+                            groupByEventList.add(groupByEvent);
                         }
+
+                        Collections.sort(groupByEventList, (o1, o2) -> o1.getDay().compareTo(o2.getDay()));
+
+                        AdapterGroupBy adapterGroupBy = new AdapterGroupBy(getActivity(), groupByEventList, 0);
+                        recyclerView.setAdapter(adapterGroupBy);
+                        adapterGroupBy.notifyDataSetChanged();
+
+                        adapterGroupBy.setOnPositionClicked((view, event, from) -> {
+                            switch (view.getId()) {
+                                case R.id.yf_rv_cl:
+                                    Intent intent = new Intent(getActivity(), EventActivity.class);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putInt(getResources().getString(R.string.from), from);
+                                    bundle.putSerializable(getResources().getString(R.string.event), event);
+                                    intent.putExtras(bundle);
+                                    startActivity(intent);
+                                    break;
+                                case R.id.ea_iv_like:
+                                    break;
+                                case R.id.yf_rv_iv_share:
+                                    break;
+                            }
+                        });
+                    } else {
+                        recyclerView.setVisibility(View.GONE);
+                        textView.setVisibility(View.VISIBLE);
                     }
-
-                    List<GroupByEvent> groupByEventList = new ArrayList<>();
-                    for (Integer day : groupByEvents.keySet()) {
-                        GroupByEvent groupByEvent = new GroupByEvent();
-                        groupByEvent.setDay(day);
-                        groupByEvent.setEvents(Objects.requireNonNull(groupByEvents.get(day)));
-                        groupByEventList.add(groupByEvent);
-                    }
-
-                    Collections.sort(groupByEventList, (o1, o2) -> o1.getDay().compareTo(o2.getDay()));
-
-                    AdapterGroupBy adapterGroupBy = new AdapterGroupBy(getActivity(), groupByEventList, 0);
-                    recyclerView.setAdapter(adapterGroupBy);
-                    adapterGroupBy.notifyDataSetChanged();
-
-                    adapterGroupBy.setOnPositionClicked((view, event, from) -> {
-                        switch (view.getId()) {
-                            case R.id.yf_rv_cl:
-                                Intent intent = new Intent(getActivity(), EventActivity.class);
-                                Bundle bundle = new Bundle();
-                                bundle.putInt(getResources().getString(R.string.from), from);
-                                bundle.putSerializable(getResources().getString(R.string.event), event);
-                                intent.putExtras(bundle);
-                                startActivity(intent);
-                                break;
-                            case R.id.ea_iv_like:
-                                break;
-                            case R.id.yf_rv_iv_share:
-                                break;
-                        }
-                    });
+                    utility.dismissDialog(progressDialog);
                 } else {
                     utility.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 400) {
@@ -149,8 +165,6 @@ public class PendingFragment extends Fragment {
                     }
                     internetDialog.show();
                 }
-
-                utility.dismissDialog(progressDialog);
             }
 
             @Override

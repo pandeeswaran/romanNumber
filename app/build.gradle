@@ -50,7 +50,4 @@ dependencies {
 
     //Lottie
     implementation 'com.airbnb.android:lottie:3.0.6'
-
-    //Tags EditText
-    implementation 'com.github.anonymous-ME:TagsEditText:0.5.0'
 }

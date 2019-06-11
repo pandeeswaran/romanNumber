@@ -109,6 +109,7 @@
     <string name="event_update_msg">Event updated successfully</string>
     <string name="event_cancel_msg">Event canceled successfully</string>
 
+    <string name="error_date">Please choose future date and time</string>
     <string name="val_name">Kindly enter the event name.</string>
     <string name="val_date">Kindly select the event date.</string>
     <string name="val_location">Kindly enter the event location.</string>
@@ -116,6 +117,12 @@
 
     <string name="sample_add">10 Taylor Ct, Ridgefield CT 06877</string>
 
+    <string name="no_p_event">No pending events found.</string>
+    <string name="no_u_event">No upcoming events found.</string>
+    <string name="no_c_event">No events created.</string>
+
     //Add Guest to Event Screen EditText Hint
     <string name="aag_et_search">Search</string>
+    <string name="aag_et_email">Enter guest emails here</string>
+    <string name="aag_et_phone">Enter guest phone numbers here</string>
 </resources>
