@@ -97,6 +97,8 @@ public class EventActivity extends AppCompatActivity {
     @BindView(R.id.ea_tv_other)
     TextView tvOther;
 
+    private List<Invitation> acceptedInvitations, pendingInvitations;
+
     private Dialog progressDialog, cancelDialog, declineDialog, internetDialog;
     private Utility utility;
 
@@ -297,7 +299,6 @@ public class EventActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     event = response.body();
 
-                    final List<Invitation> acceptedInvitations, pendingInvitations;
                     acceptedInvitations = new ArrayList<>();
                     pendingInvitations = new ArrayList<>();
 
@@ -307,6 +308,16 @@ public class EventActivity extends AppCompatActivity {
                         } else {
                             acceptedInvitations.add(event.getInvitations().get(j));
                         }
+                    }
+
+                    if (tabLayout.getTabCount() != 2 && tabLayout.getTabCount() != 0) {
+                        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.dea_accept).concat(" (").concat(String.valueOf(acceptedInvitations.size())).concat(")")), 0);
+                        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.dea_pending).concat(" (").concat(String.valueOf(pendingInvitations.size())).concat(")")), 1);
+                    } else {
+                        tabLayout.removeAllTabs();
+                        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.dea_accept).concat(" (").concat(String.valueOf(acceptedInvitations.size())).concat(")")), 0);
+                        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.dea_pending).concat(" (").concat(String.valueOf(pendingInvitations.size())).concat(")")), 1);
+
                     }
 
                     if (event.getIsPrivate()) {
@@ -368,11 +379,6 @@ public class EventActivity extends AppCompatActivity {
                                 break;
                         }
                     });
-
-                    if (tabLayout.getTabCount() != 2) {
-                        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.dea_accept).concat(" (").concat(String.valueOf(acceptedInvitations.size())).concat(")")), 0);
-                        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.dea_pending).concat(" (").concat(String.valueOf(pendingInvitations.size())).concat(")")), 1);
-                    }
 
                     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                         @Override
