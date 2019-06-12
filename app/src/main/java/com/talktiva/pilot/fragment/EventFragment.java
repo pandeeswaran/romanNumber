@@ -195,7 +195,7 @@ public class EventFragment extends Fragment {
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.replace(R.id.ef_container, fragment);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 
     @Override
