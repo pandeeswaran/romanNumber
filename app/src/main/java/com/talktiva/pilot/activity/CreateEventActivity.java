@@ -7,10 +7,8 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,6 +42,7 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -169,6 +168,7 @@ public class CreateEventActivity extends AppCompatActivity {
                         Calendar c = Calendar.getInstance();
                         newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         newDate.set(Calendar.MINUTE, minute);
+
                         if (newDate.getTimeInMillis() >= c.getTimeInMillis()) {
                             etDate.setText(newDate.getTime().toLocaleString());
                         } else {
@@ -176,87 +176,37 @@ public class CreateEventActivity extends AppCompatActivity {
                             errorDialog.show();
                         }
                     }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false);
-                    switch (from) {
-                        case "new":
-                            timePickerDialog.updateTime(Calendar.getInstance().getTime().getHours(), Calendar.getInstance().getTime().getMinutes());
-                            break;
-                        case "edit":
-                            timePickerDialog.updateTime(curEvent.getEventDate().getHours(), curEvent.getEventDate().getMinutes());
-                            break;
-                    }
+                    timePickerDialog.updateTime(Calendar.getInstance(Locale.US).getTime().getHours(), Calendar.getInstance(Locale.US).getTime().getMinutes());
                     timePickerDialog.show();
                 }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH));
-                switch (from) {
-                    case "new":
-                        datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
-                        break;
-                    case "edit":
-                        datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
-                        break;
-                }
+                datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance(Locale.US).getTimeInMillis());
                 datePickerDialog.show();
                 return true;
             } else {
                 return false;
             }
         });
+    }
 
-        etName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    @OnTextChanged(value = R.id.cea_et_name, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    void setEtNameOnTextChange(CharSequence s) {
+        if (s.toString().trim().length() > 0) {
+            tvName.setVisibility(View.GONE);
+        }
+    }
 
-            }
+    @OnTextChanged(value = R.id.cea_et_date, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    void setEtDateOnTextChange(CharSequence s) {
+        if (s.toString().trim().length() > 0) {
+            tvDate.setVisibility(View.GONE);
+        }
+    }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.toString().trim().length() > 0) {
-                    tvName.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        etDate.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.toString().trim().length() > 0) {
-                    tvDate.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        etLocation.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.toString().trim().length() > 0) {
-                    tvLocation.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+    @OnTextChanged(value = R.id.cea_et_location, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    void setEtLocationOnTextChange(CharSequence s) {
+        if (s.toString().trim().length() > 0) {
+            tvLocation.setVisibility(View.GONE);
+        }
     }
 
     @Override
