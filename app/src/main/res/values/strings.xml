@@ -121,6 +121,10 @@
     <string name="no_u_event">No upcoming events found.</string>
     <string name="no_c_event">No events created.</string>
 
+    //Context Menu Item for Upcoming and Yours event Screen
+    <string name="atc">Add to calender</string>
+    <string name="event_success">Event added successfully</string>
+
     //Add Guest to Event Screen EditText Hint
     <string name="aag_et_search">Search</string>
     <string name="aag_et_email">Enter guest emails here</string>

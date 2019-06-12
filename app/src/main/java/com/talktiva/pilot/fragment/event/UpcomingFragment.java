@@ -3,12 +3,19 @@ package com.talktiva.pilot.fragment.event;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -37,6 +44,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,6 +62,7 @@ public class UpcomingFragment extends Fragment {
 
     private Dialog progressDialog, internetDialog;
     private Utility utility;
+    private Event curEvent;
 
     private BroadcastReceiver r = new BroadcastReceiver() {
         @Override
@@ -132,6 +141,7 @@ public class UpcomingFragment extends Fragment {
                         AdapterGroupBy adapterGroupBy = new AdapterGroupBy(getActivity(), groupByEventList, 1);
                         recyclerView.setAdapter(adapterGroupBy);
                         adapterGroupBy.notifyDataSetChanged();
+                        registerForContextMenu(recyclerView);
 
                         adapterGroupBy.setOnPositionClicked((view, event, from) -> {
                             switch (view.getId()) {
@@ -147,7 +157,10 @@ public class UpcomingFragment extends Fragment {
                                     break;
                                 case R.id.yf_rv_iv_share:
                                     break;
-
+                                case R.id.yf_rv_iv_more:
+                                    curEvent = event;
+                                    Objects.requireNonNull(getActivity()).openContextMenu(view);
+                                    break;
                             }
                         });
                     } else {
@@ -189,5 +202,50 @@ public class UpcomingFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(0, v.getId(), 0, getResources().getString(R.string.atc));
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getTitle().toString().equalsIgnoreCase(getResources().getString(R.string.atc))) {
+            Cursor cursor = Objects.requireNonNull(getActivity()).getApplicationContext().getContentResolver().query(CalendarContract.Calendars.CONTENT_URI, null, null, null, null);
+            long calenderId = 0;
+
+            if (Objects.requireNonNull(cursor).moveToFirst()) {
+                calenderId = cursor.getLong(cursor.getColumnIndex(CalendarContract.Calendars._ID));
+            }
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(CalendarContract.Events.CALENDAR_ID, calenderId);
+            contentValues.put(CalendarContract.Events.TITLE, curEvent.getTitle());
+            contentValues.put(CalendarContract.Events.EVENT_LOCATION, curEvent.getLocation());
+            contentValues.put(CalendarContract.Events.ALL_DAY, false);
+            contentValues.put(CalendarContract.Events.STATUS, true);
+            contentValues.put(CalendarContract.Events.HAS_ALARM, true);
+            contentValues.put(CalendarContract.Events.DTSTART, (curEvent.getEventDate().getTime() + 60 * 60 * 1000));
+            contentValues.put(CalendarContract.Events.DTEND, curEvent.getEventDate().getTime() + 60 * 60 * 1000);
+            contentValues.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().toString());
+
+            Uri eventUri = getActivity().getApplicationContext().getContentResolver().insert(CalendarContract.Events.CONTENT_URI, contentValues);
+            long eventID = ContentUris.parseId(eventUri);
+
+            ContentValues reminders = new ContentValues();
+            reminders.put(CalendarContract.Reminders.EVENT_ID, eventID);
+            reminders.put(CalendarContract.Reminders.METHOD, true);
+            reminders.put(CalendarContract.Reminders.MINUTES, 120);
+            String reminderUriString = "content://com.android.calendar/reminders";
+            getActivity().getApplicationContext().getContentResolver().insert(Uri.parse(reminderUriString), reminders);
+
+            internetDialog = utility.showAlert(getResources().getString(R.string.event_success), false, View.VISIBLE, getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss(), View.GONE, null, null);
+            internetDialog.show();
+            return true;
+        } else {
+            return false;
+        }
     }
 }

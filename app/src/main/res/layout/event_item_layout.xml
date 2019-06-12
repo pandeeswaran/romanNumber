@@ -9,7 +9,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?selectableItemBackground"
-    android:padding="8dp"
+    android:padding="10dp"
     tools:ignore="UnusedAttribute">
 
     <TextView
@@ -61,7 +61,7 @@
         android:maxLines="1"
         android:textSize="@dimen/normal_lable_font_size"
         app:layout_constraintBottom_toBottomOf="@id/yf_rv_tv_date"
-        app:layout_constraintEnd_toStartOf="@+id/yf_rv_iv_private"
+        app:layout_constraintEnd_toStartOf="@id/yf_rv_iv_private"
         app:layout_constraintStart_toEndOf="@id/yf_rv_tv_date"
         app:layout_constraintTop_toBottomOf="@id/yf_rv_tv_full_date" />
 
@@ -72,9 +72,9 @@
         android:layout_marginEnd="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/yf_rv_private"
-        android:padding="4dp"
-        app:layout_constraintEnd_toStartOf="@+id/yf_rv_iv_share"
-        app:layout_constraintTop_toTopOf="@+id/yf_rv_tv_add"
+        android:padding="6dp"
+        app:layout_constraintEnd_toStartOf="@id/yf_rv_iv_share"
+        app:layout_constraintTop_toTopOf="@id/yf_rv_tv_add"
         app:srcCompat="@drawable/ic_private" />
 
     <ImageView
@@ -87,9 +87,9 @@
         android:contentDescription="@string/yf_rv_share"
         android:focusable="true"
         android:foreground="?android:selectableItemBackground"
-        android:padding="4dp"
+        android:padding="6dp"
         app:layout_constraintEnd_toStartOf="@id/yf_rv_iv_like"
-        app:layout_constraintTop_toTopOf="@+id/yf_rv_tv_add"
+        app:layout_constraintTop_toTopOf="@id/yf_rv_tv_add"
         app:srcCompat="@drawable/ic_share"
         tools:ignore="UnusedAttribute" />
 
@@ -102,9 +102,9 @@
         android:contentDescription="@string/yf_rv_like"
         android:focusable="true"
         android:foreground="?android:selectableItemBackground"
-        android:padding="4dp"
+        android:padding="6dp"
         app:layout_constraintEnd_toStartOf="@id/yf_rv_iv_like_count"
-        app:layout_constraintTop_toTopOf="@+id/yf_rv_tv_add"
+        app:layout_constraintTop_toTopOf="@id/yf_rv_tv_add"
         app:srcCompat="@drawable/ic_like" />
 
     <TextView
@@ -128,9 +128,9 @@
         android:contentDescription="@string/yf_rv_more"
         android:focusable="true"
         android:foreground="?android:selectableItemBackground"
-        android:padding="4dp"
+        android:padding="6dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/yf_rv_tv_add"
+        app:layout_constraintTop_toTopOf="@id/yf_rv_tv_add"
         app:srcCompat="@drawable/ic_more"
         tools:ignore="UnusedAttribute" />
 

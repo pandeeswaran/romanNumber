@@ -39,7 +39,9 @@ public class HomeActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 123;
     private final String[] appPermissions = {
             Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_NETWORK_STATE};
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.WRITE_CALENDAR,
+            Manifest.permission.READ_CALENDAR};
 
 //    Manifest.permission.READ_CALENDAR,
 //    Manifest.permission.WRITE_CALENDAR
@@ -134,7 +136,10 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        dialogClose = utility.showAlert("Are you sure you want to exit?", true, View.VISIBLE, "Yes", v -> finishAffinity(), View.VISIBLE, "No", v -> dialogClose.dismiss());
+        dialogClose = utility.showAlert("Are you sure you want to exit?", true, View.VISIBLE, "Yes", v -> {
+            dialogClose.dismiss();
+            finishAffinity();
+        }, View.VISIBLE, "No", v -> dialogClose.dismiss());
         dialogClose.show();
     }
 
@@ -142,7 +147,7 @@ public class HomeActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.ha_fl_container, fragment, tag);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 
     private void setUpHome() {
