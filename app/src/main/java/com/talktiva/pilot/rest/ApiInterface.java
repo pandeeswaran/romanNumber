@@ -1,5 +1,6 @@
 package com.talktiva.pilot.rest;
 
+import com.talktiva.pilot.model.Count;
 import com.talktiva.pilot.model.Event;
 import com.talktiva.pilot.model.User;
 import com.talktiva.pilot.request.RequestEvent;
@@ -62,8 +63,16 @@ public interface ApiInterface {
     Call<User> getMyDetails(@Header("Authorization") String token);
     //endregion
 
+    //region Like Event
     @GET("api/v1/events/{id}/like")
     Call<Event> likeEvent(@Header("Authorization") String token, @Path("id") Integer id);
+    //endregion
+
+    //region Get Pending Event Count
+    @GET("api/v1/events/pending/count")
+    Call<Count> getPendingEventCount(@Header("Authorization") String token);
+    //endregion
+
 
     /* Demo Api Calling With Token
     ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
