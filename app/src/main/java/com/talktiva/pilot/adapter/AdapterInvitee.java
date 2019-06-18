@@ -1,14 +1,13 @@
 package com.talktiva.pilot.adapter;
 
 import android.app.Activity;
-import android.graphics.Typeface;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.helper.Utility;
@@ -34,24 +33,12 @@ public class AdapterInvitee extends RecyclerView.Adapter<AdapterInvitee.InviteeV
     @NonNull
     @Override
     public InviteeViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new InviteeViewHolder(LayoutInflater.from(activity).inflate(R.layout.event_detail_item_layout, viewGroup, false));
+        return new InviteeViewHolder(LayoutInflater.from(activity).inflate(R.layout.event_detail_item_invitee, viewGroup, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull InviteeViewHolder inviteeViewHolder, int i) {
-
-        inviteeViewHolder.tvName.setTypeface(utility.getFont(), Typeface.BOLD);
-        inviteeViewHolder.tvAddress.setTypeface(utility.getFont());
-
-        inviteeViewHolder.tvName.setText(invitations.get(i).getInviteeFirstName().concat(" ").concat(invitations.get(i).getInviteeLasttName()));
-        inviteeViewHolder.tvAddress.setText(invitations.get(i).getInviteeAddress());
-
-        if (invitations.size() == i + 1) {
-            inviteeViewHolder.view.setVisibility(View.GONE);
-        } else {
-            inviteeViewHolder.view.setVisibility(View.VISIBLE);
-        }
-
+        inviteeViewHolder.bindDataWithViewHolder(invitations.get(i), i);
     }
 
     @Override
@@ -74,5 +61,19 @@ public class AdapterInvitee extends RecyclerView.Adapter<AdapterInvitee.InviteeV
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+
+        void bindDataWithViewHolder(Invitation invitation, int i) {
+            tvName.setTypeface(utility.getFontBold());
+            tvAddress.setTypeface(utility.getFontRegular());
+            tvName.setText(invitation.getInviteeFirstName().concat(" ").concat(invitation.getInviteeLasttName()));
+            tvAddress.setText(invitation.getInviteeAddress());
+            if (getItemCount() == i + 1) {
+                view.setVisibility(View.GONE);
+            } else {
+                view.setVisibility(View.VISIBLE);
+            }
+        }
     }
+
+
 }

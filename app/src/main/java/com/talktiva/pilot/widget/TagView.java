@@ -1,10 +1,12 @@
 package com.talktiva.pilot.widget;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
@@ -39,6 +41,7 @@ public class TagView extends RelativeLayout {
     private LayoutInflater mInflater;
     private OnTagClickListener mClickListener;
     private OnTagDeleteListener mDeleteListener;
+    private Typeface typeface;
 
     public TagView(Context context) {
         super(context, null);
@@ -69,6 +72,7 @@ public class TagView extends RelativeLayout {
         LogUtil.v(TAG, "[init]");
         Constants.DEBUG = (context.getApplicationContext().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        typeface = Typeface.createFromAsset(context.getApplicationContext().getAssets(), "merriweather_regular.ttf");
         // get AttributeSet
         TypedArray typeArray = context.obtainStyledAttributes(attrs, R.styleable.TagView, defStyle, defStyleRes);
         this.lineMargin = (int) typeArray.getDimension(R.styleable.TagView_lineMargin, ResolutionUtil.dpToPx(this.getContext(), Constants.DEFAULT_LINE_MARGIN));
@@ -126,6 +130,7 @@ public class TagView extends RelativeLayout {
         LogUtil.v(TAG, "[onAttachedToWindow]");
     }
 
+    @SuppressWarnings("deprecation")
     private void drawTags() {
         LogUtil.v(TAG, "[drawTags]visibility = " + (getVisibility() == View.VISIBLE));
         if (getVisibility() != View.VISIBLE) return;
@@ -143,31 +148,29 @@ public class TagView extends RelativeLayout {
             final int position = listIndex - 1;
             final Tag tag = item;
             // inflate tag layout
-            View tagLayout = mInflater.inflate(R.layout.tagview_item, null);
+            @SuppressLint("InflateParams") View tagLayout = mInflater.inflate(R.layout.tagview_item, null);
             tagLayout.setId(listIndex);
             tagLayout.setBackgroundDrawable(getSelector(tag));
             // tag text
-            TextView tagView = (TextView) tagLayout.findViewById(R.id.tv_tag_item_contain);
+            TextView tagView = tagLayout.findViewById(R.id.tv_tag_item_contain);
             tagView.setText(tag.text);
+            tagView.setTypeface(typeface);
             //tagView.setPadding(textPaddingLeft, textPaddingTop, textPaddingRight, texPaddingBottom);
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) tagView.getLayoutParams();
             params.setMargins(textPaddingLeft, textPaddingTop, textPaddingRight, texPaddingBottom);
             tagView.setLayoutParams(params);
             tagView.setTextColor(tag.tagTextColor);
             tagView.setTextSize(TypedValue.COMPLEX_UNIT_SP, tag.tagTextSize);
-            tagLayout.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mClickListener != null) {
-                        mClickListener.onTagClick(position, tag);
-                    }
+            tagLayout.setOnClickListener(v -> {
+                if (mClickListener != null) {
+                    mClickListener.onTagClick(position, tag);
                 }
             });
             // calculate　of tag layout width
             float tagWidth = tagView.getPaint().measureText(tag.text) + textPaddingLeft + textPaddingRight;
             // tagView padding (left & right)
             // deletable text
-            TextView deletableView = (TextView) tagLayout.findViewById(R.id.tv_tag_item_delete);
+            TextView deletableView = tagLayout.findViewById(R.id.tv_tag_item_delete);
             if (tag.isDeletable) {
                 deletableView.setVisibility(View.VISIBLE);
                 deletableView.setText(tag.deleteIcon);
@@ -178,13 +181,10 @@ public class TagView extends RelativeLayout {
 				deletableView.setLayoutParams(params);*/
                 deletableView.setTextColor(tag.deleteIndicatorColor);
                 deletableView.setTextSize(TypedValue.COMPLEX_UNIT_SP, tag.deleteIndicatorSize);
-                deletableView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        TagView.this.remove(position);
-                        if (mDeleteListener != null) {
-                            mDeleteListener.onTagDeleted(position, tag);
-                        }
+                deletableView.setOnClickListener(v -> {
+                    TagView.this.remove(position);
+                    if (mDeleteListener != null) {
+                        mDeleteListener.onTagDeleted(position, tag);
                     }
                 });
                 tagWidth += deletableView.getPaint().measureText(tag.deleteIcon) + deletableView.getPaddingLeft() + deletableView.getPaddingRight();

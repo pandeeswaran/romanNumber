@@ -2,10 +2,10 @@ package com.talktiva.pilot.helper;
 
 import android.graphics.Paint;
 import android.graphics.Typeface;
-
-import androidx.annotation.NonNull;
 import android.text.TextPaint;
 import android.text.style.TypefaceSpan;
+
+import androidx.annotation.NonNull;
 
 public class CustomTypefaceSpan extends TypefaceSpan {
 

@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,7 +75,7 @@ public class PendingFragment extends Fragment {
         utility = new Utility(getActivity());
         progressDialog = utility.showProgress();
         ButterKnife.bind(this, view);
-        textView.setTypeface(utility.getFont(), Typeface.BOLD);
+        textView.setTypeface(utility.getFontBold());
         setData();
     }
 

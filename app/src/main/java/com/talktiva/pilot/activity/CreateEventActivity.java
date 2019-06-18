@@ -5,7 +5,6 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -120,17 +119,17 @@ public class CreateEventActivity extends AppCompatActivity {
 
         progressDialog = utility.showProgress();
 
-        etName.setTypeface(utility.getFont());
-        etDate.setTypeface(utility.getFont());
-        etLocation.setTypeface(utility.getFont());
-        tvPrivate.setTypeface(utility.getFont());
-        tvShare.setTypeface(utility.getFont());
-        tvInvitee.setTypeface(utility.getFont());
-        tvCountFig.setTypeface(utility.getFont(), Typeface.BOLD);
-        tvCount.setTypeface(utility.getFont());
-        tvName.setTypeface(utility.getFont());
-        tvDate.setTypeface(utility.getFont());
-        tvLocation.setTypeface(utility.getFont());
+        etName.setTypeface(utility.getFontRegular());
+        etDate.setTypeface(utility.getFontRegular());
+        etLocation.setTypeface(utility.getFontRegular());
+        tvPrivate.setTypeface(utility.getFontRegular());
+        tvShare.setTypeface(utility.getFontRegular());
+        tvInvitee.setTypeface(utility.getFontRegular());
+        tvCountFig.setTypeface(utility.getFontBold());
+        tvCount.setTypeface(utility.getFontRegular());
+        tvName.setTypeface(utility.getFontRegular());
+        tvDate.setTypeface(utility.getFontRegular());
+        tvLocation.setTypeface(utility.getFontRegular());
 
         Bundle bundle = getIntent().getExtras();
         from = bundle != null ? bundle.getString(getResources().getString(R.string.from)) : null;
@@ -214,7 +213,7 @@ public class CreateEventActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.create_event_menu, menu);
         MenuItem menuItem = menu.findItem(R.id.cea_menu_save);
         SpannableString mNewTitle = new SpannableString(menuItem.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFont()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         menuItem.setTitle(mNewTitle);
         return super.onCreateOptionsMenu(menu);
     }
@@ -287,8 +286,8 @@ public class CreateEventActivity extends AppCompatActivity {
         newDate.setTimeInMillis(event.getEventDate().getTime());
         etDate.setText(event.getEventDate().toLocaleString());
         etLocation.setText(event.getLocation());
-        swPrivate.setChecked(event.getIsPrivate());
-        swCanGuest.setChecked(event.getCanInviteGuests());
+        swPrivate.setChecked(event.isPrivate());
+        swCanGuest.setChecked(event.canInviteGuests());
         invitations = new ArrayList<>();
         for (int i = 0; i < event.getInvitations().size(); i++) {
             invitation = new Invitation();
@@ -481,10 +480,10 @@ public class CreateEventActivity extends AppCompatActivity {
                 } else if (!etLocation.getText().toString().trim().equalsIgnoreCase(curEvent.getLocation())) {
                     internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
                     internetDialog.show();
-                } else if (swPrivate.isChecked() != curEvent.getIsPrivate()) {
+                } else if (swPrivate.isChecked() != curEvent.isPrivate()) {
                     internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
                     internetDialog.show();
-                } else if (swCanGuest.isChecked() != curEvent.getCanInviteGuests()) {
+                } else if (swCanGuest.isChecked() != curEvent.canInviteGuests()) {
                     internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (invitations.size() != curEvent.getInvitations().size()) {

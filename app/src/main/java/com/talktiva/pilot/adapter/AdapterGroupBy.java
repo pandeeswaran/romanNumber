@@ -41,32 +41,12 @@ public class AdapterGroupBy extends RecyclerView.Adapter<AdapterGroupBy.DateView
     @NonNull
     @Override
     public DateViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new DateViewHolder(LayoutInflater.from(activity).inflate(R.layout.event_item_day_layout, viewGroup, false));
+        return new DateViewHolder(LayoutInflater.from(activity).inflate(R.layout.event_item_master, viewGroup, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull DateViewHolder dateViewHolder, int i) {
-        dateViewHolder.textView.setTypeface(utility.getFont());
-
-        switch (groupByEvents.get(i).getDay()) {
-            case 0:
-                dateViewHolder.textView.setText(activity.getResources().getString(R.string.event_today));
-                break;
-            case 1:
-                dateViewHolder.textView.setText(activity.getResources().getString(R.string.event_tomorrow));
-                break;
-            case 2:
-                dateViewHolder.textView.setText(activity.getResources().getString(R.string.event_later));
-                break;
-        }
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
-        layoutManager.setOrientation(RecyclerView.VERTICAL);
-        dateViewHolder.recyclerView.setLayoutManager(layoutManager);
-
-        AdapterEvent adapterEvent = new AdapterEvent(activity, groupByEvents.get(i).getEvents(), clickListener, from);
-        dateViewHolder.recyclerView.setAdapter(adapterEvent);
-        adapterEvent.notifyDataSetChanged();
+        dateViewHolder.bindDataWithViewHolder(groupByEvents.get(i));
     }
 
     @Override
@@ -85,6 +65,30 @@ public class AdapterGroupBy extends RecyclerView.Adapter<AdapterGroupBy.DateView
         DateViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+
+        void bindDataWithViewHolder(GroupByEvent groupByEvent) {
+            textView.setTypeface(utility.getFontBold());
+
+            switch (groupByEvent.getDay()) {
+                case 0:
+                    textView.setText(activity.getResources().getString(R.string.event_today));
+                    break;
+                case 1:
+                    textView.setText(activity.getResources().getString(R.string.event_tomorrow));
+                    break;
+                case 2:
+                    textView.setText(activity.getResources().getString(R.string.event_later));
+                    break;
+            }
+
+            LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+            layoutManager.setOrientation(RecyclerView.VERTICAL);
+            recyclerView.setLayoutManager(layoutManager);
+
+            AdapterEvent adapterEvent = new AdapterEvent(activity, groupByEvent.getEvents(), clickListener, from);
+            recyclerView.setAdapter(adapterEvent);
+            adapterEvent.notifyDataSetChanged();
         }
     }
 }

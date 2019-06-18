@@ -45,16 +45,19 @@ public class Event implements Serializable {
     private List<Invitation> invitations;
 
     @SerializedName("likeCount")
-    private int likeCount;
+    private Integer likeCount;
+
+    @SerializedName("hasLiked")
+    private Boolean hasLiked;
 
     @SerializedName("private")
     private Boolean isPrivate;
 
-    public int getEventId() {
+    public Integer getEventId() {
         return eventId;
     }
 
-    public int getCreatedBy() {
+    public Integer getCreatedBy() {
         return createdBy;
     }
 
@@ -74,7 +77,7 @@ public class Event implements Serializable {
         return status;
     }
 
-    public Boolean getCanInviteGuests() {
+    public Boolean canInviteGuests() {
         return canInviteGuests;
     }
 
@@ -98,11 +101,15 @@ public class Event implements Serializable {
         return invitations;
     }
 
-    public int getLikeCount() {
+    public Integer getLikeCount() {
         return likeCount;
     }
 
-    public Boolean getIsPrivate() {
+    public Boolean isHasLiked() {
+        return hasLiked;
+    }
+
+    public Boolean isPrivate() {
         return isPrivate;
     }
 }

@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -85,7 +84,7 @@ public class UpcomingFragment extends Fragment {
         utility = new Utility(getActivity());
         progressDialog = utility.showProgress();
         ButterKnife.bind(this, view);
-        textView.setTypeface(utility.getFont(), Typeface.BOLD);
+        textView.setTypeface(utility.getFontBold());
         setData();
     }
 
@@ -237,7 +236,7 @@ public class UpcomingFragment extends Fragment {
             ContentValues reminders = new ContentValues();
             reminders.put(CalendarContract.Reminders.EVENT_ID, eventID);
             reminders.put(CalendarContract.Reminders.METHOD, true);
-            reminders.put(CalendarContract.Reminders.MINUTES, 120);
+            reminders.put(CalendarContract.Reminders.MINUTES, getResources().getInteger(R.integer.event_alert_time));
             String reminderUriString = "content://com.android.calendar/reminders";
             getActivity().getApplicationContext().getContentResolver().insert(Uri.parse(reminderUriString), reminders);
 

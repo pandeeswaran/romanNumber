@@ -47,10 +47,10 @@
     <string name="server_msg">Sorry!!! server is not responding or cannot reached, please try again later.</string>
 
     //HomeScreen Tab Titles
-    <string name="ha_bnm_title_home">Home</string>
-    <string name="ha_bnm_title_chat">Chat</string>
-    <string name="ha_bnm_title_notifications">Notifications</string>
-    <string name="ha_bnm_title_event">Events</string>
+    <string name="db_bnm_title_home">Home</string>
+    <string name="db_bnm_title_chat">Chat</string>
+    <string name="db_bnm_title_notifications">Notifications</string>
+    <string name="db_bnm_title_event">Events</string>
 
     //Add Popup Image View Description
     <string name="dd_add_post">Post</string>
@@ -122,11 +122,15 @@
     <string name="no_c_event">No events created.</string>
 
     //Context Menu Item for Upcoming and Yours event Screen
-    <string name="atc">Add to calender</string>
+    <string name="atc">Add to calendar</string>
     <string name="event_success">Event added successfully</string>
 
     //Add Guest to Event Screen EditText Hint
     <string name="aag_et_search">Search</string>
     <string name="aag_et_email">Enter guest emails here</string>
     <string name="aag_et_phone">Enter guest phone numbers here</string>
+    <string name="aag_tv_add">ADD</string>
+
+    //Home Activity Text
+    <string name="ha_footer">&#42; Privacy policies | talktiva &#8482;</string>
 </resources>

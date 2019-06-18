@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.location.LocationManager;
@@ -13,19 +12,17 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.provider.Settings;
-
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.Constraints;
-
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.Constraints;
+
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.talktiva.pilot.R;
 
 import java.io.File;
@@ -50,13 +47,21 @@ public class Utility {
         this.context = context;
     }
 
-    public Typeface getFont() {
-        return Typeface.createFromAsset(context.getApplicationContext().getAssets(), "merriweather_regular.ttf");
+    public Utility(Context context) {
+        this.context = (Activity) context;
+    }
+
+    public Typeface getFontRegular() {
+        return Typeface.createFromAsset(context.getApplicationContext().getAssets(), "Merriweather_regular.ttf");
+    }
+
+    public Typeface getFontBold() {
+        return Typeface.createFromAsset(context.getApplicationContext().getAssets(), "Merriweather_bold.ttf");
     }
 
     public void setTitleText(Toolbar toolbar, int id, String title) {
         TextView textView = toolbar.findViewById(id);
-        textView.setTypeface(getFont());
+        textView.setTypeface(getFontRegular());
         textView.setText(title);
     }
 
@@ -64,7 +69,7 @@ public class Utility {
         for (int i = 0; i < toolbar.getChildCount(); i++) {
             View v = toolbar.getChildAt(i);
             if (v instanceof TextView && ((TextView) v).getText() == context.getTitle()) {
-                ((TextView) v).setTypeface(getFont());
+                ((TextView) v).setTypeface(getFontRegular());
             }
         }
     }
@@ -136,13 +141,13 @@ public class Utility {
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_layout);
         dialog.setCancelable(bool);
-        ((TextView) dialog.findViewById(R.id.dialog_msg)).setTypeface(getFont());
+        ((TextView) dialog.findViewById(R.id.dialog_msg)).setTypeface(getFontRegular());
         ((TextView) dialog.findViewById(R.id.dialog_msg)).setText(msg);
-        ((Button) dialog.findViewById(R.id.dialog_positive)).setTypeface(getFont());
+        ((Button) dialog.findViewById(R.id.dialog_positive)).setTypeface(getFontRegular());
         ((Button) dialog.findViewById(R.id.dialog_positive)).setText(positiveTitle);
         dialog.findViewById(R.id.dialog_positive).setVisibility(positiveVisibility);
         dialog.findViewById(R.id.dialog_positive).setOnClickListener(positiveClickListener);
-        ((Button) dialog.findViewById(R.id.dialog_negative)).setTypeface(getFont());
+        ((Button) dialog.findViewById(R.id.dialog_negative)).setTypeface(getFontRegular());
         ((Button) dialog.findViewById(R.id.dialog_negative)).setText(negativeTitle);
         dialog.findViewById(R.id.dialog_negative).setVisibility(negativeVisibility);
         dialog.findViewById(R.id.dialog_negative).setOnClickListener(negativeClickListener);
@@ -162,10 +167,10 @@ public class Utility {
         return dialog;
     }
 
-    public void dismissDialog(Dialog progressDialog) {
-        if (progressDialog != null) {
-            if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
+    public void dismissDialog(Dialog dialog) {
+        if (dialog != null) {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
             }
         }
     }
@@ -175,9 +180,9 @@ public class Utility {
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_error);
         dialog.setCancelable(false);
-        ((TextView) dialog.findViewById(R.id.de_tv)).setTypeface(getFont());
+        ((TextView) dialog.findViewById(R.id.de_tv)).setTypeface(getFontRegular());
         ((TextView) dialog.findViewById(R.id.de_tv)).setText(msg);
-        ((Button) dialog.findViewById(R.id.de_btn)).setTypeface(getFont());
+        ((Button) dialog.findViewById(R.id.de_btn)).setTypeface(getFontRegular());
         ((Button) dialog.findViewById(R.id.de_btn)).setText(action);
         dialog.findViewById(R.id.de_btn).setOnClickListener(clickListener);
         Objects.requireNonNull(dialog.getWindow()).setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.MATCH_PARENT);

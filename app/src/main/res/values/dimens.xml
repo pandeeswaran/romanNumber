@@ -7,7 +7,10 @@
     <dimen name="et_font_size">16sp</dimen>
     <dimen name="error_font_size">12sp</dimen>
     <dimen name="normal_lable_font_size">14sp</dimen>
-    <dimen name="count_font_size">16sp</dimen>
+    <dimen name="count_font_size">18sp</dimen>
 
     <dimen name="empty_rv_font_size">16sp</dimen>
+
+    <integer name="event_alert_time">60</integer>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

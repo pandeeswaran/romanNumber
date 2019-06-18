@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <item android:drawable="@android:color/white" />
+    <item android:drawable="@color/colorPrimary" />
 
     <item
-        android:width="500px"
-        android:height="104px"
-        android:drawable="@drawable/talktiva_logo"
-        android:gravity="center" />
+        android:width="375px"
+        android:height="78px"
+        android:drawable="@drawable/talktiva_logo_white"
+        android:gravity="center"
+        tools:ignore="UnusedAttribute" />
 
 </layer-list>

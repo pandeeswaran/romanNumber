@@ -27,7 +27,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.android.material.tabs.TabLayout;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.activity.CreateEventActivity;
-import com.talktiva.pilot.activity.HomeActivity;
+import com.talktiva.pilot.activity.DashBoardActivity;
 import com.talktiva.pilot.fragment.event.PendingFragment;
 import com.talktiva.pilot.fragment.event.UpcomingFragment;
 import com.talktiva.pilot.fragment.event.YourFragment;
@@ -140,10 +140,10 @@ public class EventFragment extends Fragment {
         ButterKnife.bind(this, view);
         setHasOptionsMenu(true);
 
-        ((HomeActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
-        Objects.requireNonNull(((HomeActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
+        ((DashBoardActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
+        Objects.requireNonNull(((DashBoardActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
-        utility.setTitleText(toolbar, R.id.ef_toolbar_tv_title, getActivity().getResources().getString(R.string.ha_bnm_title_event));
+        utility.setTitleText(toolbar, R.id.ef_toolbar_tv_title, getActivity().getResources().getString(R.string.db_bnm_title_event));
 
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_pending)), 0);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_upcoming)), 1);
@@ -181,7 +181,7 @@ public class EventFragment extends Fragment {
             for (int i = 0; i < tabChildCount; i++) {
                 View tabViewChild = vgTab.getChildAt(i);
                 if (tabViewChild instanceof TextView) {
-                    ((TextView) tabViewChild).setTypeface(utility.getFont());
+                    ((TextView) tabViewChild).setTypeface(utility.getFontRegular());
                 }
             }
         }
@@ -203,7 +203,7 @@ public class EventFragment extends Fragment {
         inflater.inflate(R.menu.event_menu, menu);
         MenuItem item = menu.findItem(R.id.ef_menu_create);
         SpannableString mNewTitle = new SpannableString(item.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFont()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         item.setTitle(mNewTitle);
         super.onCreateOptionsMenu(menu, inflater);
     }

@@ -32,7 +32,7 @@ public interface ApiInterface {
     //endregion
 
     @GET("api/v1/events/{id}")
-    Call<Event> getEventById(@Header("Authorization") String token, @Path("id") int id);
+    Call<Event> getEventById(@Header("Authorization") String token, @Path("id") Integer id);
 
     //region Create Event Api
     @POST("api/v1/events")
@@ -45,11 +45,11 @@ public interface ApiInterface {
     //endregion
 
     @GET("api/v1/events/{id}/cancel")
-    Call<ResultEvents> cancelEvent(@Header("Authorization") String token, @Path("id") int id);
+    Call<ResultEvents> cancelEvent(@Header("Authorization") String token, @Path("id") Integer id);
 
     //region For Accept or Decline Event
     @GET("api/v1/events/{id}/acceptOrDecline/{status}")
-    Call<ResultEvents> acceptOrDeclineEvent(@Header("Authorization") String token, @Path("id") int id, @Path("status") boolean status);
+    Call<ResultEvents> acceptOrDeclineEvent(@Header("Authorization") String token, @Path("id") Integer id, @Path("status") Boolean status);
     //endregion
 
     //region All User Details
@@ -61,6 +61,9 @@ public interface ApiInterface {
     @GET("api/v1/users/me")
     Call<User> getMyDetails(@Header("Authorization") String token);
     //endregion
+
+    @GET("api/v1/events/{id}/like")
+    Call<Event> likeEvent(@Header("Authorization") String token, @Path("id") Integer id);
 
     /* Demo Api Calling With Token
     ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);

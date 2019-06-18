@@ -15,7 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.talktiva.pilot.R;
-import com.talktiva.pilot.activity.HomeActivity;
+import com.talktiva.pilot.activity.DashBoardActivity;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 
@@ -91,8 +91,8 @@ public class EmptyFragment extends Fragment {
         Utility utility = new Utility(getActivity());
         ButterKnife.bind(this, view);
 
-        ((HomeActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
-        Objects.requireNonNull(((HomeActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
+        ((DashBoardActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
+        Objects.requireNonNull(((DashBoardActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         utility.setTitleText(toolbar, R.id.toolbar_tv_title, mParam1);
     }

@@ -35,7 +35,6 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             app:tabGravity="fill"
-            app:tabIndicator="@drawable/custom_indicator"
             app:tabMode="fixed"
             app:tabRippleColor="@color/light_grey"
             app:tabSelectedTextColor="@color/colorPrimary"
@@ -48,6 +47,6 @@
         android:id="@+id/ef_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,12 +1,9 @@
 package com.talktiva.pilot.request;
 
-import android.print.PrinterId;
-
 import com.google.gson.annotations.SerializedName;
 import com.talktiva.pilot.model.Invitation;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 public class RequestEvent implements Serializable {

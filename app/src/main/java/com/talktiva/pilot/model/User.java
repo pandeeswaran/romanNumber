@@ -31,7 +31,7 @@ public class User implements Serializable {
     @SerializedName("address")
     private Address address;
 
-    public int getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 

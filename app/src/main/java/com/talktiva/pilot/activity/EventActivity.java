@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -133,12 +132,12 @@ public class EventActivity extends AppCompatActivity {
 
         toolbar.setNavigationIcon(R.drawable.ic_back);
 
-        tvDate.setTypeface(utility.getFont(), Typeface.BOLD);
-        tvTitle.setTypeface(utility.getFont(), Typeface.BOLD);
-        tvFullDate.setTypeface(utility.getFont());
-        tvAdd.setTypeface(utility.getFont());
-        tvCount.setTypeface(utility.getFont(), Typeface.BOLD);
-        tvOther.setTypeface(utility.getFont());
+        tvDate.setTypeface(utility.getFontBold());
+        tvTitle.setTypeface(utility.getFontBold());
+        tvFullDate.setTypeface(utility.getFontRegular());
+        tvAdd.setTypeface(utility.getFontRegular());
+        tvCount.setTypeface(utility.getFontBold());
+        tvOther.setTypeface(utility.getFontRegular());
 
         Bundle bundle = getIntent().getExtras();
         from = bundle != null ? bundle.getInt(getResources().getString(R.string.from)) : 0;
@@ -167,7 +166,7 @@ public class EventActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.detail_event_menu, menu);
         MenuItem item = menu.findItem(R.id.dea_menu_edit);
         SpannableString mNewTitle = new SpannableString(item.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFont()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         item.setTitle(mNewTitle);
 
         if (from == 2) {
@@ -212,7 +211,7 @@ public class EventActivity extends AppCompatActivity {
         }
     }
 
-    private void acceptEvent(int eventId, boolean bool) {
+    private void acceptEvent(Integer eventId, Boolean bool) {
         progressDialog.show();
 
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
@@ -258,7 +257,7 @@ public class EventActivity extends AppCompatActivity {
         finish();
     }
 
-    private void cancelEvent(int id) {
+    private void cancelEvent(Integer id) {
         progressDialog.show();
 
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
@@ -297,7 +296,7 @@ public class EventActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("deprecation")
-    private void getEventById(int id) {
+    private void getEventById(Integer id) {
         progressDialog.show();
 
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
@@ -329,16 +328,24 @@ public class EventActivity extends AppCompatActivity {
 
                     }
 
-                    if (event.getIsPrivate()) {
+                    if (event.isPrivate()) {
                         ivPrivate.setVisibility(View.VISIBLE);
                     } else {
                         ivPrivate.setVisibility(View.GONE);
                     }
 
-                    if (event.getCanInviteGuests()) {
+                    if (event.canInviteGuests()) {
                         ivShare.setVisibility(View.VISIBLE);
                     } else {
                         ivShare.setVisibility(View.GONE);
+                    }
+
+                    if (event.isHasLiked()) {
+                        ivLike.setImageResource(R.drawable.ic_liked);
+                        ivLike.setTag("1");
+                    } else {
+                        ivLike.setImageResource(R.drawable.ic_like);
+                        ivLike.setTag("0");
                     }
 
                     switch (from) {
@@ -418,7 +425,7 @@ public class EventActivity extends AppCompatActivity {
                         for (int i = 0; i < tabChildCount; i++) {
                             View tabViewChild = vgTab.getChildAt(i);
                             if (tabViewChild instanceof TextView) {
-                                ((TextView) tabViewChild).setTypeface(utility.getFont());
+                                ((TextView) tabViewChild).setTypeface(utility.getFontRegular());
                             }
                         }
                     }
@@ -434,6 +441,12 @@ public class EventActivity extends AppCompatActivity {
                     tvCount.setText(String.valueOf(event.getLikeCount()));
 
                     ivMore.setOnClickListener(v -> openContextMenu(v));
+
+                    ivLike.setOnClickListener(v -> {
+                        if (v.getTag().toString().equalsIgnoreCase("0")) {
+                            sendLike(eventId);
+                        }
+                    });
 
                     utility.dismissDialog(progressDialog);
                 } else {
@@ -499,7 +512,7 @@ public class EventActivity extends AppCompatActivity {
             ContentValues reminders = new ContentValues();
             reminders.put(CalendarContract.Reminders.EVENT_ID, eventID);
             reminders.put(CalendarContract.Reminders.METHOD, true);
-            reminders.put(CalendarContract.Reminders.MINUTES, 120);
+            reminders.put(CalendarContract.Reminders.MINUTES, getResources().getInteger(R.integer.event_alert_time));
             String reminderUriString = "content://com.android.calendar/reminders";
             getContentResolver().insert(Uri.parse(reminderUriString), reminders);
 
@@ -509,5 +522,38 @@ public class EventActivity extends AppCompatActivity {
         } else {
             return false;
         }
+    }
+
+    private void sendLike(Integer id) {
+        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        Call<Event> call = apiInterface.likeEvent(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), id);
+        call.enqueue(new Callback<Event>() {
+            @Override
+            public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
+                if (response.isSuccessful()) {
+                    if (Objects.requireNonNull(response.body()).isHasLiked()) {
+                        ivLike.setImageResource(R.drawable.ic_liked);
+                        ivLike.setTag("1");
+                        tvCount.setText(String.valueOf(response.body().getLikeCount()));
+                        LocalBroadcastManager.getInstance(EventActivity.this).sendBroadcast(new Intent("MyEvent"));
+                    }
+                } else {
+                    if (response.code() >= 300 && response.code() < 500) {
+                        utility.showMsg(response.message());
+                    } else if (response.code() >= 500) {
+                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), v -> utility.dismissDialog(internetDialog));
+                        internetDialog.show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
+                if (t.getMessage().equalsIgnoreCase("timeout")) {
+                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> utility.dismissDialog(internetDialog));
+                    internetDialog.show();
+                }
+            }
+        });
     }
 }
