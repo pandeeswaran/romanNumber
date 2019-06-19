@@ -20,7 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.talktiva.pilot.R;
-import com.talktiva.pilot.activity.EventActivity;
+import com.talktiva.pilot.Talktiva;
+import com.talktiva.pilot.activity.DetailEventActivity;
 import com.talktiva.pilot.adapter.AdapterGroupBy;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Event;
@@ -52,7 +53,6 @@ public class PendingFragment extends Fragment {
     TextView textView;
 
     private Dialog progressDialog, internetDialog;
-    private Utility utility;
 
     private BroadcastReceiver r = new BroadcastReceiver() {
         @Override
@@ -72,10 +72,10 @@ public class PendingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        utility = new Utility(getActivity());
-        progressDialog = utility.showProgress();
         ButterKnife.bind(this, view);
-        textView.setTypeface(utility.getFontBold());
+
+        progressDialog = Utility.showProgress(getActivity());
+        textView.setTypeface(Utility.getFontBold());
         setData();
     }
 
@@ -135,14 +135,12 @@ public class PendingFragment extends Fragment {
                         adapterGroupBy.setOnPositionClicked((view, event, from) -> {
                             switch (view.getId()) {
                                 case R.id.yf_rv_cl:
-                                    Intent intent = new Intent(getActivity(), EventActivity.class);
+                                    Intent intent = new Intent(getActivity(), DetailEventActivity.class);
                                     Bundle bundle = new Bundle();
                                     bundle.putInt(getResources().getString(R.string.from), from);
                                     bundle.putSerializable(getResources().getString(R.string.event), event);
                                     intent.putExtras(bundle);
                                     startActivity(intent);
-                                    break;
-                                case R.id.ea_iv_like:
                                     break;
                                 case R.id.yf_rv_iv_share:
                                     break;
@@ -152,25 +150,27 @@ public class PendingFragment extends Fragment {
                         recyclerView.setVisibility(View.GONE);
                         textView.setVisibility(View.VISIBLE);
                     }
-                    utility.dismissDialog(progressDialog);
+                    Utility.dismissDialog(progressDialog);
                 } else {
-                    utility.dismissDialog(progressDialog);
+                    Utility.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 400) {
-                        internetDialog = utility.showError(getResources().getString(R.string.network_msg), getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss());
+                        internetDialog = Utility.showError(getActivity(), R.string.network_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog.show();
                     } else if (response.code() >= 400 && response.code() < 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.authentication_msg), getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss());
+                        internetDialog = Utility.showError(getActivity(), R.string.authentication_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog.show();
                     } else if (response.code() >= 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), v -> internetDialog.dismiss());
+                        internetDialog = Utility.showError(getActivity(), R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog.show();
                     }
-                    internetDialog.show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
-                utility.dismissDialog(progressDialog);
+                Utility.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss());
+                    internetDialog = Utility.showError(getActivity(), R.string.time_out_msg, R.string.dd_ok, v -> internetDialog.dismiss());
                     internetDialog.show();
                 }
             }
@@ -180,12 +180,12 @@ public class PendingFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r, new IntentFilter("Refresh0"));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.getInstance())).registerReceiver(r, new IntentFilter("Refresh0"));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.getInstance())).unregisterReceiver(r);
     }
 }

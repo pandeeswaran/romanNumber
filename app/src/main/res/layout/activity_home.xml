@@ -15,7 +15,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#5B000000"
+        android:background="#5C000000"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <ImageView
@@ -25,10 +25,77 @@
             android:layout_marginStart="104dp"
             android:layout_marginEnd="104dp"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/talktive_logo"
+            android:src="@drawable/talktiva_logo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/ha_tv_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginEnd="64dp"
+            android:layout_marginBottom="32dp"
+            android:gravity="center"
+            android:maxLines="5"
+            android:textColor="@color/white"
+            android:textSize="@dimen/et_font_size"
+            app:layout_constraintBottom_toTopOf="@+id/ha_vpi"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.github.vivchar.viewpagerindicator.ViewPagerIndicator
+            android:id="@+id/ha_vpi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            app:delimiterSize="24dp"
+            app:itemSelectedTint="@color/colorPrimary"
+            app:itemSize="12dp"
+            app:itemTint="@color/white"
+            app:layout_constraintBottom_toTopOf="@id/ha_btn_create"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/ha_btn_create"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/bg_theme"
+            android:foreground="?android:selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/ha_btn_create"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="@dimen/et_font_size"
+            app:layout_constraintBottom_toTopOf="@id/ha_btn_login"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="UnusedAttribute" />
+
+        <Button
+            android:id="@+id/ha_btn_login"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="64dp"
+            android:background="@drawable/bg_white"
+            android:foreground="?android:selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/ha_btn_login"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/et_font_size"
+            app:layout_constraintBottom_toTopOf="@id/ha_footer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="UnusedAttribute" />
 
         <TextView
             android:id="@+id/ha_footer"

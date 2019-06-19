@@ -1,6 +1,6 @@
 package com.talktiva.pilot.adapter;
 
-import android.app.Activity;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.GroupByEvent;
 
@@ -23,14 +24,12 @@ public class AdapterGroupBy extends RecyclerView.Adapter<AdapterGroupBy.DateView
 
     private List<GroupByEvent> groupByEvents;
     private ClickListener clickListener;
-    private Activity activity;
-    private Utility utility;
+    private Context context;
     private int from;
 
-    public AdapterGroupBy(Activity activity, List<GroupByEvent> groupByEvents, int from) {
+    public AdapterGroupBy(Context context, List<GroupByEvent> groupByEvents, int from) {
         this.groupByEvents = groupByEvents;
-        utility = new Utility(activity);
-        this.activity = activity;
+        this.context = context;
         this.from = from;
     }
 
@@ -41,7 +40,7 @@ public class AdapterGroupBy extends RecyclerView.Adapter<AdapterGroupBy.DateView
     @NonNull
     @Override
     public DateViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new DateViewHolder(LayoutInflater.from(activity).inflate(R.layout.event_item_master, viewGroup, false));
+        return new DateViewHolder(LayoutInflater.from(context).inflate(R.layout.item_master, viewGroup, false));
     }
 
     @Override
@@ -68,25 +67,25 @@ public class AdapterGroupBy extends RecyclerView.Adapter<AdapterGroupBy.DateView
         }
 
         void bindDataWithViewHolder(GroupByEvent groupByEvent) {
-            textView.setTypeface(utility.getFontBold());
+            textView.setTypeface(Utility.getFontBold());
 
             switch (groupByEvent.getDay()) {
                 case 0:
-                    textView.setText(activity.getResources().getString(R.string.event_today));
+                    textView.setText(Talktiva.getInstance().getResources().getString(R.string.rv_header_today));
                     break;
                 case 1:
-                    textView.setText(activity.getResources().getString(R.string.event_tomorrow));
+                    textView.setText(Talktiva.getInstance().getResources().getString(R.string.rv_header_tomorrow));
                     break;
                 case 2:
-                    textView.setText(activity.getResources().getString(R.string.event_later));
+                    textView.setText(Talktiva.getInstance().getResources().getString(R.string.rv_header_later));
                     break;
             }
 
-            LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(Talktiva.getInstance());
             layoutManager.setOrientation(RecyclerView.VERTICAL);
             recyclerView.setLayoutManager(layoutManager);
 
-            AdapterEvent adapterEvent = new AdapterEvent(activity, groupByEvent.getEvents(), clickListener, from);
+            AdapterEvent adapterEvent = new AdapterEvent(context, groupByEvent.getEvents(), clickListener, from);
             recyclerView.setAdapter(adapterEvent);
             adapterEvent.notifyDataSetChanged();
         }

@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
     <application
+        android:name=".Talktiva"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
@@ -40,14 +41,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activity.HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait" />
+
         <activity
             android:name=".activity.DashBoardActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.EventActivity"
+            android:name=".activity.DetailEventActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.CreateEventActivity"

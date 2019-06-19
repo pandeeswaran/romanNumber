@@ -15,7 +15,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:gravity="center"
-        android:text="@string/no_u_event"
+        android:text="@string/empty_ue_msg"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/empty_rv_font_size"
         android:visibility="gone"

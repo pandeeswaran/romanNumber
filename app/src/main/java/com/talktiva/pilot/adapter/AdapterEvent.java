@@ -1,7 +1,7 @@
 package com.talktiva.pilot.adapter;
 
-import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Event;
 import com.talktiva.pilot.rest.ApiClient;
@@ -32,17 +33,14 @@ import retrofit2.Response;
 public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHolder> {
 
     private ClickListener clickListener;
-    private Dialog progressDialog, internetDialog;
+    private Dialog internetDialog;
     private List<Event> events;
-    private Activity activity;
-    private Utility utility;
+    private Context context;
     private int from;
 
-    AdapterEvent(Activity activity, List<Event> events, ClickListener clickListener, int from) {
-        this.utility = new Utility(activity);
-        this.progressDialog = utility.showProgress();
+    AdapterEvent(Context context, List<Event> events, ClickListener clickListener, int from) {
         this.clickListener = clickListener;
-        this.activity = activity;
+        this.context = context;
         this.events = events;
         this.from = from;
     }
@@ -50,7 +48,7 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new EventViewHolder(LayoutInflater.from(activity).inflate(R.layout.event_item_child, viewGroup, false));
+        return new EventViewHolder(LayoutInflater.from(context).inflate(R.layout.item_child, viewGroup, false));
     }
 
     @Override
@@ -101,11 +99,11 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
         }
 
         void bindDataWithViewHolder(Event event) {
-            tvEventDate.setTypeface(utility.getFontBold());
-            tvTitle.setTypeface(utility.getFontBold());
-            tvFullDate.setTypeface(utility.getFontBold());
-            tvAddress.setTypeface(utility.getFontRegular());
-            tvLikeCount.setTypeface(utility.getFontBold());
+            tvEventDate.setTypeface(Utility.getFontBold());
+            tvTitle.setTypeface(Utility.getFontBold());
+            tvFullDate.setTypeface(Utility.getFontBold());
+            tvAddress.setTypeface(Utility.getFontRegular());
+            tvLikeCount.setTypeface(Utility.getFontBold());
 
             tvEventDate.setText(new SimpleDateFormat("MMM", Locale.US).format(event.getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(event.getEventDate())));
             tvTitle.setText(event.getTitle());
@@ -156,7 +154,7 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
             ivLike.setOnClickListener(v -> {
                 if (v.getTag().toString().equalsIgnoreCase("0")) {
                     ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-                    Call<Event> call = apiInterface.likeEvent(activity.getResources().getString(R.string.token_prefix).concat(" ").concat(activity.getResources().getString(R.string.token_amit)), event.getEventId());
+                    Call<Event> call = apiInterface.likeEvent(Talktiva.getInstance().getResources().getString(R.string.token_prefix).concat(" ").concat(Talktiva.getInstance().getResources().getString(R.string.token_amit)), event.getEventId());
                     call.enqueue(new Callback<Event>() {
                         @Override
                         public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
@@ -168,9 +166,9 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
                                 }
                             } else {
                                 if (response.code() >= 300 && response.code() < 500) {
-                                    utility.showMsg(response.message());
+                                    Utility.showMsg(response.message());
                                 } else if (response.code() >= 500) {
-                                    internetDialog = utility.showError(activity.getResources().getString(R.string.server_msg), activity.getResources().getString(R.string.dd_try), v -> utility.dismissDialog(internetDialog));
+                                    internetDialog = Utility.showError(context, R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
                                     internetDialog.show();
                                 }
                             }
@@ -179,7 +177,7 @@ public class AdapterEvent extends RecyclerView.Adapter<AdapterEvent.EventViewHol
                         @Override
                         public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
                             if (t.getMessage().equalsIgnoreCase("timeout")) {
-                                internetDialog = utility.showError(activity.getResources().getString(R.string.time_out_msg), activity.getResources().getString(R.string.dd_ok), v -> utility.dismissDialog(internetDialog));
+                                internetDialog = Utility.showError(context, R.string.time_out_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
                                 internetDialog.show();
                             }
                         }

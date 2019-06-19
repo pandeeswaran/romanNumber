@@ -53,4 +53,7 @@ dependencies {
 
     //Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    //ViewPager Indicator
+    implementation 'com.github.vivchar:ViewPagerIndicator:1.1.0'
 }

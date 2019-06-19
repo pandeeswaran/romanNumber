@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.adapter.AdapterInvitee;
 import com.talktiva.pilot.model.Invitation;
 
@@ -47,11 +48,11 @@ public class InviteeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(Talktiva.getInstance());
         layoutManager.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
 
-        AdapterInvitee adapterInvitee = new AdapterInvitee(invitationList, getActivity());
+        AdapterInvitee adapterInvitee = new AdapterInvitee(getActivity(), invitationList);
         recyclerView.setAdapter(adapterInvitee);
         adapterInvitee.notifyDataSetChanged();
     }

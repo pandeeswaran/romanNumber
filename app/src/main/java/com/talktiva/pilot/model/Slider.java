@@ -7,17 +7,17 @@ import java.io.Serializable;
 public class Slider implements Serializable {
 
     @SerializedName("text")
-    private String text;
+    private Integer text;
 
     @SerializedName("image_url")
     private String imageUrl;
 
-    public Slider(String text, String imageUrl) {
+    public Slider(Integer text, String imageUrl) {
         this.text = text;
         this.imageUrl = imageUrl;
     }
 
-    public String getText() {
+    public Integer getText() {
         return text;
     }
 

@@ -148,7 +148,7 @@ public class TagView extends RelativeLayout {
             final int position = listIndex - 1;
             final Tag tag = item;
             // inflate tag layout
-            @SuppressLint("InflateParams") View tagLayout = mInflater.inflate(R.layout.tagview_item, null);
+            @SuppressLint("InflateParams") View tagLayout = mInflater.inflate(R.layout.item_tagview, null);
             tagLayout.setId(listIndex);
             tagLayout.setBackgroundDrawable(getSelector(tag));
             // tag text

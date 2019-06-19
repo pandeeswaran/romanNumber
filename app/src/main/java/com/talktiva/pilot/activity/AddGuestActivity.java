@@ -1,6 +1,9 @@
 package com.talktiva.pilot.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -13,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.widget.Tag;
 import com.talktiva.pilot.widget.TagView;
@@ -44,13 +48,12 @@ public class AddGuestActivity extends AppCompatActivity {
     @BindView(R.id.aag_tv_email_add)
     TextView tvEmailAdd;
 
-    private Utility utility;
+    private BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_guest);
-        utility = new Utility(this);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
@@ -59,23 +62,23 @@ public class AddGuestActivity extends AppCompatActivity {
 
         toolbar.setNavigationIcon(R.drawable.ic_cancel);
 
-        utility.setTitleText(toolbar, R.id.aag_toolbar_tv_title, getResources().getString(R.string.aag_title));
+        Utility.setTitleText(toolbar, R.id.aag_toolbar_tv_title, R.string.aag_title);
 
-        etEmail.setTypeface(utility.getFontRegular());
-        tvEmailAdd.setTypeface(utility.getFontRegular());
-        etSearch.setTypeface(utility.getFontRegular());
+        etEmail.setTypeface(Utility.getFontRegular());
+        tvEmailAdd.setTypeface(Utility.getFontRegular());
+        etSearch.setTypeface(Utility.getFontRegular());
     }
 
     @OnTextChanged(R.id.aag_et_email)
     void setEtEmailOnTextChange(CharSequence s) {
         if (isMailEmpty(s.toString().trim())) {
-            llEmail.setBackgroundResource(R.drawable.search_bg1);
+            llEmail.setBackgroundResource(R.drawable.bg_1_search);
             tvEmailAdd.setVisibility(View.GONE);
         } else if (!isValidMail(s.toString().trim())) {
-            llEmail.setBackgroundResource(R.drawable.search_bg2);
+            llEmail.setBackgroundResource(R.drawable.bg_2_search);
             tvEmailAdd.setVisibility(View.GONE);
         } else {
-            llEmail.setBackgroundResource(R.drawable.search_bg1);
+            llEmail.setBackgroundResource(R.drawable.bg_1_search);
             tvEmailAdd.setVisibility(View.VISIBLE);
         }
     }
@@ -101,5 +104,22 @@ public class AddGuestActivity extends AppCompatActivity {
             tagsEmail.addTag(tag);
             etEmail.setText("");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        receiver = new NetworkChangeReceiver();
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    @Override
+    protected void onDestroy() {
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
     }
 }

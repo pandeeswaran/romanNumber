@@ -1,6 +1,6 @@
 package com.talktiva.pilot.adapter;
 
-import android.app.Activity;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,19 +21,17 @@ import butterknife.ButterKnife;
 public class AdapterInvitee extends RecyclerView.Adapter<AdapterInvitee.InviteeViewHolder> {
 
     private List<Invitation> invitations;
-    private Activity activity;
-    private Utility utility;
+    private Context context;
 
-    public AdapterInvitee(List<Invitation> invitations, Activity activity) {
-        utility = new Utility(activity);
+    public AdapterInvitee(Context context, List<Invitation> invitations) {
         this.invitations = invitations;
-        this.activity = activity;
+        this.context = context;
     }
 
     @NonNull
     @Override
     public InviteeViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new InviteeViewHolder(LayoutInflater.from(activity).inflate(R.layout.event_detail_item_invitee, viewGroup, false));
+        return new InviteeViewHolder(LayoutInflater.from(context).inflate(R.layout.item_invitee, viewGroup, false));
     }
 
     @Override
@@ -54,7 +52,7 @@ public class AdapterInvitee extends RecyclerView.Adapter<AdapterInvitee.InviteeV
         @BindView(R.id.textView2)
         TextView tvAddress;
 
-        @BindView(R.id.view)
+        @BindView(R.id.dea_view)
         View view;
 
         InviteeViewHolder(@NonNull View itemView) {
@@ -63,8 +61,8 @@ public class AdapterInvitee extends RecyclerView.Adapter<AdapterInvitee.InviteeV
         }
 
         void bindDataWithViewHolder(Invitation invitation, int i) {
-            tvName.setTypeface(utility.getFontBold());
-            tvAddress.setTypeface(utility.getFontRegular());
+            tvName.setTypeface(Utility.getFontBold());
+            tvAddress.setTypeface(Utility.getFontRegular());
             tvName.setText(invitation.getInviteeFirstName().concat(" ").concat(invitation.getInviteeLasttName()));
             tvAddress.setText(invitation.getInviteeAddress());
             if (getItemCount() == i + 1) {

@@ -1,136 +1,186 @@
 <resources>
-    <string name="app_name">Talktiva</string>
 
+    <!--region Application Name-->
+    <string name="app_name">Talktiva</string>
+    <!--endregion-->
+
+    <!--region API Input Type-->
     <string name="charset">UTF-8</string>
     <string name="content_type">application/json</string>
+    <!--endregion-->
 
+    <!--region User Token-->
     <string name="token_prefix">Bearer</string>
     <string name="token_amit">eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJsYXN0TmFtZSI6IlBhdGVsIiwidXNlcl9uYW1lIjoiYW1pdCIsInVzZXJJZCI6MiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sImNsaWVudF9pZCI6InRhbGt0aXZhQXBwIiwiZmlyc3ROYW1lIjoiQW1pdCIsImF1ZCI6WyJtcy9ub3RpZmljYXRpb24iLCJtcy91c2VyIiwibXMvZXZlbnQiXSwicGFzc3dvcmQiOiIkMmEkMTAkODNxekh2Y1liUXpWSC5Qa0kuM1Y2ZWFBdGZiNG9sRDBjcUJPVXpmdklQMlY3aVcxWE9SWi4iLCJzY29wZSI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNTYxNzg3MTM0LCJqdGkiOiJjOTgwMWMxMS1iMWYyLTQ2OTctYjYzOC1iMWFmN2Y5ZWYxNmEiLCJlbWFpbCI6ImFtaXRAdGVzdC5jb20iLCJ1c2VybmFtZSI6ImFtaXQifQ.dRggonTLIaLpZ43slb6oEgZneFDgPf4ronQW-hvwGGDO6bMMUak2ooNnVLRcQ_soBlT9bmgYic-8l7OstG0FU_N5MjykYV_evrd-fVtxbtjlWvZ_1nDyjz31zH1DW0A65zk0bsxun-UYXFn7585FVIvrNT2fouYVE5bzHaSg8tt1YQ3lV8CYtOCB_fmvXaP-DrqJDCR0MzLYL6bC45QlTBefSy5wmkUTx7975K8tmIvx1gwrv85XW8DjrGATYb8pEmID684Wf55gIJS39ONqfitya64p9Xm8Ndnrixm_vmqGorKcJWG_qL6mZODuYh-_yFKo397QEJvHwAUH6Ye-vg</string>
     <string name="token_anand">eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJsYXN0TmFtZSI6IkRhdmUiLCJ1c2VyX25hbWUiOiJhbmFuZCIsInVzZXJJZCI6NCwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sImNsaWVudF9pZCI6InRhbGt0aXZhQXBwIiwiZmlyc3ROYW1lIjoiQW5hbmQiLCJhdWQiOlsibXMvbm90aWZpY2F0aW9uIiwibXMvdXNlciIsIm1zL2V2ZW50Il0sInBhc3N3b3JkIjoiJDJhJDEwJHpRbERGeTFWREJkQkJCRzVOVTlpNU9wb0dYQkFpdWF2RnMyV1RiaGkxamQvYmkzMzBMUjBLIiwic2NvcGUiOlsiUk9MRV9VU0VSIl0sImV4cCI6MTU2MTc4NzE3NSwianRpIjoiM2UyMGIwOTUtM2EzYi00YmRmLTgxNTItODJjZDVkZmI4ZWZiIiwiZW1haWwiOiJhbmFuZEB0ZXN0LmNvbSIsInVzZXJuYW1lIjoiYW5hbmQifQ.B2pQ6TOIUH05idCgYLJIOQtlUXtkGpOwsmjIv1ZM_BeGDaRLyUFdmIrsoAVGUYgYopd-9nGzxsJqFu2DwI0-U1iICGoWN2bmmCbtrvKxbrm4E9D-kXqzlpQ5croSXmY5l0fplWG-hGw3OE9DNvFI5eiWkf2DPi8Nn-AtdQKU0E4SrixbkuIM_62m2XJq5hJEXarn6BW2wJJ--z9EWJaN-fJilYvO6DQdNUM85GRHkcbGnVXGXWaiyV3UjltnnznF6foqh1NSAA-YOkjFGfRAXOphtPl2i9TVdWf-MD98b2jREsRLxM7wRU_S4c5CMb1CyB0Ct6bwNSW6Y79-PAwB5w</string>
+    <!--endregion-->
 
-    //Event Activity Titles
-    <string name="ea_title_0">View Pending Event</string>
-    <string name="ea_title_1">View Upcoming Event</string>
-    <string name="ea_title_2">View My Event</string>
+    <!--region Detail Event Activity Title-->
+    <string name="dea_title_1">View Upcoming Event</string>
+    <string name="dea_title_0">View Pending Event</string>
+    <string name="dea_title_2">View My Event</string>
+    <!--endregion-->
+
+    <!--region Detail Event Activity Menu-->
+    <string name="dea_menu_edit">Edit</string>
+    <!--endregion-->
+
+    <!--region Detail Event Activity Tab Title-->
+    <string name="dea_tab_accept">Accepted Guests</string>
+    <string name="dea_tab_pending">Pending Guests</string>
+    <!--endregion-->
+
+    <!--region Detail Event Invitee RecyclerView ImageView Description-->
+    <string name="event_user">User Image</string>
+    <!--endregion-->
+
+    <!--region Create/Edit Event Activity Title-->
     <string name="cea_title1">Create Event</string>
     <string name="cea_title2">Edit Event</string>
-    <string name="aag_title">Add Guest to Event</string>
+    <!--endregion-->
 
-    //Create Event Activity Menu
+    <!--region Create/Edit Event Activity Menu-->
     <string name="cea_menu_save">Save</string>
+    <!--endregion-->
 
-    //Create Detail Event Activity Menu
-    <string name="dea_menu_edit">Edit</string>
+    <!--region Create/Edit Event EditText Hint-->
+    <string name="cea_et_location">Event Location</string>
+    <string name="cea_et_name">Event Name</string>
+    <string name="cea_et_date">Event Date</string>
+    <!--endregion-->
 
-    //Dialog Button Title
+    <!--region Create/Edit Event TextView-->
+    <string name="cea_tv_can_guest">Guest can invite community friends</string>
+    <string name="cea_tv_private">Private event</string>
+    <string name="cea_tv_invited">guests added</string>
+    <!--endregion-->
+
+    <!--region Create/Edit Event Button Title-->
+    <string name="cea_btn_guest">Add Guests</string>
+    <!--endregion-->
+
+    <!--region Event Validation Messages-->
+    <string name="cea_error_date">Please choose future date and time</string>
+    <string name="cea_val_name">Kindly enter the event name.</string>
+    <string name="cea_val_date">Kindly select the event date.</string>
+    <string name="cea_val_location">Kindly enter the event location.</string>
+    <string name="cea_val_guest">Kindly add guests.</string>
+    <!--endregion-->
+
+    <!--region Add Guest Activity Title-->
+    <string name="aag_title">Add Guest to Event</string>
+    <!--endregion-->
+
+    <!--region Add guest Activity EditText/TextView Hint/Text-->
+    <string name="aag_et_phone">Enter guest phone numbers here</string>
+    <string name="aag_et_email">Enter guest emails here</string>
+    <string name="aag_et_search">Search</string>
+    <string name="aag_tv_add">ADD</string>
+    <!--endregion-->
+
+    <!--region Dialog Buttons-->
     <string name="dd_setting">Setting</string>
+    <string name="dd_try">Try Again</string>
     <string name="dd_yes">Yes</string>
     <string name="dd_no">No</string>
     <string name="dd_ok">OK</string>
-    <string name="dd_try">Try Again</string>
+    <!--endregion-->
 
-    //Intent Parsing Strings
+    <!--region Intent Parsing Strings-->
+    <string name="from_edit">edit</string>
+    <string name="from_new">new</string>
     <string name="event">event</string>
     <string name="from">from</string>
-    <string name="from_new">new</string>
-    <string name="from_edit">edit</string>
+    <!--endregion-->
 
-    //Network and Gps Error Message
-    <string name="gps_msg">Your GPS seems to be disabled, do you want to enable it?</string>
-
+    <!--region GPS/Network/Alert/Server Messages-->
+    <string name="server_msg">Sorry!!! server is not responding or cannot reached, please try again later.</string>
     <string name="internet_msg">Your INTERNET seems to be disabled,\ndo you want to enable it?</string>
-
     <string name="network_msg">There is no network connection at the moment, try again later.</string>
+    <string name="authentication_msg">You are not authorize user to do this event&#8230;</string>
+    <string name="gps_msg">Your GPS seems to be disabled, do you want to enable it?</string>
     <string name="connection_msg">Opps!!! Connection is slow, please try again.</string>
     <string name="time_out_msg">Sorry!!! Connection time out, please try again.</string>
-    <string name="authentication_msg">You are not authorize user to do this event&#8230;</string>
-    <string name="server_msg">Sorry!!! server is not responding or cannot reached, please try again later.</string>
+    <string name="internet">No Internet Connection</string>
+    <!--endregion-->
 
-    //HomeScreen Tab Titles
-    <string name="db_bnm_title_home">Home</string>
-    <string name="db_bnm_title_chat">Chat</string>
+    <!--region Dash Board Activity Bottom Navigation Menu Title-->
     <string name="db_bnm_title_notifications">Notifications</string>
     <string name="db_bnm_title_event">Events</string>
+    <string name="db_bnm_title_home">Home</string>
+    <string name="db_bnm_title_chat">Chat</string>
+    <!--endregion-->
 
-    //Add Popup Image View Description
-    <string name="dd_add_post">Post</string>
-    <string name="dd_add_event">Event</string>
-    <string name="dd_add_alert">Safety Alert</string>
+    <!--region Dialog Action Messages-->
+    <string name="dd_permission_msg">Required permissions are not granted, ask again?</string>
+    <string name="dd_decline_msg">Are you sure you want to decline this event?</string>
+    <string name="dd_cancel_msg">Are you sure you want to cancel this event?</string>
+    <string name="dd_logout_msg">Are you sure you want to log out?</string>
+    <string name="dd_exit_msg">Are you sure you want to exit?</string>
+    <string name="dd_discard">Discard Changes?</string>
+    <!--endregion-->
 
-    //Event Fragment Yours RecyclerView Item ImageButton Description
-    <string name="yf_rv_private">Private</string>
-    <string name="yf_rv_chat">Chat</string>
-    <string name="yf_rv_edit">Edit</string>
-    <string name="yf_rv_share">Share</string>
-    <string name="yf_rv_like">Like</string>
-    <string name="yf_rv_more">More</string>
-
-    //Event Fragment Yours RecyclerView Item Button Text
-    <string name="yf_rv_accept">Accept</string>
-    <string name="yf_rv_decline">Decline</string>
-    <string name="yf_rv_cancel">Cancel</string>
-
-    //Event Fragment Tab Titles
-    <string name="ef_tab_pending">Pending</string>
+    <!--region Event Fragment Tab Title-->
     <string name="ef_tab_upcoming">Upcoming</string>
+    <string name="ef_tab_pending">Pending</string>
     <string name="ef_tab_yours">Yours</string>
+    <!--endregion-->
 
-    //Event Details Tab Titles
-    <string name="dea_accept">Accepted Guests</string>
-    <string name="dea_pending">Pending Guests</string>
+    <!--region Event Fragment TextView-->
+    <string name="empty_ue_msg">No upcoming events found.</string>
+    <string name="empty_pe_msg">No pending events found.</string>
+    <string name="empty_ye_msg">No events created.</string>
+    <!--endregion-->
 
-    //Event Fragment Option Menu Title
+    <!--region Event Fragment Menu-->
     <string name="ef_menu_create">Create</string>
+    <!--endregion-->
 
-    //Create Event EditText Hint
-    <string name="event_name">Event Name</string>
-    <string name="event_date">Event Date</string>
-    <string name="event_time">Event Time</string>
-    <string name="event_location">Event Location</string>
-    <string name="event_private">Private event</string>
-    <string name="event_can_guest">Guest can invite community friends</string>
-    <string name="event_guest">Add Guests</string>
-    <string name="event_invited">guests added</string>
-    <string name="event_cancel">Cancel Event</string>
+    <!--region Event RecyclerView Item ImageButton Description-->
+    <string name="rv_iv_private">Private</string>
+    <string name="rv_iv_share">Share</string>
+    <string name="rv_iv_chat">Chat</string>
+    <string name="rv_iv_edit">Edit</string>
+    <string name="rv_iv_like">Like</string>
+    <string name="rv_iv_more">More</string>
 
-    <string name="event_tomorrow">TOMORROW</string>
-    <string name="event_today">TODAY</string>
-    <string name="event_later">LATER</string>
+    <string name="rv_iv_decline">Decline</string>
+    <string name="rv_iv_accept">Accept</string>
+    <string name="rv_iv_cancel">Cancel</string>
 
-    <string name="event_user">User Image</string>
-    <string name="internet">No Internet Connection</string>
+    <string name="rv_header_tomorrow">TOMORROW</string>
+    <string name="rv_header_today">TODAY</string>
+    <string name="rv_header_later">LATER</string>
+    <!--endregion-->
 
-    <string name="decline_msg">Are you sure you want to decline this event?</string>
-    <string name="cancel_msg">Are you sure you want to cancel this event?</string>
-    <string name="logout_msg">Are you sure you want to log out?</string>
-    <string name="discard">Discard Changes?</string>
-
+    <!--region Event Response Messages-->
     <string name="event_success_msg">Event created successfully</string>
     <string name="event_update_msg">Event updated successfully</string>
     <string name="event_cancel_msg">Event canceled successfully</string>
+    <string name="event_guest_added">Guest added successfully</string>
+    <string name="event_guest_exist">Guest already selected</string>
+    <string name="event_success">Event added successfully</string>
+    <!--endregion-->
 
-    <string name="error_date">Please choose future date and time</string>
-    <string name="val_name">Kindly enter the event name.</string>
-    <string name="val_date">Kindly select the event date.</string>
-    <string name="val_location">Kindly enter the event location.</string>
-    <string name="val_guest">Kindly add guests.</string>
+    <!--region Context Menu Title-->
+    <string name="atc">Add to calendar</string>
+    <!--endregion-->
+
+    <!--region Home Activity Footer-->
+    <string name="ha_footer">&#42; Privacy policies | talktiva &#8482;</string>
+    <!--endregion-->
+
+    <!--region Home Activity Button Text-->
+    <string name="ha_btn_login">Login</string>
+    <string name="ha_btn_create">Create Account</string>
+    <!--endregion-->
+
+    <string name="ha_tv_content_1">The Private social network for your community 1</string>
+    <string name="ha_tv_content_2">The Private social network for your community 2</string>
+    <string name="ha_tv_content_3">The Private social network for your community 3</string>
+    <string name="ha_tv_content_4">The Private social network for your community 4</string>
+    <string name="ha_tv_content_5">The Private social network for your community 5</string>
 
     <string name="sample_add">10 Taylor Ct, Ridgefield CT 06877</string>
 
-    <string name="no_p_event">No pending events found.</string>
-    <string name="no_u_event">No upcoming events found.</string>
-    <string name="no_c_event">No events created.</string>
-
-    //Context Menu Item for Upcoming and Yours event Screen
-    <string name="atc">Add to calendar</string>
-    <string name="event_success">Event added successfully</string>
-
-    //Add Guest to Event Screen EditText Hint
-    <string name="aag_et_search">Search</string>
-    <string name="aag_et_email">Enter guest emails here</string>
-    <string name="aag_et_phone">Enter guest phone numbers here</string>
-    <string name="aag_tv_add">ADD</string>
-
-    //Home Activity Text
-    <string name="ha_footer">&#42; Privacy policies | talktiva &#8482;</string>
 </resources>

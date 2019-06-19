@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -25,6 +28,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.gson.Gson;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.helper.CustomTypefaceSpan;
+import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Event;
 import com.talktiva.pilot.model.Invitation;
@@ -92,23 +96,19 @@ public class CreateEventActivity extends AppCompatActivity {
     TextView tvCount;
 
     private Dialog progressDialog, internetDialog, errorDialog;
-    private Utility utility;
-    private Event curEvent;
-
     private Calendar currentDate, newDate;
-
-    private String from;
-    private int count = 0;
-
     private List<Invitation> invitations;
+    private BroadcastReceiver receiver;
     private Invitation invitation;
+    private Event curEvent;
+    private int count = 0;
+    private String from;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
-        utility = new Utility(this);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
@@ -117,31 +117,31 @@ public class CreateEventActivity extends AppCompatActivity {
 
         toolbar.setNavigationIcon(R.drawable.ic_cancel);
 
-        progressDialog = utility.showProgress();
+        progressDialog = Utility.showProgress(CreateEventActivity.this);
 
-        etName.setTypeface(utility.getFontRegular());
-        etDate.setTypeface(utility.getFontRegular());
-        etLocation.setTypeface(utility.getFontRegular());
-        tvPrivate.setTypeface(utility.getFontRegular());
-        tvShare.setTypeface(utility.getFontRegular());
-        tvInvitee.setTypeface(utility.getFontRegular());
-        tvCountFig.setTypeface(utility.getFontBold());
-        tvCount.setTypeface(utility.getFontRegular());
-        tvName.setTypeface(utility.getFontRegular());
-        tvDate.setTypeface(utility.getFontRegular());
-        tvLocation.setTypeface(utility.getFontRegular());
+        etName.setTypeface(Utility.getFontRegular());
+        etDate.setTypeface(Utility.getFontRegular());
+        etLocation.setTypeface(Utility.getFontRegular());
+        tvPrivate.setTypeface(Utility.getFontRegular());
+        tvShare.setTypeface(Utility.getFontRegular());
+        tvInvitee.setTypeface(Utility.getFontRegular());
+        tvCountFig.setTypeface(Utility.getFontBold());
+        tvCount.setTypeface(Utility.getFontRegular());
+        tvName.setTypeface(Utility.getFontRegular());
+        tvDate.setTypeface(Utility.getFontRegular());
+        tvLocation.setTypeface(Utility.getFontRegular());
 
         Bundle bundle = getIntent().getExtras();
         from = bundle != null ? bundle.getString(getResources().getString(R.string.from)) : null;
 
         switch (Objects.requireNonNull(from)) {
             case "new":
-                utility.setTitleText(toolbar, R.id.cea_toolbar_tv_title, getResources().getString(R.string.cea_title1));
+                Utility.setTitleText(toolbar, R.id.cea_toolbar_tv_title, R.string.cea_title1);
                 tvCountFig.setText(String.valueOf(count));
                 break;
 
             case "edit":
-                utility.setTitleText(toolbar, R.id.cea_toolbar_tv_title, getResources().getString(R.string.cea_title2));
+                Utility.setTitleText(toolbar, R.id.cea_toolbar_tv_title, R.string.cea_title2);
                 curEvent = (Event) bundle.getSerializable(getResources().getString(R.string.event));
                 getEventDetails(Objects.requireNonNull(curEvent));
                 break;
@@ -171,7 +171,7 @@ public class CreateEventActivity extends AppCompatActivity {
                         if (newDate.getTimeInMillis() >= c.getTimeInMillis()) {
                             etDate.setText(newDate.getTime().toLocaleString());
                         } else {
-                            errorDialog = utility.showAlert(getResources().getString(R.string.error_date), false, View.VISIBLE, getResources().getString(R.string.dd_ok), v2 -> errorDialog.dismiss(), View.GONE, null, null);
+                            errorDialog = Utility.showAlert(CreateEventActivity.this, R.string.cea_error_date, false, View.VISIBLE, R.string.dd_ok, v2 -> errorDialog.dismiss(), View.GONE, null, null);
                             errorDialog.show();
                         }
                     }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false);
@@ -213,7 +213,7 @@ public class CreateEventActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.create_event_menu, menu);
         MenuItem menuItem = menu.findItem(R.id.cea_menu_save);
         SpannableString mNewTitle = new SpannableString(menuItem.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        mNewTitle.setSpan(new CustomTypefaceSpan("", Utility.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         menuItem.setTitle(mNewTitle);
         return super.onCreateOptionsMenu(menu);
     }
@@ -231,10 +231,14 @@ public class CreateEventActivity extends AppCompatActivity {
                         if (etLocation != null && etLocation.getText().toString().trim().length() != 0) {
                             switch (from) {
                                 case "new":
-                                    createEvent();
+                                    if (Utility.isConnectingToInternet()) {
+                                        createEvent();
+                                    }
                                     return true;
                                 case "edit":
-                                    updateEvent(curEvent.getEventId());
+                                    if (Utility.isConnectingToInternet()) {
+                                        updateEvent(curEvent.getEventId());
+                                    }
                                     return true;
                             }
                         } else {
@@ -261,14 +265,14 @@ public class CreateEventActivity extends AppCompatActivity {
                     count = invitations.size();
                     tvCountFig.setText(String.valueOf(count));
                 } else {
-                    errorDialog = utility.showAlert("Guest added successfully.", false, View.VISIBLE, getResources().getString(R.string.dd_ok), v -> errorDialog.dismiss(), View.GONE, null, null);
+                    errorDialog = Utility.showAlert(CreateEventActivity.this, R.string.event_guest_added, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
                     errorDialog.show();
                 }
                 break;
             case "edit":
                 if (invitations != null) {
                     if (invitations.size() != 0) {
-                        errorDialog = utility.showAlert("Guest already selected.", false, View.VISIBLE, getResources().getString(R.string.dd_ok), v -> errorDialog.dismiss(), View.GONE, null, null);
+                        errorDialog = Utility.showAlert(CreateEventActivity.this, R.string.event_guest_exist, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
                         errorDialog.show();
                     } else {
                         invitations = getInvitations();
@@ -342,17 +346,17 @@ public class CreateEventActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if (response.isSuccessful()) {
-                    utility.dismissDialog(progressDialog);
+                    Utility.dismissDialog(progressDialog);
                     finish();
-                    utility.showMsg(getResources().getString(R.string.event_success_msg));
+                    Utility.showMsg(R.string.event_success_msg);
                     LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEvent"));
                 } else {
-                    utility.dismissDialog(progressDialog);
+                    Utility.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 500) {
                         Log.d("Error", "onResponse: " + Objects.requireNonNull(response.errorBody()).toString());
-                        utility.showMsg(response.message());
+                        Utility.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), v -> utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.showError(CreateEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -360,9 +364,9 @@ public class CreateEventActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
-                utility.dismissDialog(progressDialog);
+                Utility.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.showError(CreateEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -413,17 +417,17 @@ public class CreateEventActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if (response.isSuccessful()) {
-                    utility.dismissDialog(progressDialog);
+                    Utility.dismissDialog(progressDialog);
                     finish();
-                    utility.showMsg(getResources().getString(R.string.event_update_msg));
+                    Utility.showMsg(R.string.event_update_msg);
                     LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("ViewEvent"));
                     LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEvent"));
                 } else {
-                    utility.dismissDialog(progressDialog);
+                    Utility.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 500) {
-                        utility.showMsg(response.message());
+                        Utility.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), v -> utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.showError(CreateEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -431,9 +435,9 @@ public class CreateEventActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
-                utility.dismissDialog(progressDialog);
+                Utility.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.showError(CreateEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -464,7 +468,7 @@ public class CreateEventActivity extends AppCompatActivity {
         switch (from) {
             case "new":
                 if (etName.getText().toString().trim().length() != 0 || etDate.getText().toString().trim().length() != 0 || etLocation.getText().toString().trim().length() != 0) {
-                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else {
                     finish();
@@ -472,27 +476,44 @@ public class CreateEventActivity extends AppCompatActivity {
                 break;
             case "edit":
                 if (!etName.getText().toString().trim().equalsIgnoreCase(curEvent.getTitle())) {
-                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (!etDate.getText().toString().trim().equalsIgnoreCase(curEvent.getEventDate().toLocaleString())) {
-                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (!etLocation.getText().toString().trim().equalsIgnoreCase(curEvent.getLocation())) {
-                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (swPrivate.isChecked() != curEvent.isPrivate()) {
-                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (swCanGuest.isChecked() != curEvent.canInviteGuests()) {
-                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (invitations.size() != curEvent.getInvitations().size()) {
-                    internetDialog = utility.showAlert(getResources().getString(R.string.discard), false, View.VISIBLE, getResources().getString(R.string.dd_yes), v -> finish(), View.VISIBLE, getResources().getString(R.string.dd_no), v -> utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else {
                     finish();
                 }
                 break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        receiver = new NetworkChangeReceiver();
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    @Override
+    protected void onDestroy() {
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
     }
 }

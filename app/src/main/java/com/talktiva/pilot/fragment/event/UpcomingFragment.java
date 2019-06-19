@@ -27,7 +27,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.talktiva.pilot.R;
-import com.talktiva.pilot.activity.EventActivity;
+import com.talktiva.pilot.Talktiva;
+import com.talktiva.pilot.activity.DetailEventActivity;
 import com.talktiva.pilot.adapter.AdapterGroupBy;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Event;
@@ -60,7 +61,6 @@ public class UpcomingFragment extends Fragment {
     TextView textView;
 
     private Dialog progressDialog, internetDialog;
-    private Utility utility;
     private Event curEvent;
 
     private BroadcastReceiver r = new BroadcastReceiver() {
@@ -81,10 +81,10 @@ public class UpcomingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        utility = new Utility(getActivity());
-        progressDialog = utility.showProgress();
         ButterKnife.bind(this, view);
-        textView.setTypeface(utility.getFontBold());
+
+        progressDialog = Utility.showProgress(getActivity());
+        textView.setTypeface(Utility.getFontBold());
         setData();
     }
 
@@ -145,14 +145,12 @@ public class UpcomingFragment extends Fragment {
                         adapterGroupBy.setOnPositionClicked((view, event, from) -> {
                             switch (view.getId()) {
                                 case R.id.yf_rv_cl:
-                                    Intent intent = new Intent(getActivity(), EventActivity.class);
+                                    Intent intent = new Intent(Talktiva.getInstance(), DetailEventActivity.class);
                                     Bundle bundle = new Bundle();
                                     bundle.putInt(getResources().getString(R.string.from), from);
                                     bundle.putSerializable(getResources().getString(R.string.event), event);
                                     intent.putExtras(bundle);
                                     startActivity(intent);
-                                    break;
-                                case R.id.ea_iv_like:
                                     break;
                                 case R.id.yf_rv_iv_share:
                                     break;
@@ -166,15 +164,15 @@ public class UpcomingFragment extends Fragment {
                         recyclerView.setVisibility(View.GONE);
                         textView.setVisibility(View.VISIBLE);
                     }
-                    utility.dismissDialog(progressDialog);
+                    Utility.dismissDialog(progressDialog);
                 } else {
-                    utility.dismissDialog(progressDialog);
+                    Utility.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 400) {
-                        internetDialog = utility.showError(getResources().getString(R.string.network_msg), getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss());
+                        internetDialog = Utility.showError(getActivity(), R.string.network_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
                     } else if (response.code() >= 400 && response.code() < 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.authentication_msg), getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss());
+                        internetDialog = Utility.showError(getActivity(), R.string.authentication_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
                     } else if (response.code() >= 500) {
-                        internetDialog = utility.showError(getResources().getString(R.string.server_msg), getResources().getString(R.string.dd_try), v -> internetDialog.dismiss());
+                        internetDialog = Utility.showError(getActivity(), R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
                     }
                     internetDialog.show();
                 }
@@ -182,9 +180,9 @@ public class UpcomingFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
-                utility.dismissDialog(progressDialog);
+                Utility.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = utility.showError(getResources().getString(R.string.time_out_msg), getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss());
+                    internetDialog = Utility.showError(getActivity(), R.string.time_out_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -194,13 +192,13 @@ public class UpcomingFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r, new IntentFilter("Refresh1"));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.getInstance())).registerReceiver(r, new IntentFilter("Refresh1"));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.getInstance())).unregisterReceiver(r);
     }
 
     @Override
@@ -212,7 +210,7 @@ public class UpcomingFragment extends Fragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getTitle().toString().equalsIgnoreCase(getResources().getString(R.string.atc))) {
-            Cursor cursor = Objects.requireNonNull(getActivity()).getApplicationContext().getContentResolver().query(CalendarContract.Calendars.CONTENT_URI, null, null, null, null);
+            Cursor cursor = Objects.requireNonNull(Talktiva.getInstance()).getApplicationContext().getContentResolver().query(CalendarContract.Calendars.CONTENT_URI, null, null, null, null);
             long calenderId = 0;
 
             if (Objects.requireNonNull(cursor).moveToFirst()) {
@@ -230,7 +228,7 @@ public class UpcomingFragment extends Fragment {
             contentValues.put(CalendarContract.Events.DTEND, curEvent.getEventDate().getTime() + 60 * 60 * 1000);
             contentValues.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().toString());
 
-            Uri eventUri = getActivity().getApplicationContext().getContentResolver().insert(CalendarContract.Events.CONTENT_URI, contentValues);
+            Uri eventUri = Talktiva.getInstance().getApplicationContext().getContentResolver().insert(CalendarContract.Events.CONTENT_URI, contentValues);
             long eventID = ContentUris.parseId(eventUri);
 
             ContentValues reminders = new ContentValues();
@@ -238,9 +236,9 @@ public class UpcomingFragment extends Fragment {
             reminders.put(CalendarContract.Reminders.METHOD, true);
             reminders.put(CalendarContract.Reminders.MINUTES, getResources().getInteger(R.integer.event_alert_time));
             String reminderUriString = "content://com.android.calendar/reminders";
-            getActivity().getApplicationContext().getContentResolver().insert(Uri.parse(reminderUriString), reminders);
+            Talktiva.getInstance().getApplicationContext().getContentResolver().insert(Uri.parse(reminderUriString), reminders);
 
-            internetDialog = utility.showAlert(getResources().getString(R.string.event_success), false, View.VISIBLE, getResources().getString(R.string.dd_ok), v -> internetDialog.dismiss(), View.GONE, null, null);
+            internetDialog = Utility.showAlert(getActivity(), R.string.event_success, false, View.VISIBLE, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog), View.GONE, null, null);
             internetDialog.show();
             return true;
         } else {

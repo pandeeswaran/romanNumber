@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -32,7 +31,6 @@ import com.talktiva.pilot.fragment.event.PendingFragment;
 import com.talktiva.pilot.fragment.event.UpcomingFragment;
 import com.talktiva.pilot.fragment.event.YourFragment;
 import com.talktiva.pilot.helper.CustomTypefaceSpan;
-import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 
 import java.util.Objects;
@@ -52,9 +50,6 @@ public class EventFragment extends Fragment {
 
     @BindView(R.id.ef_container)
     FrameLayout frameLayout;
-
-    private BroadcastReceiver receiver;
-    private Utility utility;
 
     private BroadcastReceiver r0 = new BroadcastReceiver() {
         @Override
@@ -95,25 +90,9 @@ public class EventFragment extends Fragment {
     public EventFragment() {
     }
 
-    //region Register And Unregister Broadcast Connectivity Receiver
-    private void registerNetworkBroadcast() {
-        Objects.requireNonNull(getActivity()).registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-    }
-
-    private void unregisterNetworkBroadcast() {
-        try {
-            Objects.requireNonNull(getActivity()).unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-    }
-    //endregion
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        receiver = new NetworkChangeReceiver(getActivity());
-        registerNetworkBroadcast();
         LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r0, new IntentFilter("PendingEvent"));
         LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r1, new IntentFilter("UpcomingEvent"));
         LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(r2, new IntentFilter("MyEvent"));
@@ -122,7 +101,6 @@ public class EventFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        unregisterNetworkBroadcast();
         LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r0);
         LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r1);
         LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).unregisterReceiver(r2);
@@ -136,14 +114,13 @@ public class EventFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        utility = new Utility(getActivity());
         ButterKnife.bind(this, view);
         setHasOptionsMenu(true);
 
         ((DashBoardActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
         Objects.requireNonNull(((DashBoardActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
-        utility.setTitleText(toolbar, R.id.ef_toolbar_tv_title, getActivity().getResources().getString(R.string.db_bnm_title_event));
+        Utility.setTitleText(toolbar, R.id.ef_toolbar_tv_title, R.string.db_bnm_title_event);
 
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_pending)), 0);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_upcoming)), 1);
@@ -181,7 +158,7 @@ public class EventFragment extends Fragment {
             for (int i = 0; i < tabChildCount; i++) {
                 View tabViewChild = vgTab.getChildAt(i);
                 if (tabViewChild instanceof TextView) {
-                    ((TextView) tabViewChild).setTypeface(utility.getFontRegular());
+                    ((TextView) tabViewChild).setTypeface(Utility.getFontRegular());
                 }
             }
         }
@@ -203,7 +180,7 @@ public class EventFragment extends Fragment {
         inflater.inflate(R.menu.event_menu, menu);
         MenuItem item = menu.findItem(R.id.ef_menu_create);
         SpannableString mNewTitle = new SpannableString(item.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("", utility.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        mNewTitle.setSpan(new CustomTypefaceSpan("", Utility.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         item.setTitle(mNewTitle);
         super.onCreateOptionsMenu(menu, inflater);
     }
