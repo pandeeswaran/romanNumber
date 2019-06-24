@@ -19,6 +19,7 @@ import com.talktiva.pilot.adapter.AdapterInvitee;
 import com.talktiva.pilot.model.Invitation;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,11 +49,11 @@ public class InviteeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(Talktiva.getInstance());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(Talktiva.Companion.getInstance());
         layoutManager.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
 
-        AdapterInvitee adapterInvitee = new AdapterInvitee(getActivity(), invitationList);
+        AdapterInvitee adapterInvitee = new AdapterInvitee(Objects.requireNonNull(getActivity()), invitationList);
         recyclerView.setAdapter(adapterInvitee);
         adapterInvitee.notifyDataSetChanged();
     }

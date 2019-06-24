@@ -74,7 +74,7 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textColor="@color/font"
-                    android:textSize="@dimen/normal_lable_font_size"
+                    android:textSize="@dimen/normal_label_font_size"
                     app:layout_constraintEnd_toStartOf="@id/dea_iv_private"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -117,7 +117,7 @@
                     android:maxEms="20"
                     android:maxLines="1"
                     android:textColor="@color/font"
-                    android:textSize="@dimen/normal_lable_font_size"
+                    android:textSize="@dimen/normal_label_font_size"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/dea_tv_date"
                     app:layout_constraintTop_toTopOf="@id/dea_tv_date" />
@@ -134,7 +134,7 @@
                     android:maxEms="20"
                     android:maxLines="1"
                     android:textColor="@color/font"
-                    android:textSize="@dimen/normal_lable_font_size"
+                    android:textSize="@dimen/normal_label_font_size"
                     app:layout_constraintBottom_toBottomOf="@id/dea_tv_date"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -266,7 +266,7 @@
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
                     android:textColor="@color/colorPrimary"
-                    android:textSize="@dimen/normal_lable_font_size"
+                    android:textSize="@dimen/normal_label_font_size"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

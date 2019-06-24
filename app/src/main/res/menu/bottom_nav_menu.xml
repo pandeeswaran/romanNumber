@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
         android:id="@+id/db_bnm_home"
@@ -7,14 +8,14 @@
         android:title="@string/db_bnm_title_home" />
 
     <item
-        android:id="@+id/db_bnm_chat"
+        android:id="@+id/db_bnm_chats"
         android:icon="@drawable/ic_chat"
-        android:title="@string/db_bnm_title_chat" />
+        android:title="@string/db_bnm_title_chats" />
 
     <item
         android:id="@+id/db_bnm_add"
         android:icon="@drawable/ic_add"
-        android:title="" />
+        tools:ignore="MenuTitle" />
 
     <item
         android:id="@+id/db_bnm_notification"

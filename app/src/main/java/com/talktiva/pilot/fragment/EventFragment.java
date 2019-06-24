@@ -40,7 +40,7 @@ import butterknife.ButterKnife;
 
 public class EventFragment extends Fragment {
 
-    public static final String TAG = "EventFragment";
+    public static String TAG = "EventFragment";
 
     @BindView(R.id.ef_toolbar)
     Toolbar toolbar;
@@ -120,7 +120,7 @@ public class EventFragment extends Fragment {
         ((DashBoardActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
         Objects.requireNonNull(((DashBoardActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
-        Utility.setTitleText(toolbar, R.id.ef_toolbar_tv_title, R.string.db_bnm_title_event);
+        Utility.INSTANCE.setTitleText(toolbar, R.id.ef_toolbar_tv_title, R.string.db_bnm_title_event);
 
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_pending)), 0);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_upcoming)), 1);
@@ -158,7 +158,7 @@ public class EventFragment extends Fragment {
             for (int i = 0; i < tabChildCount; i++) {
                 View tabViewChild = vgTab.getChildAt(i);
                 if (tabViewChild instanceof TextView) {
-                    ((TextView) tabViewChild).setTypeface(Utility.getFontRegular());
+                    ((TextView) tabViewChild).setTypeface(Utility.INSTANCE.getFontRegular());
                 }
             }
         }
@@ -180,7 +180,7 @@ public class EventFragment extends Fragment {
         inflater.inflate(R.menu.event_menu, menu);
         MenuItem item = menu.findItem(R.id.ef_menu_create);
         SpannableString mNewTitle = new SpannableString(item.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("", Utility.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        mNewTitle.setSpan(new CustomTypefaceSpan("", Utility.INSTANCE.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         item.setTitle(mNewTitle);
         super.onCreateOptionsMenu(menu, inflater);
     }

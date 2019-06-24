@@ -60,6 +60,6 @@ public class EmptyFragment extends Fragment {
         ((DashBoardActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
         Objects.requireNonNull(((DashBoardActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
-        Utility.setTitleText(toolbar, R.id.toolbar_tv_title, mParam1);
+        Utility.INSTANCE.setTitleText(toolbar, R.id.toolbar_tv_title, mParam1);
     }
 }

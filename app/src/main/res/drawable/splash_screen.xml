@@ -5,8 +5,8 @@
     <item android:drawable="@color/colorPrimary" />
 
     <item
-        android:width="375px"
-        android:height="78px"
+        android:width="500px"
+        android:height="104px"
         android:drawable="@drawable/talktiva_logo_white"
         android:gravity="center"
         tools:ignore="UnusedAttribute" />

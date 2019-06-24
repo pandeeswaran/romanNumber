@@ -42,6 +42,7 @@ import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
 import com.talktiva.pilot.results.ResultEvents;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,18 +106,19 @@ public class DetailEventActivity extends AppCompatActivity {
     @BindView(R.id.dea_tv_other)
     TextView tvOther;
 
+    private DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
     private Dialog progressDialog, cancelDialog, declineDialog, internetDialog;
     private List<Invitation> acceptedInvitations, pendingInvitations;
-    private int from, eventId;
-    private Event event;
     protected BroadcastReceiver r = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (Utility.isConnectingToInternet()) {
+            if (Utility.INSTANCE.isConnectingToInternet()) {
                 getEventById(eventId);
             }
         }
     };
+    private int from, eventId;
+    private Event event;
     private BroadcastReceiver receiver;
 
     @Override
@@ -125,39 +127,39 @@ public class DetailEventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event_detail);
         ButterKnife.bind(this);
 
-        progressDialog = Utility.showProgress(DetailEventActivity.this);
+        progressDialog = Utility.INSTANCE.showProgress(DetailEventActivity.this);
         setSupportActionBar(toolbar);
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        toolbar.setNavigationIcon(R.drawable.ic_back);
+        toolbar.setNavigationIcon(R.drawable.ic_back_white);
 
-        tvDate.setTypeface(Utility.getFontBold());
-        tvTitle.setTypeface(Utility.getFontBold());
-        tvFullDate.setTypeface(Utility.getFontRegular());
-        tvAdd.setTypeface(Utility.getFontRegular());
-        tvCount.setTypeface(Utility.getFontBold());
-        tvOther.setTypeface(Utility.getFontRegular());
+        tvDate.setTypeface(Utility.INSTANCE.getFontBold());
+        tvTitle.setTypeface(Utility.INSTANCE.getFontBold());
+        tvFullDate.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvAdd.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvCount.setTypeface(Utility.INSTANCE.getFontBold());
+        tvOther.setTypeface(Utility.INSTANCE.getFontRegular());
 
         Bundle bundle = getIntent().getExtras();
         from = bundle != null ? bundle.getInt(getResources().getString(R.string.from)) : 0;
 
         switch (from) {
             case 0:
-                Utility.setTitleText(toolbar, R.id.dea_toolbar_tv_title, R.string.dea_title_0);
+                Utility.INSTANCE.setTitleText(toolbar, R.id.dea_toolbar_tv_title, R.string.dea_title_0);
                 break;
             case 1:
-                Utility.setTitleText(toolbar, R.id.dea_toolbar_tv_title, R.string.dea_title_1);
+                Utility.INSTANCE.setTitleText(toolbar, R.id.dea_toolbar_tv_title, R.string.dea_title_1);
                 break;
             case 2:
-                Utility.setTitleText(toolbar, R.id.dea_toolbar_tv_title, R.string.dea_title_2);
+                Utility.INSTANCE.setTitleText(toolbar, R.id.dea_toolbar_tv_title, R.string.dea_title_2);
                 break;
         }
 
         Event event = (Event) (bundle != null ? bundle.getSerializable(getResources().getString(R.string.event)) : null);
-        eventId = Objects.requireNonNull(event).getEventId();
-        if (Utility.isConnectingToInternet()) {
+        eventId = Objects.requireNonNull(Objects.requireNonNull(event).getEventId());
+        if (Utility.INSTANCE.isConnectingToInternet()) {
             getEventById(eventId);
         }
 
@@ -169,7 +171,7 @@ public class DetailEventActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.detail_event_menu, menu);
         MenuItem item = menu.findItem(R.id.dea_menu_edit);
         SpannableString mNewTitle = new SpannableString(item.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("", Utility.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        mNewTitle.setSpan(new CustomTypefaceSpan("", Utility.INSTANCE.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         item.setTitle(mNewTitle);
 
         if (from == 2) {
@@ -224,7 +226,7 @@ public class DetailEventActivity extends AppCompatActivity {
     private void acceptEvent(Integer eventId, Boolean bool) {
         progressDialog.show();
 
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<ResultEvents> call = apiInterface.acceptOrDeclineEvent(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), eventId, bool);
         call.enqueue(new Callback<ResultEvents>() {
             @Override
@@ -240,12 +242,12 @@ public class DetailEventActivity extends AppCompatActivity {
                             break;
                     }
                 } else {
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 500) {
-                        Utility.showMsg(response.message());
+                        Utility.INSTANCE.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = Utility.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try,
-                                v -> Utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try,
+                                v -> Utility.INSTANCE.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -253,9 +255,9 @@ public class DetailEventActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
-                Utility.dismissDialog(progressDialog);
+                Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -270,24 +272,24 @@ public class DetailEventActivity extends AppCompatActivity {
     private void cancelEvent(Integer id) {
         progressDialog.show();
 
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<ResultEvents> call = apiInterface.cancelEvent(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), id);
         call.enqueue(new Callback<ResultEvents>() {
             @Override
             public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
                 if (response.isSuccessful()) {
-                    Utility.dismissDialog(cancelDialog);
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(cancelDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                     finish();
-                    Utility.showMsg(R.string.event_cancel_msg);
+                    Utility.INSTANCE.showMsg(R.string.event_cancel_msg);
                     LocalBroadcastManager.getInstance(DetailEventActivity.this).sendBroadcast(new Intent("MyEvent"));
                 } else {
-                    Utility.dismissDialog(cancelDialog);
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(cancelDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 500) {
-                        Utility.showMsg(response.message());
+                        Utility.INSTANCE.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = Utility.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -295,21 +297,20 @@ public class DetailEventActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
-                Utility.dismissDialog(cancelDialog);
-                Utility.dismissDialog(progressDialog);
+                Utility.INSTANCE.dismissDialog(cancelDialog);
+                Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
         });
     }
 
-    @SuppressWarnings("deprecation")
     private void getEventById(Integer id) {
         progressDialog.show();
 
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<Event> call = apiInterface.getEventById(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), id);
         call.enqueue(new Callback<Event>() {
             @Override
@@ -320,8 +321,8 @@ public class DetailEventActivity extends AppCompatActivity {
                     acceptedInvitations = new ArrayList<>();
                     pendingInvitations = new ArrayList<>();
 
-                    for (int j = 0; j < event.getInvitations().size(); j++) {
-                        if (event.getInvitations().get(j).getStatus().equalsIgnoreCase("pending")) {
+                    for (int j = 0; j < Objects.requireNonNull(event.getInvitations()).size(); j++) {
+                        if (Objects.requireNonNull(event.getInvitations().get(j).getStatus()).equalsIgnoreCase("pending")) {
                             pendingInvitations.add(event.getInvitations().get(j));
                         } else {
                             acceptedInvitations.add(event.getInvitations().get(j));
@@ -338,19 +339,19 @@ public class DetailEventActivity extends AppCompatActivity {
 
                     }
 
-                    if (event.isPrivate()) {
+                    if (Objects.requireNonNull(event.isPrivate())) {
                         ivPrivate.setVisibility(View.VISIBLE);
                     } else {
                         ivPrivate.setVisibility(View.GONE);
                     }
 
-                    if (event.canInviteGuests()) {
+                    if (Objects.requireNonNull(event.getCanInviteGuests())) {
                         ivShare.setVisibility(View.VISIBLE);
                     } else {
                         ivShare.setVisibility(View.GONE);
                     }
 
-                    if (event.isHasLiked()) {
+                    if (Objects.requireNonNull(event.isHasLiked())) {
                         ivLike.setImageResource(R.drawable.ic_liked);
                         ivLike.setTag("1");
                     } else {
@@ -388,7 +389,7 @@ public class DetailEventActivity extends AppCompatActivity {
                     }
 
                     ivAccept.setOnClickListener(v -> {
-                        if (Utility.isConnectingToInternet()) {
+                        if (Utility.INSTANCE.isConnectingToInternet()) {
                             acceptEvent(event.getEventId(), true);
                         }
                     });
@@ -396,27 +397,27 @@ public class DetailEventActivity extends AppCompatActivity {
                     ivDecline.setOnClickListener(v -> {
                         switch (from) {
                             case 0:
-                                declineDialog = Utility.showAlert(DetailEventActivity.this, R.string.dd_decline_msg, false, View.VISIBLE, R.string.dd_yes, v1 -> {
-                                    if (Utility.isConnectingToInternet()) {
+                                declineDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, R.string.dd_decline_msg, false, View.VISIBLE, R.string.dd_yes, v1 -> {
+                                    if (Utility.INSTANCE.isConnectingToInternet()) {
                                         acceptEvent(event.getEventId(), false);
                                     }
-                                }, View.VISIBLE, R.string.dd_no, V -> Utility.dismissDialog(declineDialog));
+                                }, View.VISIBLE, R.string.dd_no, V -> Utility.INSTANCE.dismissDialog(declineDialog));
                                 declineDialog.show();
                                 break;
                             case 1:
-                                declineDialog = Utility.showAlert(DetailEventActivity.this, R.string.dd_decline_msg, false, View.VISIBLE, R.string.dd_yes, v2 -> {
-                                    if (Utility.isConnectingToInternet()) {
+                                declineDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, R.string.dd_decline_msg, false, View.VISIBLE, R.string.dd_yes, v2 -> {
+                                    if (Utility.INSTANCE.isConnectingToInternet()) {
                                         acceptEvent(event.getEventId(), false);
                                     }
-                                }, View.VISIBLE, R.string.dd_no, V -> Utility.dismissDialog(declineDialog));
+                                }, View.VISIBLE, R.string.dd_no, V -> Utility.INSTANCE.dismissDialog(declineDialog));
                                 declineDialog.show();
                                 break;
                             case 2:
-                                cancelDialog = Utility.showAlert(DetailEventActivity.this, R.string.dd_cancel_msg, false, View.VISIBLE, R.string.dd_yes, v3 -> {
-                                    if (Utility.isConnectingToInternet()) {
+                                cancelDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, R.string.dd_cancel_msg, false, View.VISIBLE, R.string.dd_yes, v3 -> {
+                                    if (Utility.INSTANCE.isConnectingToInternet()) {
                                         cancelEvent(event.getEventId());
                                     }
-                                }, View.VISIBLE, R.string.dd_no, V -> Utility.dismissDialog(cancelDialog));
+                                }, View.VISIBLE, R.string.dd_no, V -> Utility.INSTANCE.dismissDialog(cancelDialog));
                                 cancelDialog.show();
                                 break;
                         }
@@ -451,7 +452,7 @@ public class DetailEventActivity extends AppCompatActivity {
                         for (int i = 0; i < tabChildCount; i++) {
                             View tabViewChild = vgTab.getChildAt(i);
                             if (tabViewChild instanceof TextView) {
-                                ((TextView) tabViewChild).setTypeface(Utility.getFontRegular());
+                                ((TextView) tabViewChild).setTypeface(Utility.INSTANCE.getFontRegular());
                             }
                         }
                     }
@@ -462,27 +463,27 @@ public class DetailEventActivity extends AppCompatActivity {
 
                     tvDate.setText(new SimpleDateFormat("MMM", Locale.US).format(event.getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(event.getEventDate())));
                     tvTitle.setText(event.getTitle());
-                    tvFullDate.setText(event.getEventDate().toLocaleString());
-                    tvAdd.setText(event.getCreatorFirstName().concat(" ").concat(event.getCreatorLasttName()).concat(" | ").concat(event.getLocation()));
+                    tvFullDate.setText(dateFormat.format(event.getEventDate()));
+                    tvAdd.setText(Objects.requireNonNull(event.getCreatorFirstName()).concat(" ").concat(Objects.requireNonNull(event.getCreatorLasttName())).concat(" | ").concat(Objects.requireNonNull(event.getLocation())));
                     tvCount.setText(String.valueOf(event.getLikeCount()));
 
                     ivMore.setOnClickListener(v -> openContextMenu(v));
 
                     ivLike.setOnClickListener(v -> {
                         if (v.getTag().toString().equalsIgnoreCase("0")) {
-                            if (Utility.isConnectingToInternet()) {
+                            if (Utility.INSTANCE.isConnectingToInternet()) {
                                 sendLike(eventId);
                             }
                         }
                     });
 
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                 } else {
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 500) {
-                        Utility.showMsg(response.message());
+                        Utility.INSTANCE.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = Utility.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -490,10 +491,10 @@ public class DetailEventActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
-                Utility.dismissDialog(cancelDialog);
-                Utility.dismissDialog(progressDialog);
+                Utility.INSTANCE.dismissDialog(cancelDialog);
+                Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -530,7 +531,7 @@ public class DetailEventActivity extends AppCompatActivity {
             contentValues.put(CalendarContract.Events.ALL_DAY, false);
             contentValues.put(CalendarContract.Events.STATUS, true);
             contentValues.put(CalendarContract.Events.HAS_ALARM, true);
-            contentValues.put(CalendarContract.Events.DTSTART, (event.getEventDate().getTime() + 60 * 60 * 1000));
+            contentValues.put(CalendarContract.Events.DTSTART, (Objects.requireNonNull(event.getEventDate()).getTime() + 60 * 60 * 1000));
             contentValues.put(CalendarContract.Events.DTEND, event.getEventDate().getTime() + 60 * 60 * 1000);
             contentValues.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().toString());
 
@@ -544,7 +545,7 @@ public class DetailEventActivity extends AppCompatActivity {
             String reminderUriString = "content://com.android.calendar/reminders";
             getContentResolver().insert(Uri.parse(reminderUriString), reminders);
 
-            internetDialog = Utility.showAlert(DetailEventActivity.this, R.string.event_success, false, View.VISIBLE, R.string.dd_ok, v -> internetDialog.dismiss(), View.GONE, null, null);
+            internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, R.string.event_success, false, View.VISIBLE, R.string.dd_ok, v -> internetDialog.dismiss(), View.GONE, null, null);
             internetDialog.show();
             return true;
         } else {
@@ -553,13 +554,13 @@ public class DetailEventActivity extends AppCompatActivity {
     }
 
     private void sendLike(Integer id) {
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<Event> call = apiInterface.likeEvent(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), id);
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if (response.isSuccessful()) {
-                    if (Objects.requireNonNull(response.body()).isHasLiked()) {
+                    if (Objects.requireNonNull(Objects.requireNonNull(response.body()).isHasLiked())) {
                         ivLike.setImageResource(R.drawable.ic_liked);
                         ivLike.setTag("1");
                         tvCount.setText(String.valueOf(response.body().getLikeCount()));
@@ -567,9 +568,9 @@ public class DetailEventActivity extends AppCompatActivity {
                     }
                 } else {
                     if (response.code() >= 300 && response.code() < 500) {
-                        Utility.showMsg(response.message());
+                        Utility.INSTANCE.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = Utility.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -578,7 +579,7 @@ public class DetailEventActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }

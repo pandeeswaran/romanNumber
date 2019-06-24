@@ -16,7 +16,7 @@
         android:paddingBottom="8dp"
         android:textAllCaps="true"
         android:textColor="@color/grey"
-        android:textSize="@dimen/normal_lable_font_size"
+        android:textSize="@dimen/normal_label_font_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

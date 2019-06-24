@@ -61,10 +61,10 @@
 
     <!--region Event Validation Messages-->
     <string name="cea_error_date">Please choose future date and time</string>
-    <string name="cea_val_name">Kindly enter the event name.</string>
-    <string name="cea_val_date">Kindly select the event date.</string>
-    <string name="cea_val_location">Kindly enter the event location.</string>
-    <string name="cea_val_guest">Kindly add guests.</string>
+    <string name="cea_val_name">Kindly enter the event name</string>
+    <string name="cea_val_date">Kindly select the event date</string>
+    <string name="cea_val_location">Kindly enter the event location</string>
+    <string name="cea_val_guest">Kindly add guests</string>
     <!--endregion-->
 
     <!--region Add Guest Activity Title-->
@@ -94,13 +94,13 @@
     <!--endregion-->
 
     <!--region GPS/Network/Alert/Server Messages-->
-    <string name="server_msg">Sorry!!! server is not responding or cannot reached, please try again later.</string>
-    <string name="internet_msg">Your INTERNET seems to be disabled,\ndo you want to enable it?</string>
-    <string name="network_msg">There is no network connection at the moment, try again later.</string>
-    <string name="authentication_msg">You are not authorize user to do this event&#8230;</string>
-    <string name="gps_msg">Your GPS seems to be disabled, do you want to enable it?</string>
-    <string name="connection_msg">Opps!!! Connection is slow, please try again.</string>
-    <string name="time_out_msg">Sorry!!! Connection time out, please try again.</string>
+    <string name="server_msg">Sorry&#33;&#33;&#33; server is not responding or cannot reached&#44; please try again later&#46;</string>
+    <string name="internet_msg">Your INTERNET seems to be disabled&#44;\ndo you want to enable it&#63;</string>
+    <string name="network_msg">There is no network connection at the moment&#44; try again later&#46;</string>
+    <string name="authentication_msg">You are not authorize user to do this event&#46;</string>
+    <string name="gps_msg">Your GPS seems to be disabled&#44; do you want to enable it&#63;</string>
+    <string name="connection_msg">Oops&#33;&#33;&#33; Connection is slow&#44; please try again&#46;</string>
+    <string name="time_out_msg">Sorry&#33;&#33;&#33; Connection time out&#44; please try again&#46;</string>
     <string name="internet">No Internet Connection</string>
     <!--endregion-->
 
@@ -108,16 +108,16 @@
     <string name="db_bnm_title_notifications">Notifications</string>
     <string name="db_bnm_title_event">Events</string>
     <string name="db_bnm_title_home">Home</string>
-    <string name="db_bnm_title_chat">Chat</string>
+    <string name="db_bnm_title_chats">Chats</string>
     <!--endregion-->
 
     <!--region Dialog Action Messages-->
-    <string name="dd_permission_msg">Required permissions are not granted, ask again?</string>
-    <string name="dd_decline_msg">Are you sure you want to decline this event?</string>
-    <string name="dd_cancel_msg">Are you sure you want to cancel this event?</string>
-    <string name="dd_logout_msg">Are you sure you want to log out?</string>
-    <string name="dd_exit_msg">Are you sure you want to exit?</string>
-    <string name="dd_discard">Discard Changes?</string>
+    <string name="dd_permission_msg">Required permissions are not granted&#44; ask again&#63;</string>
+    <string name="dd_decline_msg">Are you sure you want to decline this event&#63;</string>
+    <string name="dd_cancel_msg">Are you sure you want to cancel this event&#63;</string>
+    <string name="dd_logout_msg">Are you sure you want to log out&#63;</string>
+    <string name="dd_exit_msg">Are you sure you want to exit&#63;</string>
+    <string name="dd_discard">Discard Changes&#63;</string>
     <!--endregion-->
 
     <!--region Event Fragment Tab Title-->
@@ -127,9 +127,9 @@
     <!--endregion-->
 
     <!--region Event Fragment TextView-->
-    <string name="empty_ue_msg">No upcoming events found.</string>
-    <string name="empty_pe_msg">No pending events found.</string>
-    <string name="empty_ye_msg">No events created.</string>
+    <string name="empty_ue_msg">No upcoming events found</string>
+    <string name="empty_pe_msg">No pending events found</string>
+    <string name="empty_ye_msg">No events created</string>
     <!--endregion-->
 
     <!--region Event Fragment Menu-->
@@ -167,7 +167,7 @@
     <!--endregion-->
 
     <!--region Home Activity Footer-->
-    <string name="ha_footer">&#42; Privacy policies | talktiva &#8482;</string>
+    <string name="ha_footer">&#42; Privacy policies &#124; talktiva &#8482;</string>
     <!--endregion-->
 
     <!--region Home Activity Button Text-->
@@ -175,12 +175,22 @@
     <string name="ha_btn_create">Create Account</string>
     <!--endregion-->
 
+    <string name="la_btn_fb">Sign-in with Facebook</string>
+    <string name="la_btn_google">Sign-in with Google</string>
+    <string name="la_tv_welcome">Welcome Back&#33;</string>
+    <string name="la_ll_tv_or">OR</string>
+    <string name="la_et_email">Email</string>
+    <string name="la_et_pass">Password</string>
+    <string name="la_tv_forgot">Forgot Password&#63;</string>
+    <string name="la_btn_sign_in">Sign-In</string>
+
     <string name="ha_tv_content_1">The Private social network for your community 1</string>
     <string name="ha_tv_content_2">The Private social network for your community 2</string>
     <string name="ha_tv_content_3">The Private social network for your community 3</string>
     <string name="ha_tv_content_4">The Private social network for your community 4</string>
     <string name="ha_tv_content_5">The Private social network for your community 5</string>
 
-    <string name="sample_add">10 Taylor Ct, Ridgefield CT 06877</string>
+    <string name="sample_add">10 Taylor Ct&#44; Ridgefield CT 06877</string>
+    <string name="back">Back</string>
 
 </resources>

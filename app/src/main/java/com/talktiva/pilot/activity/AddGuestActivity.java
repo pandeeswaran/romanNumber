@@ -62,11 +62,11 @@ public class AddGuestActivity extends AppCompatActivity {
 
         toolbar.setNavigationIcon(R.drawable.ic_cancel);
 
-        Utility.setTitleText(toolbar, R.id.aag_toolbar_tv_title, R.string.aag_title);
+        Utility.INSTANCE.setTitleText(toolbar, R.id.aag_toolbar_tv_title, R.string.aag_title);
 
-        etEmail.setTypeface(Utility.getFontRegular());
-        tvEmailAdd.setTypeface(Utility.getFontRegular());
-        etSearch.setTypeface(Utility.getFontRegular());
+        etEmail.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvEmailAdd.setTypeface(Utility.INSTANCE.getFontRegular());
+        etSearch.setTypeface(Utility.INSTANCE.getFontRegular());
     }
 
     @OnTextChanged(R.id.aag_et_email)

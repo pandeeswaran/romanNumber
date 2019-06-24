@@ -25,7 +25,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
-import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.Talktiva;
@@ -39,6 +38,7 @@ import com.talktiva.pilot.rest.ApiInterface;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -116,7 +116,7 @@ public class DashBoardActivity extends AppCompatActivity {
                 if (deniedPermissions.isEmpty()) {
                     setUpHome();
                 } else {
-                    dialogPermission = Utility.showAlert(DashBoardActivity.this, R.string.dd_permission_msg, false, View.VISIBLE, R.string.dd_yes, v -> {
+                    dialogPermission = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_permission_msg, false, View.VISIBLE, R.string.dd_yes, v -> {
                         for (int i = 0; deniedPermissions.size() > i; i++) {
                             if (ActivityCompat.shouldShowRequestPermissionRationale(DashBoardActivity.this, deniedPermissions.get(i))) {
                                 checkAndRequestPermission();
@@ -149,7 +149,7 @@ public class DashBoardActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        dialogClose = Utility.showAlert(DashBoardActivity.this, R.string.dd_exit_msg, true, View.VISIBLE, R.string.dd_yes, v -> {
+        dialogClose = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_exit_msg, true, View.VISIBLE, R.string.dd_yes, v -> {
             dialogClose.dismiss();
             finishAffinity();
         }, View.VISIBLE, R.string.dd_no, v -> dialogClose.dismiss());
@@ -163,44 +163,90 @@ public class DashBoardActivity extends AppCompatActivity {
         transaction.commitAllowingStateLoss();
     }
 
+    private void removeFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.remove(fragment);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.commitAllowingStateLoss();
+    }
+
     private void setUpHome() {
-        for (int i = 0; i < bottomNavigationView.getChildCount(); i++) {
-            View child = bottomNavigationView.getChildAt(i);
-            if (child instanceof BottomNavigationMenuView) {
-                BottomNavigationMenuView menu = (BottomNavigationMenuView) child;
-                for (int j = 0; j < menu.getChildCount(); j++) {
-                    View item = menu.getChildAt(j);
-                    View smallItemText = item.findViewById(R.id.smallLabel);
-                    if (smallItemText instanceof TextView) {
-                        ((TextView) smallItemText).setTypeface(Utility.getFontRegular());
-                        ((TextView) smallItemText).setTextSize(10);
-                    }
-                    View largeItemText = item.findViewById(R.id.largeLabel);
-                    if (largeItemText instanceof TextView) {
-                        ((TextView) largeItemText).setTypeface(Utility.getFontRegular());
-                        ((TextView) largeItemText).setTextSize(10);
-                    }
-                }
-            }
-        }
+
+
+//        for (int i = 0; i < bottomNavigationView.getChildCount(); i++) {
+//            View child = bottomNavigationView.getChildAt(i);
+//            if (child instanceof BottomNavigationMenuView) {
+//                BottomNavigationMenuView menu = (BottomNavigationMenuView) child;
+//                for (int j = 0; j < menu.getChildCount(); j++) {
+//                    View item = menu.getChildAt(j);
+//                    View smallItemText = item.findViewById(R.id.smallLabel);
+//                    if (smallItemText instanceof TextView) {
+//                        ((TextView) smallItemText).setTypeface(Utility.INSTANCE.getFontRegular());
+//                        ((TextView) smallItemText).setTextSize(10);
+//                    }
+//                    View largeItemText = item.findViewById(R.id.largeLabel);
+//                    if (largeItemText instanceof TextView) {
+//                        ((TextView) largeItemText).setTypeface(Utility.INSTANCE.getFontRegular());
+//                        ((TextView) largeItemText).setTextSize(10);
+//                    }
+//                }
+//            }
+//        }
 
         bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.db_bnm_home:
-                    loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_home), getResources().getString(R.string.db_bnm_title_home));
-                    return true;
-                case R.id.db_bnm_chat:
-                    loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_chat), getResources().getString(R.string.db_bnm_title_chat));
-                    return true;
+                    EmptyFragment homeFragment = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_home));
+                    if (homeFragment != null && homeFragment.isVisible()) {
+                        return true;
+                    } else {
+                        loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_home), getResources().getString(R.string.db_bnm_title_home));
+                        return true;
+                    }
+                case R.id.db_bnm_chats:
+                    EmptyFragment chatsFragment = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_chats));
+                    if (chatsFragment != null && chatsFragment.isVisible()) {
+                        return true;
+                    } else {
+                        loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_chats), getResources().getString(R.string.db_bnm_title_chats));
+                        return true;
+                    }
                 case R.id.db_bnm_add:
-                    return true;
+                    EmptyFragment fragmentHome = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_home));
+                    if (fragmentHome != null && fragmentHome.isVisible()) {
+                        removeFragment(fragmentHome);
+                        return true;
+                    }
+
+                    EmptyFragment fragmentChats = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_chats));
+                    if (fragmentChats != null && fragmentChats.isVisible()) {
+                        removeFragment(fragmentChats);
+                        return true;
+                    }
+
+                    EmptyFragment fragmentNotification = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_notifications));
+                    if (fragmentNotification != null && fragmentNotification.isVisible()) {
+                        removeFragment(fragmentNotification);
+                        return true;
+                    }
+
+                    EventFragment fragmentEvent = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
+                    if (fragmentEvent != null && fragmentEvent.isVisible()) {
+                        removeFragment(fragmentEvent);
+                        return true;
+                    }
                 case R.id.db_bnm_notification:
-                    loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_notifications), getResources().getString(R.string.db_bnm_title_notifications));
-                    return true;
+                    EmptyFragment notificationFragment = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_notifications));
+                    if (notificationFragment != null && notificationFragment.isVisible()) {
+                        return true;
+                    } else {
+                        loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_notifications), getResources().getString(R.string.db_bnm_title_notifications));
+                        return true;
+                    }
                 case R.id.db_bnm_event:
                     EventFragment myFragment = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
                     if (myFragment != null && myFragment.isVisible()) {
-                        return false;
+                        return true;
                     } else {
                         loadFragment(new EventFragment(), EventFragment.TAG);
                         return true;
@@ -217,20 +263,20 @@ public class DashBoardActivity extends AppCompatActivity {
         super.onResume();
         receiver = new NetworkChangeReceiver();
         registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        if (Utility.isConnectingToInternet()) {
+        if (Utility.INSTANCE.isConnectingToInternet()) {
             setPendingEventCount();
         }
     }
 
     private void setPendingEventCount() {
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<Count> call = apiInterface.getPendingEventCount(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)));
         call.enqueue(new Callback<Count>() {
             @Override
             public void onResponse(@NonNull Call<Count> call, @NonNull Response<Count> response) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
-                        if (response.body().getEventCount() != 0) {
+                        if (Objects.requireNonNull(response.body().getEventCount()) != 0) {
                             showBadge(getApplicationContext(), bottomNavigationView, R.id.db_bnm_event, String.valueOf(response.body().getEventCount()));
                         } else {
                             removeBadge(bottomNavigationView, R.id.db_bnm_event);
@@ -243,7 +289,7 @@ public class DashBoardActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Count> call, @NonNull Throwable t) {
-                Log.e(Talktiva.TAG, "onFailure: ".concat(t.getMessage()));
+                Log.e(Talktiva.Companion.getTAG(), "onFailure: ".concat(t.getMessage()));
             }
         });
     }

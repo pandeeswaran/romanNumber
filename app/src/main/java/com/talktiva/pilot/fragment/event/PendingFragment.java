@@ -74,8 +74,8 @@ public class PendingFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        progressDialog = Utility.showProgress(getActivity());
-        textView.setTypeface(Utility.getFontBold());
+        progressDialog = Utility.INSTANCE.showProgress(getActivity());
+        textView.setTypeface(Utility.INSTANCE.getFontBold());
         setData();
     }
 
@@ -83,7 +83,7 @@ public class PendingFragment extends Fragment {
     private void setData() {
         progressDialog.show();
 
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<ResultEvents> call = apiInterface.getPendingEvents(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)));
         call.enqueue(new Callback<ResultEvents>() {
             @Override
@@ -150,17 +150,17 @@ public class PendingFragment extends Fragment {
                         recyclerView.setVisibility(View.GONE);
                         textView.setVisibility(View.VISIBLE);
                     }
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                 } else {
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 400) {
-                        internetDialog = Utility.showError(getActivity(), R.string.network_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.INSTANCE.showError(getActivity(), R.string.network_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                         internetDialog.show();
                     } else if (response.code() >= 400 && response.code() < 500) {
-                        internetDialog = Utility.showError(getActivity(), R.string.authentication_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.INSTANCE.showError(getActivity(), R.string.authentication_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                         internetDialog.show();
                     } else if (response.code() >= 500) {
-                        internetDialog = Utility.showError(getActivity(), R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.INSTANCE.showError(getActivity(), R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -168,9 +168,9 @@ public class PendingFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
-                Utility.dismissDialog(progressDialog);
+                Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.showError(getActivity(), R.string.time_out_msg, R.string.dd_ok, v -> internetDialog.dismiss());
+                    internetDialog = Utility.INSTANCE.showError(getActivity(), R.string.time_out_msg, R.string.dd_ok, v -> internetDialog.dismiss());
                     internetDialog.show();
                 }
             }
@@ -180,12 +180,12 @@ public class PendingFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.getInstance())).registerReceiver(r, new IntentFilter("Refresh0"));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r, new IntentFilter("Refresh0"));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.getInstance())).unregisterReceiver(r);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
     }
 }

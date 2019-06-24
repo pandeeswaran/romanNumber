@@ -36,8 +36,10 @@ import com.talktiva.pilot.request.RequestEvent;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -95,6 +97,7 @@ public class CreateEventActivity extends AppCompatActivity {
     @BindView(R.id.cea_tv_count)
     TextView tvCount;
 
+    private DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
     private Dialog progressDialog, internetDialog, errorDialog;
     private Calendar currentDate, newDate;
     private List<Invitation> invitations;
@@ -117,31 +120,31 @@ public class CreateEventActivity extends AppCompatActivity {
 
         toolbar.setNavigationIcon(R.drawable.ic_cancel);
 
-        progressDialog = Utility.showProgress(CreateEventActivity.this);
+        progressDialog = Utility.INSTANCE.showProgress(CreateEventActivity.this);
 
-        etName.setTypeface(Utility.getFontRegular());
-        etDate.setTypeface(Utility.getFontRegular());
-        etLocation.setTypeface(Utility.getFontRegular());
-        tvPrivate.setTypeface(Utility.getFontRegular());
-        tvShare.setTypeface(Utility.getFontRegular());
-        tvInvitee.setTypeface(Utility.getFontRegular());
-        tvCountFig.setTypeface(Utility.getFontBold());
-        tvCount.setTypeface(Utility.getFontRegular());
-        tvName.setTypeface(Utility.getFontRegular());
-        tvDate.setTypeface(Utility.getFontRegular());
-        tvLocation.setTypeface(Utility.getFontRegular());
+        etName.setTypeface(Utility.INSTANCE.getFontRegular());
+        etDate.setTypeface(Utility.INSTANCE.getFontRegular());
+        etLocation.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvPrivate.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvShare.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvInvitee.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvCountFig.setTypeface(Utility.INSTANCE.getFontBold());
+        tvCount.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvName.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvDate.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvLocation.setTypeface(Utility.INSTANCE.getFontRegular());
 
         Bundle bundle = getIntent().getExtras();
         from = bundle != null ? bundle.getString(getResources().getString(R.string.from)) : null;
 
         switch (Objects.requireNonNull(from)) {
             case "new":
-                Utility.setTitleText(toolbar, R.id.cea_toolbar_tv_title, R.string.cea_title1);
+                Utility.INSTANCE.setTitleText(toolbar, R.id.cea_toolbar_tv_title, R.string.cea_title1);
                 tvCountFig.setText(String.valueOf(count));
                 break;
 
             case "edit":
-                Utility.setTitleText(toolbar, R.id.cea_toolbar_tv_title, R.string.cea_title2);
+                Utility.INSTANCE.setTitleText(toolbar, R.id.cea_toolbar_tv_title, R.string.cea_title2);
                 curEvent = (Event) bundle.getSerializable(getResources().getString(R.string.event));
                 getEventDetails(Objects.requireNonNull(curEvent));
                 break;
@@ -155,7 +158,7 @@ public class CreateEventActivity extends AppCompatActivity {
                         break;
                     case "edit":
                         currentDate = Calendar.getInstance(Locale.US);
-                        currentDate.setTimeInMillis(curEvent.getEventDate().getTime());
+                        currentDate.setTimeInMillis(Objects.requireNonNull(curEvent.getEventDate()).getTime());
                         break;
                 }
 
@@ -164,14 +167,18 @@ public class CreateEventActivity extends AppCompatActivity {
                     newDate.set(year, month, dayOfMonth);
 
                     TimePickerDialog timePickerDialog = new TimePickerDialog(CreateEventActivity.this, (view1, hourOfDay, minute) -> {
-                        Calendar c = Calendar.getInstance();
                         newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         newDate.set(Calendar.MINUTE, minute);
 
-                        if (newDate.getTimeInMillis() >= c.getTimeInMillis()) {
-                            etDate.setText(newDate.getTime().toLocaleString());
+                        Date dt1 = new Date(newDate.getTime().getYear(), newDate.getTime().getMonth(), newDate.getTime().getDay(), newDate.getTime().getHours(), newDate.getTime().getMinutes());
+
+                        Calendar c = Calendar.getInstance();
+                        Date dt2 = new Date(c.getTime().getYear(), c.getTime().getMonth(), c.getTime().getDay(), c.getTime().getHours(), c.getTime().getMinutes());
+
+                        if (dt1.getTime() > dt2.getTime()) {
+                            etDate.setText(dateFormat.format(dt1));
                         } else {
-                            errorDialog = Utility.showAlert(CreateEventActivity.this, R.string.cea_error_date, false, View.VISIBLE, R.string.dd_ok, v2 -> errorDialog.dismiss(), View.GONE, null, null);
+                            errorDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.cea_error_date, false, View.VISIBLE, R.string.dd_ok, v2 -> errorDialog.dismiss(), View.GONE, null, null);
                             errorDialog.show();
                         }
                     }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false);
@@ -213,7 +220,7 @@ public class CreateEventActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.create_event_menu, menu);
         MenuItem menuItem = menu.findItem(R.id.cea_menu_save);
         SpannableString mNewTitle = new SpannableString(menuItem.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("", Utility.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        mNewTitle.setSpan(new CustomTypefaceSpan("", Utility.INSTANCE.getFontRegular()), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         menuItem.setTitle(mNewTitle);
         return super.onCreateOptionsMenu(menu);
     }
@@ -231,13 +238,13 @@ public class CreateEventActivity extends AppCompatActivity {
                         if (etLocation != null && etLocation.getText().toString().trim().length() != 0) {
                             switch (from) {
                                 case "new":
-                                    if (Utility.isConnectingToInternet()) {
+                                    if (Utility.INSTANCE.isConnectingToInternet()) {
                                         createEvent();
                                     }
                                     return true;
                                 case "edit":
-                                    if (Utility.isConnectingToInternet()) {
-                                        updateEvent(curEvent.getEventId());
+                                    if (Utility.INSTANCE.isConnectingToInternet()) {
+                                        updateEvent(Objects.requireNonNull(curEvent.getEventId()));
                                     }
                                     return true;
                             }
@@ -265,14 +272,14 @@ public class CreateEventActivity extends AppCompatActivity {
                     count = invitations.size();
                     tvCountFig.setText(String.valueOf(count));
                 } else {
-                    errorDialog = Utility.showAlert(CreateEventActivity.this, R.string.event_guest_added, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
+                    errorDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.event_guest_added, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
                     errorDialog.show();
                 }
                 break;
             case "edit":
                 if (invitations != null) {
                     if (invitations.size() != 0) {
-                        errorDialog = Utility.showAlert(CreateEventActivity.this, R.string.event_guest_exist, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
+                        errorDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.event_guest_exist, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
                         errorDialog.show();
                     } else {
                         invitations = getInvitations();
@@ -287,13 +294,13 @@ public class CreateEventActivity extends AppCompatActivity {
     private void getEventDetails(Event event) {
         etName.setText(event.getTitle());
         newDate = Calendar.getInstance();
-        newDate.setTimeInMillis(event.getEventDate().getTime());
-        etDate.setText(event.getEventDate().toLocaleString());
+        newDate.setTimeInMillis(Objects.requireNonNull(event.getEventDate()).getTime());
+        etDate.setText(dateFormat.format(event.getEventDate()));
         etLocation.setText(event.getLocation());
-        swPrivate.setChecked(event.isPrivate());
-        swCanGuest.setChecked(event.canInviteGuests());
+        swPrivate.setChecked(Objects.requireNonNull(event.isPrivate()));
+        swCanGuest.setChecked(Objects.requireNonNull(event.getCanInviteGuests()));
         invitations = new ArrayList<>();
-        for (int i = 0; i < event.getInvitations().size(); i++) {
+        for (int i = 0; i < Objects.requireNonNull(event.getInvitations()).size(); i++) {
             invitation = new Invitation();
             invitation.setInviteeId(event.getInvitations().get(i).getInviteeId());
             invitation.setInvitationId(event.getInvitations().get(i).getInvitationId());
@@ -330,9 +337,9 @@ public class CreateEventActivity extends AppCompatActivity {
         event.setLocation(etLocation.getText().toString().trim());
 
         if (swPrivate.isChecked()) {
-            event.setIsPrivate(true);
+            event.setPrivate(true);
         } else {
-            event.setIsPrivate(false);
+            event.setPrivate(false);
         }
 
         event.setTitle(etName.getText().toString().trim());
@@ -340,23 +347,23 @@ public class CreateEventActivity extends AppCompatActivity {
 
         Log.d("Event Json : ", new Gson().toJson(event));
 
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<Event> call = apiInterface.createEvent(getResources().getString(R.string.content_type), getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), getResources().getString(R.string.charset), event);
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if (response.isSuccessful()) {
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                     finish();
-                    Utility.showMsg(R.string.event_success_msg);
+                    Utility.INSTANCE.showMsg(R.string.event_success_msg);
                     LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEvent"));
                 } else {
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 500) {
                         Log.d("Error", "onResponse: " + Objects.requireNonNull(response.errorBody()).toString());
-                        Utility.showMsg(response.message());
+                        Utility.INSTANCE.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = Utility.showError(CreateEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.INSTANCE.showError(CreateEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -364,9 +371,9 @@ public class CreateEventActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
-                Utility.dismissDialog(progressDialog);
+                Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.showError(CreateEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showError(CreateEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -381,7 +388,7 @@ public class CreateEventActivity extends AppCompatActivity {
         event.setEventId(id);
 
         if (swCanGuest.isChecked()) {
-            event.setCanInviteGuests(true);
+            event.setCanInviteGuests(false);
         } else {
             event.setCanInviteGuests(false);
         }
@@ -401,9 +408,9 @@ public class CreateEventActivity extends AppCompatActivity {
         event.setLocation(etLocation.getText().toString().trim());
 
         if (swPrivate.isChecked()) {
-            event.setIsPrivate(true);
+            event.setPrivate(true);
         } else {
-            event.setIsPrivate(false);
+            event.setPrivate(false);
         }
 
         event.setTitle(etName.getText().toString().trim());
@@ -411,23 +418,23 @@ public class CreateEventActivity extends AppCompatActivity {
 
         Log.d("Event Json : ", new Gson().toJson(event));
 
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<Event> call = apiInterface.editEvent(getResources().getString(R.string.content_type), getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), getResources().getString(R.string.charset), event);
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if (response.isSuccessful()) {
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                     finish();
-                    Utility.showMsg(R.string.event_update_msg);
+                    Utility.INSTANCE.showMsg(R.string.event_update_msg);
                     LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("ViewEvent"));
                     LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEvent"));
                 } else {
-                    Utility.dismissDialog(progressDialog);
+                    Utility.INSTANCE.dismissDialog(progressDialog);
                     if (response.code() >= 300 && response.code() < 500) {
-                        Utility.showMsg(response.message());
+                        Utility.INSTANCE.showMsg(response.message());
                     } else if (response.code() >= 500) {
-                        internetDialog = Utility.showError(CreateEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.dismissDialog(internetDialog));
+                        internetDialog = Utility.INSTANCE.showError(CreateEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                         internetDialog.show();
                     }
                 }
@@ -435,9 +442,9 @@ public class CreateEventActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
-                Utility.dismissDialog(progressDialog);
+                Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.showError(CreateEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showError(CreateEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
@@ -468,7 +475,7 @@ public class CreateEventActivity extends AppCompatActivity {
         switch (from) {
             case "new":
                 if (etName.getText().toString().trim().length() != 0 || etDate.getText().toString().trim().length() != 0 || etLocation.getText().toString().trim().length() != 0) {
-                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else {
                     finish();
@@ -476,22 +483,22 @@ public class CreateEventActivity extends AppCompatActivity {
                 break;
             case "edit":
                 if (!etName.getText().toString().trim().equalsIgnoreCase(curEvent.getTitle())) {
-                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
-                } else if (!etDate.getText().toString().trim().equalsIgnoreCase(curEvent.getEventDate().toLocaleString())) {
-                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
+                } else if (!etDate.getText().toString().trim().equalsIgnoreCase(dateFormat.format(curEvent.getEventDate()))) {
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (!etLocation.getText().toString().trim().equalsIgnoreCase(curEvent.getLocation())) {
-                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
-                } else if (swPrivate.isChecked() != curEvent.isPrivate()) {
-                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
+                } else if (swPrivate.isChecked() != Objects.requireNonNull(curEvent.isPrivate())) {
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
-                } else if (swCanGuest.isChecked() != curEvent.canInviteGuests()) {
-                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
+                } else if (swCanGuest.isChecked() != Objects.requireNonNull(curEvent.getCanInviteGuests())) {
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
-                } else if (invitations.size() != curEvent.getInvitations().size()) {
-                    internetDialog = Utility.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.dismissDialog(internetDialog));
+                } else if (invitations.size() != Objects.requireNonNull(curEvent.getInvitations()).size()) {
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else {
                     finish();
