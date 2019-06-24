@@ -25,10 +25,9 @@ class AdapterInvitee(private val context: Context, private val invitations: List
     }
 
     inner class InviteeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private var tvName = itemView.findViewById(R.id.textView) as TextView
-        private var tvAddress = itemView.findViewById(R.id.textView2) as TextView
-        private var view = itemView.findViewById(R.id.dea_view) as View
+        private var tvName = itemView.findViewById<TextView>(R.id.textView)
+        private var tvAddress = itemView.findViewById<TextView>(R.id.textView2)
+        private var view = itemView.findViewById<View>(R.id.dea_view)
 
         fun bindDataWithViewHolder(invitation: Invitation, i: Int) {
             tvName.typeface = Utility.fontBold

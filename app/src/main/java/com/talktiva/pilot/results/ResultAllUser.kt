@@ -3,8 +3,9 @@ package com.talktiva.pilot.results
 import com.google.gson.annotations.SerializedName
 import com.talktiva.pilot.model.Links
 import com.talktiva.pilot.model.User
+import java.io.Serializable
 
-class ResultAllUser {
+class ResultAllUser : Serializable {
 
     @SerializedName("content")
     val users: List<User>? = null

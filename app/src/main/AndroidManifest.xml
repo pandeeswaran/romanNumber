@@ -46,19 +46,23 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.LoginActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustPan|stateHidden" />
         <activity
             android:name=".activity.DashBoardActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustPan|stateHidden" />
         <activity
             android:name=".activity.DetailEventActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.CreateEventActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustPan|stateHidden" />
         <activity
             android:name=".activity.AddGuestActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustPan|stateHidden" />
     </application>
 
 </manifest>

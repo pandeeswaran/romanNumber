@@ -9,8 +9,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.talktiva.pilot.R
 import com.talktiva.pilot.Talktiva
 import com.talktiva.pilot.helper.Utility
@@ -26,7 +24,6 @@ import java.util.*
 
 class AdapterEvent internal constructor(private val context: Context, private val events: List<Event>, private val clickListener: ClickListener, private val from: Int) : RecyclerView.Adapter<AdapterEvent.EventViewHolder>() {
 
-    private val dateFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT)
     private var internetDialog: Dialog? = null
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): EventViewHolder {
@@ -42,17 +39,16 @@ class AdapterEvent internal constructor(private val context: Context, private va
     }
 
     inner class EventViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private var clItem = itemView.findViewById(R.id.yf_rv_cl) as ConstraintLayout
-        private var tvEventDate = itemView.findViewById(R.id.yf_rv_tv_date) as TextView
-        private var tvTitle = itemView.findViewById(R.id.yf_rv_tv_title) as TextView
-        private var tvFullDate = itemView.findViewById(R.id.yf_rv_tv_full_date) as TextView
-        private var tvAddress = itemView.findViewById(R.id.yf_rv_tv_add) as TextView
-        private var ivPrivate = itemView.findViewById(R.id.yf_rv_iv_private) as ImageView
-        private var ivShare = itemView.findViewById(R.id.yf_rv_iv_share) as ImageView
-        private var ivLike = itemView.findViewById(R.id.yf_rv_iv_like) as ImageView
-        private var tvLikeCount = itemView.findViewById(R.id.yf_rv_iv_like_count) as TextView
-        private var ivMore = itemView.findViewById(R.id.yf_rv_iv_more) as ImageView
+        private var clItem = itemView.findViewById<ConstraintLayout>(R.id.yf_rv_cl)
+        private var tvEventDate = itemView.findViewById<TextView>(R.id.yf_rv_tv_date)
+        private var tvTitle = itemView.findViewById<TextView>(R.id.yf_rv_tv_title)
+        private var tvFullDate = itemView.findViewById<TextView>(R.id.yf_rv_tv_full_date)
+        private var tvAddress = itemView.findViewById<TextView>(R.id.yf_rv_tv_add)
+        private var ivPrivate = itemView.findViewById<ImageView>(R.id.yf_rv_iv_private)
+        private var ivShare = itemView.findViewById<ImageView>(R.id.yf_rv_iv_share)
+        private var ivLike = itemView.findViewById<ImageView>(R.id.yf_rv_iv_like)
+        private var tvLikeCount = itemView.findViewById<TextView>(R.id.yf_rv_iv_like_count)
+        private var ivMore = itemView.findViewById<ImageView>(R.id.yf_rv_iv_more)
 
         fun bindDataWithViewHolder(event: Event) {
             tvEventDate.typeface = Utility.fontBold
@@ -64,7 +60,7 @@ class AdapterEvent internal constructor(private val context: Context, private va
             tvEventDate.text = SimpleDateFormat("MMM", Locale.US).format(event.eventDate).plus("\n").plus(SimpleDateFormat("dd", Locale.US).format(event.eventDate))
             tvTitle.text = event.title
 
-
+            val dateFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT)
             tvFullDate.text = dateFormat.format(event.eventDate)
             tvAddress.text = event.creatorFirstName.plus(" ").plus(event.creatorLasttName).plus(" | ").plus(event.location)
             tvLikeCount.text = event.likeCount.toString()

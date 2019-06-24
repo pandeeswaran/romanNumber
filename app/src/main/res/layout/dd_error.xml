@@ -43,6 +43,7 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/bg_theme"
         android:gravity="center"
+        android:padding="@dimen/et_padding"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="@dimen/et_font_size"

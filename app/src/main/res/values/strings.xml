@@ -175,6 +175,7 @@
     <string name="ha_btn_create">Create Account</string>
     <!--endregion-->
 
+    <!--region Login Activity Button/Hint/Error Text-->
     <string name="la_btn_fb">Sign-in with Facebook</string>
     <string name="la_btn_google">Sign-in with Google</string>
     <string name="la_tv_welcome">Welcome Back&#33;</string>
@@ -183,6 +184,11 @@
     <string name="la_et_pass">Password</string>
     <string name="la_tv_forgot">Forgot Password&#63;</string>
     <string name="la_btn_sign_in">Sign-In</string>
+    <string name="la_tv_email_empty">Please enter email</string>
+    <string name="la_tv_email_error">Please enter valid email</string>
+    <string name="la_tv_pass_empty">Please enter password</string>
+    <string name="la_tv_pass_error">Please enter valid password</string>
+    <!--endregion-->
 
     <string name="ha_tv_content_1">The Private social network for your community 1</string>
     <string name="ha_tv_content_2">The Private social network for your community 2</string>
@@ -191,6 +197,7 @@
     <string name="ha_tv_content_5">The Private social network for your community 5</string>
 
     <string name="sample_add">10 Taylor Ct&#44; Ridgefield CT 06877</string>
+
     <string name="back">Back</string>
 
 </resources>

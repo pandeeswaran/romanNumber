@@ -10,12 +10,13 @@
         android:id="@+id/la_iv_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:clickable="true"
         android:contentDescription="@string/app_name"
         android:focusable="true"
         android:foreground="?android:selectableItemBackground"
+        android:padding="@dimen/et_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_info"
@@ -25,12 +26,17 @@
         android:id="@+id/la_iv_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
         android:contentDescription="@string/back"
+        android:focusable="true"
+        android:foreground="?android:selectableItemBackground"
+        android:padding="@dimen/et_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_back_theme" />
+        app:srcCompat="@drawable/ic_back_theme"
+        tools:ignore="UnusedAttribute" />
 
     <ImageView
         android:id="@+id/la_iv"
@@ -139,9 +145,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
-        android:hint="@string/la_et_email"
-        android:textColorHint="@color/colorPrimary"
-        app:hintTextAppearance="?android:textAppearanceSmall"
+        app:hintEnabled="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/la_ll_or">
@@ -150,10 +154,29 @@
             android:id="@+id/la_et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/la_et_email"
             android:inputType="textEmailAddress"
-            android:textAppearance="?android:textAppearanceMedium" />
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@color/dark_grey"
+            android:textColorHint="@color/colorPrimary" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/la_tv_email"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="32dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:textColor="@color/red"
+        android:textSize="@dimen/error_font_size"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/la_til_email" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/la_til_pass"
@@ -162,36 +185,53 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
-        android:hint="@string/la_et_pass"
-        android:textColorHint="@color/colorPrimary"
-        app:hintTextAppearance="?android:textAppearanceSmall"
+        app:hintEnabled="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/la_til_email"
-        app:passwordToggleEnabled="true">
+        app:layout_constraintTop_toBottomOf="@id/la_tv_email"
+        app:passwordToggleEnabled="true"
+        app:passwordToggleTint="@color/colorPrimary"
+        app:passwordToggleTintMode="src_atop">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/la_et_pass"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/la_et_pass"
             android:inputType="textPassword"
-            android:textAppearance="?android:textAppearanceMedium" />
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@color/dark_grey"
+            android:textColorHint="@color/colorPrimary" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/la_tv_pass"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="32dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:textColor="@color/red"
+        android:textSize="@dimen/error_font_size"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/la_til_pass" />
 
     <TextView
         android:id="@+id/la_tv_forgot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="8dp"
         android:text="@string/la_tv_forgot"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/normal_label_font_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/la_til_pass" />
+        app:layout_constraintTop_toBottomOf="@+id/la_tv_pass" />
 
     <Button
         android:id="@+id/la_btn_sign_in"

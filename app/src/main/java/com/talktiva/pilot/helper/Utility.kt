@@ -28,10 +28,10 @@ object Utility {
     private var preferences: SharedPreferences? = null
 
     val fontRegular: Typeface
-        get() = Typeface.createFromAsset(Talktiva.instance!!.assets, "Merriweather_regular.ttf")
+        get() = Typeface.createFromAsset(Talktiva.instance!!.assets, "merriweather_regular.ttf")
 
     val fontBold: Typeface
-        get() = Typeface.createFromAsset(Talktiva.instance!!.assets, "Merriweather_bold.ttf")
+        get() = Typeface.createFromAsset(Talktiva.instance!!.assets, "merriweather_bold.ttf")
 
     //region Device Id and Device Name
     //    @SuppressLint("HardwareIds")
@@ -112,6 +112,33 @@ object Utility {
         dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
+
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    fun showAlert(context: Context, msg: String?, bool: Boolean?, positiveVisibility: Int?, positiveTitle: Int?, positiveClickListener: View.OnClickListener, negativeVisibility: Int?, negativeTitle: Int?, negativeClickListener: View.OnClickListener?): Dialog {
+        val dialog = Dialog(context)
+        dialog.setContentView(R.layout.dd_layout)
+        dialog.setCancelable(bool!!)
+
+        (dialog.findViewById<View>(R.id.dialog_msg) as TextView).typeface = fontRegular
+        (dialog.findViewById<View>(R.id.dialog_msg) as TextView).setText(msg!!)
+
+        (dialog.findViewById<View>(R.id.dialog_positive) as Button).typeface = fontRegular
+        (dialog.findViewById<View>(R.id.dialog_positive) as Button).setText(positiveTitle!!)
+        dialog.findViewById<View>(R.id.dialog_positive).visibility = positiveVisibility!!
+        dialog.findViewById<View>(R.id.dialog_positive).setOnClickListener(positiveClickListener)
+
+        dialog.findViewById<View>(R.id.dialog_negative).visibility = negativeVisibility!!
+
+        if (negativeVisibility != GONE) {
+            (dialog.findViewById<View>(R.id.dialog_negative) as Button).typeface = fontRegular
+            (dialog.findViewById<View>(R.id.dialog_negative) as Button).setText(negativeTitle!!)
+            dialog.findViewById<View>(R.id.dialog_negative).setOnClickListener(negativeClickListener)
+        }
+
+        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        return dialog
+    }
     //endregion
 
     //region Progress Dialog
@@ -143,6 +170,24 @@ object Utility {
 
         (dialog.findViewById<View>(R.id.de_tv) as TextView).typeface = fontRegular
         (dialog.findViewById<View>(R.id.de_tv) as TextView).setText(msg!!)
+
+        (dialog.findViewById<View>(R.id.de_btn) as Button).typeface = fontRegular
+        (dialog.findViewById<View>(R.id.de_btn) as Button).setText(action!!)
+        dialog.findViewById<View>(R.id.de_btn).setOnClickListener(clickListener)
+
+        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.MATCH_PARENT)
+        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        return dialog
+    }
+
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    fun showError(context: Context, msg: String?, action: Int?, clickListener: View.OnClickListener): Dialog {
+        val dialog = Dialog(context)
+        dialog.setContentView(R.layout.dd_error)
+        dialog.setCancelable(false)
+
+        (dialog.findViewById<View>(R.id.de_tv) as TextView).typeface = fontRegular
+        (dialog.findViewById<View>(R.id.de_tv) as TextView).text = msg!!
 
         (dialog.findViewById<View>(R.id.de_btn) as Button).typeface = fontRegular
         (dialog.findViewById<View>(R.id.de_btn) as Button).setText(action!!)

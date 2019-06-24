@@ -33,9 +33,8 @@ class AdapterGroupBy(private val context: Context, private val groupByEvents: Li
     }
 
     inner class DateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private var recyclerView = itemView.findViewById(R.id.rv_rv_events) as RecyclerView
-        private var textView = itemView.findViewById(R.id.rv_tv_day) as TextView
+        private var recyclerView = itemView.findViewById<RecyclerView>(R.id.rv_rv_events)
+        private var textView = itemView.findViewById<TextView>(R.id.rv_tv_day)
 
         fun bindDataWithViewHolder(groupByEvent: GroupByEvent) {
             textView.typeface = Utility.fontBold

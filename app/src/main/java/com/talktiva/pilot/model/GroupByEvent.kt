@@ -1,7 +1,10 @@
 package com.talktiva.pilot.model
 
-class GroupByEvent {
+import java.io.Serializable
+
+class GroupByEvent : Serializable {
 
     var day: Int? = null
+
     var events: List<Event>? = null
 }

@@ -3,8 +3,9 @@ package com.talktiva.pilot.results
 import com.google.gson.annotations.SerializedName
 import com.talktiva.pilot.model.Event
 import com.talktiva.pilot.model.Links
+import java.io.Serializable
 
-class ResultEvents {
+class ResultEvents : Serializable {
 
     @SerializedName("content")
     val events: List<Event>? = null

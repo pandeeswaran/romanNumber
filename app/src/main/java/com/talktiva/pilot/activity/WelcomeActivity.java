@@ -30,6 +30,7 @@ import com.talktiva.pilot.model.Slider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -78,7 +79,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     @OnPageChange(value = R.id.ha_vp, callback = OnPageChange.Callback.PAGE_SELECTED)
     void setViewPagerOnPageSelected(int position) {
-        tvContent.setText(sliders.get(position).getText());
+        tvContent.setText(Objects.requireNonNull(sliders.get(position).getText()));
     }
 
     @Override
@@ -106,12 +107,12 @@ public class WelcomeActivity extends AppCompatActivity {
         viewPager.setAdapter(pagerAdapter);
         pagerIndicator.setupWithViewPager(viewPager);
         viewPager.setOffscreenPageLimit(5);
-        tvContent.setText(sliders.get(0).getText());
+        tvContent.setText(Objects.requireNonNull(sliders.get(0).getText()));
     }
 
     @OnClick(R.id.ha_btn_login)
     void setBtnLoginOnClick() {
-        startActivity(new Intent(WelcomeActivity.this, DashBoardActivity.class));
+        startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
         finish();
     }
 

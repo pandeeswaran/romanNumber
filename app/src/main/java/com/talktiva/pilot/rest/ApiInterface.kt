@@ -4,15 +4,11 @@ import com.talktiva.pilot.helper.AppConstant
 import com.talktiva.pilot.model.Count
 import com.talktiva.pilot.model.Event
 import com.talktiva.pilot.request.RequestEvent
+import com.talktiva.pilot.request.RequestLogin
 import com.talktiva.pilot.results.ResultEvents
-
+import com.talktiva.pilot.results.ResultLogin
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
+import retrofit2.http.*
 
 interface ApiInterface {
 
@@ -72,6 +68,10 @@ interface ApiInterface {
     fun getPendingEventCount(@Header(AppConstant.AUTH) token: String): Call<Count>
     //endregion
 
+    //region Login
+    @POST(AppConstant.LOGIN)
+    fun getLogin(@Header(AppConstant.C_TYPE) contentType: String, @Header(AppConstant.AUTH) token: String, @Header(AppConstant.CHARSET) charset: String, @Body requestLogin: RequestLogin): Call<ResultLogin>
+    //endregion
 
     /* Demo Api Calling With Token
     ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);

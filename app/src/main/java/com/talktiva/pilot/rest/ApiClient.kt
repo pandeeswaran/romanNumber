@@ -1,11 +1,10 @@
 package com.talktiva.pilot.rest
 
+import com.talktiva.pilot.helper.AppConstant
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-
-    private const val BASE_URL = "http://54.80.108.189:9092/ms-event/"
 
     private var retrofit: Retrofit? = null
 
@@ -13,7 +12,7 @@ object ApiClient {
         get() {
             if (retrofit == null) {
                 retrofit = Retrofit.Builder()
-                        .baseUrl(BASE_URL)
+                        .baseUrl(AppConstant.BASE_URL)
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
             }
