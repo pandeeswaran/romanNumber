@@ -31,8 +31,11 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.fragment.invitee.InviteeFragment;
+import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.CustomTypefaceSpan;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
@@ -40,8 +43,10 @@ import com.talktiva.pilot.model.Event;
 import com.talktiva.pilot.model.Invitation;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
+import com.talktiva.pilot.results.ResultError;
 import com.talktiva.pilot.results.ResultEvents;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -109,6 +114,10 @@ public class DetailEventActivity extends AppCompatActivity {
     private DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
     private Dialog progressDialog, cancelDialog, declineDialog, internetDialog;
     private List<Invitation> acceptedInvitations, pendingInvitations;
+    private BroadcastReceiver receiver;
+    private int from, eventId;
+    private Event event;
+
     protected BroadcastReceiver r = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -117,9 +126,6 @@ public class DetailEventActivity extends AppCompatActivity {
             }
         }
     };
-    private int from, eventId;
-    private Event event;
-    private BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,7 +233,7 @@ public class DetailEventActivity extends AppCompatActivity {
         progressDialog.show();
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResultEvents> call = apiInterface.acceptOrDeclineEvent(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), eventId, bool);
+        Call<ResultEvents> call = apiInterface.acceptOrDeclineEvent(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))), eventId, bool);
         call.enqueue(new Callback<ResultEvents>() {
             @Override
             public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
@@ -243,12 +249,13 @@ public class DetailEventActivity extends AppCompatActivity {
                     }
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    if (response.code() >= 300 && response.code() < 500) {
-                        Utility.INSTANCE.showMsg(response.message());
-                    } else if (response.code() >= 500) {
-                        internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try,
-                                v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    try {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
+                        }.getType());
+                        internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
                         internetDialog.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -273,7 +280,7 @@ public class DetailEventActivity extends AppCompatActivity {
         progressDialog.show();
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResultEvents> call = apiInterface.cancelEvent(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), id);
+        Call<ResultEvents> call = apiInterface.cancelEvent(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))), id);
         call.enqueue(new Callback<ResultEvents>() {
             @Override
             public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
@@ -286,11 +293,13 @@ public class DetailEventActivity extends AppCompatActivity {
                 } else {
                     Utility.INSTANCE.dismissDialog(cancelDialog);
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    if (response.code() >= 300 && response.code() < 500) {
-                        Utility.INSTANCE.showMsg(response.message());
-                    } else if (response.code() >= 500) {
-                        internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    try {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
+                        }.getType());
+                        internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
                         internetDialog.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -311,7 +320,7 @@ public class DetailEventActivity extends AppCompatActivity {
         progressDialog.show();
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<Event> call = apiInterface.getEventById(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), id);
+        Call<Event> call = apiInterface.getEventById(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))), id);
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
@@ -480,18 +489,19 @@ public class DetailEventActivity extends AppCompatActivity {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    if (response.code() >= 300 && response.code() < 500) {
-                        Utility.INSTANCE.showMsg(response.message());
-                    } else if (response.code() >= 500) {
-                        internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    try {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
+                        }.getType());
+                        internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
                         internetDialog.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
-                Utility.INSTANCE.dismissDialog(cancelDialog);
                 Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
                     internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
@@ -555,7 +565,7 @@ public class DetailEventActivity extends AppCompatActivity {
 
     private void sendLike(Integer id) {
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<Event> call = apiInterface.likeEvent(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), id);
+        Call<Event> call = apiInterface.likeEvent(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))), id);
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
@@ -567,11 +577,13 @@ public class DetailEventActivity extends AppCompatActivity {
                         LocalBroadcastManager.getInstance(DetailEventActivity.this).sendBroadcast(new Intent("MyEvent"));
                     }
                 } else {
-                    if (response.code() >= 300 && response.code() < 500) {
-                        Utility.INSTANCE.showMsg(response.message());
-                    } else if (response.code() >= 500) {
-                        internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    try {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
+                        }.getType());
+                        internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
                         internetDialog.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }

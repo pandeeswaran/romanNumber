@@ -34,7 +34,6 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.OnPageChange;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -65,6 +64,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private Integer delay = 4000;
     private Integer page = 0;
+
     Runnable runnable = new Runnable() {
         public void run() {
             if (pagerAdapter.getCount() == page) {
@@ -108,12 +108,8 @@ public class WelcomeActivity extends AppCompatActivity {
         pagerIndicator.setupWithViewPager(viewPager);
         viewPager.setOffscreenPageLimit(5);
         tvContent.setText(Objects.requireNonNull(sliders.get(0).getText()));
-    }
 
-    @OnClick(R.id.ha_btn_login)
-    void setBtnLoginOnClick() {
-        startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
-        finish();
+        btnLogin.setOnClickListener(v -> startActivity(new Intent(WelcomeActivity.this, LoginActivity.class)));
     }
 
     @Override
@@ -183,7 +179,7 @@ public class WelcomeActivity extends AppCompatActivity {
             return;
         }
         this.doubleBackToExitPressedOnce = true;
-        Utility.INSTANCE.showMsg("Please click BACK again to exit");
+        Utility.INSTANCE.showMsg(R.string.exit);
         new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }
 }

@@ -1,11 +1,12 @@
 package com.talktiva.pilot.rest
 
+import android.app.AppComponentFactory
 import com.talktiva.pilot.helper.AppConstant
 import com.talktiva.pilot.model.Count
 import com.talktiva.pilot.model.Event
 import com.talktiva.pilot.request.RequestEvent
-import com.talktiva.pilot.request.RequestLogin
 import com.talktiva.pilot.results.ResultEvents
+import com.talktiva.pilot.results.ResultForgot
 import com.talktiva.pilot.results.ResultLogin
 import retrofit2.Call
 import retrofit2.http.*
@@ -68,10 +69,14 @@ interface ApiInterface {
     fun getPendingEventCount(@Header(AppConstant.AUTH) token: String): Call<Count>
     //endregion
 
-    //region Login
+    //region
+    @FormUrlEncoded
     @POST(AppConstant.LOGIN)
-    fun getLogin(@Header(AppConstant.C_TYPE) contentType: String, @Header(AppConstant.AUTH) token: String, @Header(AppConstant.CHARSET) charset: String, @Body requestLogin: RequestLogin): Call<ResultLogin>
+    fun getLogin(@Header(AppConstant.C_TYPE) contentType: String, @Header(AppConstant.AUTH) token: String, @Header(AppConstant.CHARSET) charset: String, @Field("grant_type") grantType: String, @Field("username") username: String, @Field("password") password: String): Call<ResultLogin>
     //endregion
+
+    @GET(AppConstant.FORGOT_PASS)
+    fun forgotPassword(@Path(AppConstant.EMAIL) email: String): Call<ResultForgot>
 
     /* Demo Api Calling With Token
     ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);

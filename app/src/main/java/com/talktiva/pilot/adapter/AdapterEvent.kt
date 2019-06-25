@@ -9,15 +9,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.talktiva.pilot.R
-import com.talktiva.pilot.Talktiva
+import com.talktiva.pilot.helper.AppConstant
 import com.talktiva.pilot.helper.Utility
 import com.talktiva.pilot.model.Event
 import com.talktiva.pilot.rest.ApiClient
 import com.talktiva.pilot.rest.ApiInterface
+import com.talktiva.pilot.results.ResultError
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -99,33 +103,38 @@ class AdapterEvent internal constructor(private val context: Context, private va
 
             ivLike.setOnClickListener { v ->
                 if (v.tag.toString().equals("0", ignoreCase = true)) {
-                    val apiInterface = ApiClient.client.create(ApiInterface::class.java)
-                    val call = apiInterface.likeEvent(Talktiva.instance?.resources?.getString(R.string.token_prefix).plus(" ").plus(Talktiva.instance?.resources?.getString(R.string.token_amit)), event.eventId)
-                    call.enqueue(object : Callback<Event> {
-                        override fun onResponse(call: Call<Event>, response: Response<Event>) {
-                            if (response.isSuccessful) {
-                                if (response.body()!!.isHasLiked!!) {
-                                    ivLike.setImageResource(R.drawable.ic_liked)
-                                    ivLike.tag = "1"
-                                    tvLikeCount.text = response.body()!!.likeCount.toString()
+                    if (Utility.isConnectingToInternet) {
+                        val apiInterface = ApiClient.client.create(ApiInterface::class.java)
+                        val call = apiInterface.likeEvent(Utility.getPreference(AppConstant.PREF_T_TYPE).plus(" ").plus(Utility.getPreference(AppConstant.PREF_A_TOKEN)), event.eventId)
+                        call.enqueue(object : Callback<Event> {
+                            override fun onResponse(call: Call<Event>, response: Response<Event>) {
+                                if (response.isSuccessful) {
+                                    if (response.body()!!.isHasLiked!!) {
+                                        ivLike.setImageResource(R.drawable.ic_liked)
+                                        ivLike.tag = "1"
+                                        tvLikeCount.text = response.body()!!.likeCount.toString()
+                                    }
+                                } else {
+                                    try {
+                                        val resultError = Gson().fromJson<ResultError>(Objects.requireNonNull(response.errorBody())!!.string(), object : TypeToken<ResultError>() {
+                                        }.type)
+                                        internetDialog = Utility.showAlert(context, resultError.errorDescription, true, View.VISIBLE, R.string.dd_try, View.OnClickListener { Utility.dismissDialog(internetDialog) }, View.GONE, null, null)
+                                        internetDialog!!.show()
+                                    } catch (e: IOException) {
+                                        e.printStackTrace()
+                                    }
+
                                 }
-                            } else {
-                                if (response.code() in 300..499) {
-                                    Utility.showMsg(response.message())
-                                } else if (response.code() >= 500) {
-                                    internetDialog = Utility.showError(context, R.string.server_msg, R.string.dd_try, View.OnClickListener { Utility.dismissDialog(internetDialog) })
+                            }
+
+                            override fun onFailure(call: Call<Event>, t: Throwable) {
+                                if (t.message.equals("timeout", ignoreCase = true)) {
+                                    internetDialog = Utility.showError(context, R.string.time_out_msg, R.string.dd_ok, View.OnClickListener { Utility.dismissDialog(internetDialog) })
                                     internetDialog!!.show()
                                 }
                             }
-                        }
-
-                        override fun onFailure(call: Call<Event>, t: Throwable) {
-                            if (t.message.equals("timeout", ignoreCase = true)) {
-                                internetDialog = Utility.showError(context, R.string.time_out_msg, R.string.dd_ok, View.OnClickListener { Utility.dismissDialog(internetDialog) })
-                                internetDialog!!.show()
-                            }
-                        }
-                    })
+                        })
+                    }
                 }
             }
         }

@@ -10,8 +10,7 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
-        if (Utility.getPrefrance(AppConstant.ACCESS_TOKEN) != null) startActivity(Intent(this@SplashActivity, DashBoardActivity::class.java))
+        if (Utility.getPreference(AppConstant.PREF_A_TOKEN) != null) startActivity(Intent(this@SplashActivity, DashBoardActivity::class.java))
         else startActivity(Intent(this@SplashActivity, WelcomeActivity::class.java))
         finish()
     }

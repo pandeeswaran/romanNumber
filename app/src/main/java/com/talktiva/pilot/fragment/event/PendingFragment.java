@@ -19,17 +19,22 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.activity.DetailEventActivity;
 import com.talktiva.pilot.adapter.AdapterGroupBy;
+import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Event;
 import com.talktiva.pilot.model.GroupByEvent;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
+import com.talktiva.pilot.results.ResultError;
 import com.talktiva.pilot.results.ResultEvents;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -74,9 +79,11 @@ public class PendingFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        progressDialog = Utility.INSTANCE.showProgress(getActivity());
+        progressDialog = Utility.INSTANCE.showProgress(Objects.requireNonNull(getActivity()));
         textView.setTypeface(Utility.INSTANCE.getFontBold());
-        setData();
+        if (Utility.INSTANCE.isConnectingToInternet()) {
+            setData();
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -84,7 +91,7 @@ public class PendingFragment extends Fragment {
         progressDialog.show();
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResultEvents> call = apiInterface.getPendingEvents(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)));
+        Call<ResultEvents> call = apiInterface.getPendingEvents(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))));
         call.enqueue(new Callback<ResultEvents>() {
             @Override
             public void onResponse(@NonNull Call<ResultEvents> call, @NonNull Response<ResultEvents> response) {
@@ -102,7 +109,7 @@ public class PendingFragment extends Fragment {
                         for (Event event : resultEvents.getEvents()) {
                             Date curDate = Calendar.getInstance().getTime();
                             int day;
-                            if (curDate.getDate() == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
+                            if (curDate.getDate() == Objects.requireNonNull(event.getEventDate()).getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
                                 day = 0;
                             } else if ((curDate.getDate() + 1) == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
                                 day = 1;
@@ -126,9 +133,9 @@ public class PendingFragment extends Fragment {
                             groupByEventList.add(groupByEvent);
                         }
 
-                        Collections.sort(groupByEventList, (o1, o2) -> o1.getDay().compareTo(o2.getDay()));
+                        Collections.sort(groupByEventList, (o1, o2) -> Objects.requireNonNull(o1.getDay()).compareTo(Objects.requireNonNull(o2.getDay())));
 
-                        AdapterGroupBy adapterGroupBy = new AdapterGroupBy(getActivity(), groupByEventList, 0);
+                        AdapterGroupBy adapterGroupBy = new AdapterGroupBy(Objects.requireNonNull(getActivity()), groupByEventList, 0);
                         recyclerView.setAdapter(adapterGroupBy);
                         adapterGroupBy.notifyDataSetChanged();
 
@@ -153,15 +160,13 @@ public class PendingFragment extends Fragment {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    if (response.code() >= 300 && response.code() < 400) {
-                        internetDialog = Utility.INSTANCE.showError(getActivity(), R.string.network_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    try {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
+                        }.getType());
+                        internetDialog = Utility.INSTANCE.showAlert(Objects.requireNonNull(getActivity()), resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
                         internetDialog.show();
-                    } else if (response.code() >= 400 && response.code() < 500) {
-                        internetDialog = Utility.INSTANCE.showError(getActivity(), R.string.authentication_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                        internetDialog.show();
-                    } else if (response.code() >= 500) {
-                        internetDialog = Utility.INSTANCE.showError(getActivity(), R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                        internetDialog.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -170,7 +175,7 @@ public class PendingFragment extends Fragment {
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(getActivity(), R.string.time_out_msg, R.string.dd_ok, v -> internetDialog.dismiss());
+                    internetDialog = Utility.INSTANCE.showError(Objects.requireNonNull(getActivity()), R.string.time_out_msg, R.string.dd_ok, v -> internetDialog.dismiss());
                     internetDialog.show();
                 }
             }

@@ -21,11 +21,10 @@ import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.Utility;
-import com.talktiva.pilot.request.RequestLogin;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
+import com.talktiva.pilot.results.ResultError;
 import com.talktiva.pilot.results.ResultLogin;
-import com.talktiva.pilot.results.ResultLoginError;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -114,13 +113,17 @@ public class LoginActivity extends AppCompatActivity {
             if (Objects.requireNonNull(etEmail.getText()).toString().trim().length() == 0) {
                 tvEmail.setText(R.string.la_tv_email_empty);
                 tvEmail.setVisibility(View.VISIBLE);
-            } else if (etPass.getText().toString().trim().length() == 0) {
+            } else if (Objects.requireNonNull(etPass.getText()).toString().trim().length() == 0) {
                 tvPass.setText(R.string.la_tv_pass_empty);
                 tvPass.setVisibility(View.VISIBLE);
             } else {
-                login();
+                if (Utility.INSTANCE.isConnectingToInternet()) {
+                    login();
+                }
             }
         });
+
+        tvForgot.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, ForgotActivity.class)));
     }
 
     @OnTextChanged(R.id.la_et_email)
@@ -138,7 +141,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnTextChanged(R.id.la_et_pass)
     void setEtPassOnTextChange(CharSequence sequence) {
-//        String s = sequence.toString().trim();
+        String s = sequence.toString().trim();
 //        if (sequence.length() == 0) {
 //            tvEmail.setVisibility(View.GONE);
 //        } else if (!Patterns..matcher(s).matches()) {
@@ -151,34 +154,34 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(LoginActivity.this, WelcomeActivity.class));
-        finish();
+        super.onBackPressed();
     }
 
     private void login() {
         progressDialog.show();
 
-        RequestLogin requestLogin = new RequestLogin();
-        requestLogin.setGrantType(Objects.requireNonNull(etPass.getText()).toString().trim());
-        requestLogin.setUsername(Objects.requireNonNull(etEmail.getText()).toString().trim());
-        requestLogin.setPassword(etPass.getText().toString().trim());
-
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResultLogin> call = apiInterface.getLogin(AppConstant.CT_LOGIN, AppConstant.LOGIN_TOKEN, AppConstant.UTF, requestLogin);
+        Call<ResultLogin> call = apiInterface.getLogin(AppConstant.CT_LOGIN, AppConstant.LOGIN_TOKEN, AppConstant.UTF, AppConstant.GRANT_TYPE, Objects.requireNonNull(etEmail.getText()).toString().trim(), Objects.requireNonNull(etPass.getText()).toString().trim());
         call.enqueue(new Callback<ResultLogin>() {
             @Override
             public void onResponse(@NonNull Call<ResultLogin> call, @NonNull Response<ResultLogin> response) {
                 if (response.isSuccessful()) {
                     Utility.INSTANCE.dismissDialog(progressDialog);
 
+                    Utility.INSTANCE.setPreference(AppConstant.PREF_A_TOKEN, Objects.requireNonNull(response.body()).getAccessToken());
+                    Utility.INSTANCE.setPreference(AppConstant.PREF_R_TOKEN, response.body().getRefreshToken());
+                    Utility.INSTANCE.setPreference(AppConstant.PREF_EXPIRE, Objects.requireNonNull(String.valueOf(response.body().getExpiresIn())));
+                    Utility.INSTANCE.setPreference(AppConstant.PREF_T_TYPE, response.body().getTokenType());
+                    Utility.INSTANCE.setPreference(AppConstant.PREF_USER, String.valueOf(response.body().getUserId()));
+
                     startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
                     finish();
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     try {
-                        ResultLoginError resultLoginError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultLoginError>() {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
                         }.getType());
-                        internetDialog = Utility.INSTANCE.showAlert(LoginActivity.this, resultLoginError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+                        internetDialog = Utility.INSTANCE.showAlert(LoginActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
                         internetDialog.show();
                     } catch (IOException e) {
                         e.printStackTrace();

@@ -23,7 +23,7 @@ public class EmptyFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
 
-    @BindView(R.id.toolbar)
+    @BindView(R.id.fa_toolbar)
     Toolbar toolbar;
 
     private Integer mParam1;

@@ -26,7 +26,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.CustomTypefaceSpan;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
@@ -35,7 +37,9 @@ import com.talktiva.pilot.model.Invitation;
 import com.talktiva.pilot.request.RequestEvent;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
+import com.talktiva.pilot.results.ResultError;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -348,7 +352,7 @@ public class CreateEventActivity extends AppCompatActivity {
         Log.d("Event Json : ", new Gson().toJson(event));
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<Event> call = apiInterface.createEvent(getResources().getString(R.string.content_type), getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), getResources().getString(R.string.charset), event);
+        Call<Event> call = apiInterface.createEvent(AppConstant.CT_JSON, Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))), AppConstant.UTF, event);
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
@@ -359,12 +363,13 @@ public class CreateEventActivity extends AppCompatActivity {
                     LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEvent"));
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    if (response.code() >= 300 && response.code() < 500) {
-                        Log.d("Error", "onResponse: " + Objects.requireNonNull(response.errorBody()).toString());
-                        Utility.INSTANCE.showMsg(response.message());
-                    } else if (response.code() >= 500) {
-                        internetDialog = Utility.INSTANCE.showError(CreateEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    try {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
+                        }.getType());
+                        internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
                         internetDialog.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -419,7 +424,7 @@ public class CreateEventActivity extends AppCompatActivity {
         Log.d("Event Json : ", new Gson().toJson(event));
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<Event> call = apiInterface.editEvent(getResources().getString(R.string.content_type), getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)), getResources().getString(R.string.charset), event);
+        Call<Event> call = apiInterface.editEvent(AppConstant.CT_JSON, Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))), AppConstant.UTF, event);
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
@@ -431,11 +436,13 @@ public class CreateEventActivity extends AppCompatActivity {
                     LocalBroadcastManager.getInstance(CreateEventActivity.this).sendBroadcast(new Intent("MyEvent"));
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    if (response.code() >= 300 && response.code() < 500) {
-                        Utility.INSTANCE.showMsg(response.message());
-                    } else if (response.code() >= 500) {
-                        internetDialog = Utility.INSTANCE.showError(CreateEventActivity.this, R.string.server_msg, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    try {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
+                        }.getType());
+                        internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
                         internetDialog.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }

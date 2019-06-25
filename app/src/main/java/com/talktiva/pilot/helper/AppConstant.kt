@@ -4,18 +4,20 @@ object AppConstant {
 
     //region Headers
     const val AUTH = "Authorization"
-
     const val C_TYPE = "Content-Type"
+    const val CHARSET = "charset"
+
+    const val GRANT_TYPE = "password"
+
     const val CT_JSON = "application/json"
     const val CT_LOGIN = "application/x-www-form-urlencoded"
 
-
-    const val CHARSET = "charset"
     const val UTF = "UTF-8"
     //endregion
 
     //region Path Parameters
     const val ID = "id"
+    const val EMAIL = "email"
     const val STATUS = "status"
     //endregion
 
@@ -29,6 +31,7 @@ object AppConstant {
     const val ACCEPT_DECLINE = "ms-event/api/v1/events/{id}/acceptOrDecline/{status}"
     const val LIKE_EVENT = "ms-event/api/v1/events/{id}/like"
     const val P_EVENT_COUNT = "ms-event/api/v1/events/pending/count"
+    const val FORGOT_PASS = "ms-event/api/v1/users/resetPassword/{email}"
 
     const val LOGIN = "uaa/oauth/token"
 
@@ -37,8 +40,11 @@ object AppConstant {
 
     const val LOGIN_TOKEN = "Basic dGFsa3RpdmFBcHA6dGFsa0BUaXZhITE="
 
-    const val REFRESH_TOKEN = "refresh_token"
-    const val ACCESS_TOKEN = "access_token"
-    const val TOKEN_TYPE = "token_type"
-    const val EXPIRE = "expires_in"
+    const val PREF_R_TOKEN = "refresh_token"
+    const val PREF_A_TOKEN = "access_token"
+    const val PREF_T_TYPE = "token_type"
+    const val PREF_EXPIRE = "expires_in"
+    const val PREF_USER = "userId"
+
+    const val FILE_USER = "currentUser"
 }

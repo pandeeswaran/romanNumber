@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".activity.LoginActivity">
 
     <ImageView
@@ -62,7 +63,7 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/la_iv" />
+        app:layout_constraintTop_toBottomOf="@id/la_iv" />
 
     <Button
         android:id="@+id/la_btn_google"
@@ -226,12 +227,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:clickable="true"
+        android:focusable="true"
         android:text="@string/la_tv_forgot"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/normal_label_font_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/la_tv_pass" />
+        app:layout_constraintTop_toBottomOf="@id/la_tv_pass" />
 
     <Button
         android:id="@+id/la_btn_sign_in"
@@ -248,7 +251,7 @@
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/la_tv_forgot" />
+        app:layout_constraintTop_toBottomOf="@id/la_tv_forgot" />
 
     <TextView
         android:id="@+id/la_tv_footer"

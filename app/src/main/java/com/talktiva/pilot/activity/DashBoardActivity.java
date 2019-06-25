@@ -26,16 +26,21 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.fragment.EmptyFragment;
 import com.talktiva.pilot.fragment.EventFragment;
+import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Count;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
+import com.talktiva.pilot.results.ResultError;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -58,7 +63,7 @@ public class DashBoardActivity extends AppCompatActivity {
     @BindView(R.id.db_bnv)
     BottomNavigationView bottomNavigationView;
 
-    private Dialog dialogPermission, dialogClose;
+    private Dialog dialogPermission, dialogClose, internetDialog;
     private BroadcastReceiver receiver;
 
     public static void showBadge(Context context, BottomNavigationView bottomNavigationView, int itemId, String value) {
@@ -150,6 +155,12 @@ public class DashBoardActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         dialogClose = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_exit_msg, true, View.VISIBLE, R.string.dd_yes, v -> {
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+
             dialogClose.dismiss();
             finishAffinity();
         }, View.VISIBLE, R.string.dd_no, v -> dialogClose.dismiss());
@@ -203,6 +214,7 @@ public class DashBoardActivity extends AppCompatActivity {
                         loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_home), getResources().getString(R.string.db_bnm_title_home));
                         return true;
                     }
+
                 case R.id.db_bnm_chats:
                     EmptyFragment chatsFragment = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_chats));
                     if (chatsFragment != null && chatsFragment.isVisible()) {
@@ -211,6 +223,7 @@ public class DashBoardActivity extends AppCompatActivity {
                         loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_chats), getResources().getString(R.string.db_bnm_title_chats));
                         return true;
                     }
+
                 case R.id.db_bnm_add:
                     EmptyFragment fragmentHome = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_home));
                     if (fragmentHome != null && fragmentHome.isVisible()) {
@@ -235,6 +248,7 @@ public class DashBoardActivity extends AppCompatActivity {
                         removeFragment(fragmentEvent);
                         return true;
                     }
+
                 case R.id.db_bnm_notification:
                     EmptyFragment notificationFragment = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_notifications));
                     if (notificationFragment != null && notificationFragment.isVisible()) {
@@ -243,6 +257,7 @@ public class DashBoardActivity extends AppCompatActivity {
                         loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_notifications), getResources().getString(R.string.db_bnm_title_notifications));
                         return true;
                     }
+
                 case R.id.db_bnm_event:
                     EventFragment myFragment = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
                     if (myFragment != null && myFragment.isVisible()) {
@@ -270,7 +285,7 @@ public class DashBoardActivity extends AppCompatActivity {
 
     private void setPendingEventCount() {
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<Count> call = apiInterface.getPendingEventCount(getResources().getString(R.string.token_prefix).concat(" ").concat(getResources().getString(R.string.token_amit)));
+        Call<Count> call = apiInterface.getPendingEventCount(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))));
         call.enqueue(new Callback<Count>() {
             @Override
             public void onResponse(@NonNull Call<Count> call, @NonNull Response<Count> response) {
@@ -284,12 +299,25 @@ public class DashBoardActivity extends AppCompatActivity {
                     } else {
                         removeBadge(bottomNavigationView, R.id.db_bnm_event);
                     }
+                } else {
+                    try {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
+                        }.getType());
+                        internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+                        internetDialog.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Count> call, @NonNull Throwable t) {
                 Log.e(Talktiva.Companion.getTAG(), "onFailure: ".concat(t.getMessage()));
+                if (t.getMessage().equalsIgnoreCase("timeout")) {
+                    internetDialog = Utility.INSTANCE.showError(DashBoardActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    internetDialog.show();
+                }
             }
         });
     }

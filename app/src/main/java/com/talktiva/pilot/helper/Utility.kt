@@ -120,7 +120,7 @@ object Utility {
         dialog.setCancelable(bool!!)
 
         (dialog.findViewById<View>(R.id.dialog_msg) as TextView).typeface = fontRegular
-        (dialog.findViewById<View>(R.id.dialog_msg) as TextView).setText(msg!!)
+        (dialog.findViewById<View>(R.id.dialog_msg) as TextView).text = msg!!
 
         (dialog.findViewById<View>(R.id.dialog_positive) as Button).typeface = fontRegular
         (dialog.findViewById<View>(R.id.dialog_positive) as Button).setText(positiveTitle!!)
@@ -209,19 +209,19 @@ object Utility {
     }
     //endregion
 
-    fun setPrefrance(key: String?, value: String?): Boolean? {
+    fun setPreference(key: String?, value: String?): Boolean? {
         preferences = Talktiva.instance!!.getSharedPreferences(Talktiva.TAG, Context.MODE_PRIVATE)
         val editor = preferences!!.edit()
         editor.putString(key!!, value!!)
         return editor.commit()
     }
 
-    fun getPrefrance(key: String?): String? {
+    fun getPreference(key: String?): String? {
         preferences = Talktiva.instance!!.getSharedPreferences(Talktiva.TAG, Context.MODE_PRIVATE)
         return preferences?.getString(key!!, null)
     }
 
-    fun blankPrefrance(key: String?): Boolean? {
+    fun blankPreference(key: String?): Boolean? {
         preferences = Talktiva.instance!!.getSharedPreferences(Talktiva.TAG, Context.MODE_PRIVATE)
         val editor = preferences!!.edit()
         editor.putString(key!!, null)
