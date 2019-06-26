@@ -32,6 +32,7 @@ object AppConstant {
     const val LIKE_EVENT = "ms-event/api/v1/events/{id}/like"
     const val P_EVENT_COUNT = "ms-event/api/v1/events/pending/count"
     const val FORGOT_PASS = "ms-event/api/v1/users/resetPassword/{email}"
+    const val CHECK_COMMUNITY = "ms-event/api/v1/users/communities"
 
     const val LOGIN = "uaa/oauth/token"
 

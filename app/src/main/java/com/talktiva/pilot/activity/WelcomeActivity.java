@@ -109,6 +109,8 @@ public class WelcomeActivity extends AppCompatActivity {
         viewPager.setOffscreenPageLimit(5);
         tvContent.setText(Objects.requireNonNull(sliders.get(0).getText()));
 
+        btnCreate.setOnClickListener(v -> startActivity(new Intent(WelcomeActivity.this, FindCommunityActivity.class)));
+
         btnLogin.setOnClickListener(v -> startActivity(new Intent(WelcomeActivity.this, LoginActivity.class)));
     }
 

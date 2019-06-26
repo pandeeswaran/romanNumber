@@ -183,7 +183,6 @@ public class DashBoardActivity extends AppCompatActivity {
 
     private void setUpHome() {
 
-
 //        for (int i = 0; i < bottomNavigationView.getChildCount(); i++) {
 //            View child = bottomNavigationView.getChildAt(i);
 //            if (child instanceof BottomNavigationMenuView) {

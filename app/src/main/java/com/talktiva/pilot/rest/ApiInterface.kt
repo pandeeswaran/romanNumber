@@ -1,6 +1,5 @@
 package com.talktiva.pilot.rest
 
-import android.app.AppComponentFactory
 import com.talktiva.pilot.helper.AppConstant
 import com.talktiva.pilot.model.Count
 import com.talktiva.pilot.model.Event

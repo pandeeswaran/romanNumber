@@ -14,12 +14,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
+import com.talktiva.pilot.results.ResultError;
 import com.talktiva.pilot.results.ResultForgot;
 
+import java.io.IOException;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -42,6 +46,9 @@ public class ForgotActivity extends AppCompatActivity {
 
     @BindView(R.id.fa_tv)
     TextView textView;
+
+    @BindView(R.id.fa_tv_error)
+    TextView tvError;
 
     @BindView(R.id.fa_et_email)
     EditText etEmail;
@@ -69,6 +76,7 @@ public class ForgotActivity extends AppCompatActivity {
 
         tvForgot.setTypeface(Utility.INSTANCE.getFontRegular());
         textView.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvError.setTypeface(Utility.INSTANCE.getFontRegular());
         etEmail.setTypeface(Utility.INSTANCE.getFontRegular());
         tvEmail.setTypeface(Utility.INSTANCE.getFontRegular());
         btnReset.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -91,7 +99,7 @@ public class ForgotActivity extends AppCompatActivity {
     @OnTextChanged(R.id.fa_et_email)
     void setEtEmailOnTextChange(CharSequence sequence) {
         String s = sequence.toString().trim();
-        if (sequence.length() == 0) {
+        if (s.length() == 0) {
             tvEmail.setVisibility(View.GONE);
         } else if (!Patterns.EMAIL_ADDRESS.matcher(s).matches()) {
             tvEmail.setVisibility(View.VISIBLE);
@@ -101,13 +109,10 @@ public class ForgotActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
     private void reset() {
         progressDialog.show();
+        tvError.setText("");
+        tvError.setVisibility(View.GONE);
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<ResultForgot> call = apiInterface.forgotPassword(etEmail.getText().toString().trim());
@@ -116,15 +121,21 @@ public class ForgotActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<ResultForgot> call, @NonNull Response<ResultForgot> response) {
                 if (response.isSuccessful()) {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, Objects.requireNonNull(response.body()).getResponseMessage(), true, View.VISIBLE, R.string.dd_try, v -> {
+                    internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, Objects.requireNonNull(response.body()).getResponseMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
                         Utility.INSTANCE.dismissDialog(internetDialog);
                         finish();
                     }, View.GONE, null, null);
                     internetDialog.show();
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, response.message(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
-                    internetDialog.show();
+                    try {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
+                        }.getType());
+                        tvError.setText(resultError.getMessage());
+                        tvError.setVisibility(View.VISIBLE);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 

@@ -4,6 +4,10 @@
     <string name="app_name">Talktiva</string>
     <!--endregion-->
 
+    <!--region Google Server Client Id-->
+    <string name="server_client_id">129685831491-1u36kpn6dfid896fekdmgasujmt0p3rn.apps.googleusercontent.com</string>
+    <!--endregion-->
+
     <!--region Detail Event Activity Title-->
     <string name="dea_title_1">View Upcoming Event</string>
     <string name="dea_title_0">View Pending Event</string>
@@ -174,7 +178,7 @@
     <string name="la_btn_fb">Sign-in with Facebook</string>
     <string name="la_btn_google">Sign-in with Google</string>
     <string name="la_tv_welcome">Welcome Back&#33;</string>
-    <string name="la_ll_tv_or">OR</string>
+    <string name="la_ll_tv_or">OR USE YOUR OWN EMAIL</string>
     <string name="la_et_email">Email</string>
     <string name="la_et_pass">Password</string>
     <string name="la_tv_forgot">Forgot Password&#63;</string>
@@ -195,10 +199,30 @@
     <string name="fa_btn_reset">Reset Password</string>
     <!--endregion-->
 
+    <!--region Find Community Activity Button/Text-->
+    <string name="fca_tv">Hi there&#33;\nLet us get started&#46;&#46;&#46;</string>
+    <string name="fca_tv_invitation">Have an invitation code&#63;</string>
+    <string name="fca_btn_fyc">Find your community</string>
+    <!--endregion-->
+
+    <!--region Community Activity Button/Text-->
+    <string name="ca_tv">Please enter your home address</string>
+    <string name="ca_et_street">Street Name (Required)</string>
+    <string name="ca_et_apart">Apartment/Unit (Optional)</string>
+    <string name="ca_et_zip">Zip Code (Required)</string>
+    <string name="ca_btn_fyc">Find your community</string>
+    <string name="ca_et_street_error">Please enter street name</string>
+    <string name="ca_et_zip_error">Please enter zip code</string>
+    <!--endregion-->
+
     <string name="sample_add">10 Taylor Ct&#44; Ridgefield CT 06877</string>
 
     <string name="back">Back</string>
     <string name="exit">Please click BACK again to exit</string>
     <string name="title_activity_forgot">ForgotActivity</string>
+    <string name="title_activity_find_community">FindCommunityActivity</string>
+    <string name="title_activity_invitation">InvitationActivity</string>
+    <string name="title_activity_forgot_result">ForgotResultActivity</string>
+    <string name="title_activity_community">CommunityActivity</string>
 
 </resources>

@@ -20,7 +20,6 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-
         <receiver
             android:name=".helper.NetworkChangeReceiver"
             tools:ignore="InnerclassSeparator">
@@ -44,6 +43,16 @@
         <activity
             android:name=".activity.WelcomeActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.FindCommunityActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.InvitationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.CommunityActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustPan|stateHidden" />
         <activity
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait"

@@ -2,7 +2,9 @@ package com.talktiva.pilot.activity;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.view.Window;
@@ -12,13 +14,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.rest.ApiClient;
@@ -83,7 +94,13 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.la_tv_footer)
     TextView tvFooter;
 
+    @BindView(R.id.la_btn_google_sign_in)
+    SignInButton signInButton;
+
+    private GoogleSignInClient mGoogleSignInClient;
     private Dialog progressDialog, internetDialog;
+
+    private int GOOGLE_SIGN_IN = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +124,11 @@ public class LoginActivity extends AppCompatActivity {
         btnSignIn.setTypeface(Utility.INSTANCE.getFontRegular());
         tvForgot.setTypeface(Utility.INSTANCE.getFontRegular());
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
         ivBack.setOnClickListener(v -> onBackPressed());
 
         btnSignIn.setOnClickListener(v -> {
@@ -124,12 +146,24 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         tvForgot.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, ForgotActivity.class)));
+
+        btnGoogle.setOnClickListener(v -> {
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        updateUI(account);
     }
 
     @OnTextChanged(R.id.la_et_email)
     void setEtEmailOnTextChange(CharSequence sequence) {
         String s = sequence.toString().trim();
-        if (sequence.length() == 0) {
+        if (s.length() == 0) {
             tvEmail.setVisibility(View.GONE);
         } else if (!Patterns.EMAIL_ADDRESS.matcher(s).matches()) {
             tvEmail.setVisibility(View.VISIBLE);
@@ -150,11 +184,6 @@ public class LoginActivity extends AppCompatActivity {
 //        } else {
 //            tvEmail.setVisibility(View.GONE);
 //        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 
     private void login() {
@@ -198,5 +227,43 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GOOGLE_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                // Signed in successfully, show authenticated UI.
+                updateUI(account);
+            } catch (ApiException e) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                Log.w(Talktiva.Companion.getTAG(), "signInResult:failed code=" + e.getStatusCode());
+                updateUI(null);
+            }
+        }
+    }
+
+    private void updateUI(GoogleSignInAccount account) {
+        if (account != null) {
+            String personName = account.getDisplayName();
+            String personGivenName = account.getGivenName();
+            String personFamilyName = account.getFamilyName();
+            String personEmail = account.getEmail();
+            String personId = account.getId();
+            Uri personPhoto = account.getPhotoUrl();
+
+        } else {
+
+        }
+    }
+
+    private void logoutFromGoogle() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, task -> {
+                });
     }
 }
