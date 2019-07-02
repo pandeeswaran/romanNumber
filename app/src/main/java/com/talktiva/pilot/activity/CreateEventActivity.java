@@ -32,8 +32,10 @@ import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.CustomTypefaceSpan;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
+import com.talktiva.pilot.model.Address;
 import com.talktiva.pilot.model.Event;
 import com.talktiva.pilot.model.Invitation;
+import com.talktiva.pilot.model.User;
 import com.talktiva.pilot.request.RequestEvent;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
@@ -122,7 +124,7 @@ public class CreateEventActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        toolbar.setNavigationIcon(R.drawable.ic_cancel);
+        toolbar.setNavigationIcon(R.drawable.ic_cancel_white);
 
         progressDialog = Utility.INSTANCE.showProgress(CreateEventActivity.this);
 
@@ -145,6 +147,9 @@ public class CreateEventActivity extends AppCompatActivity {
             case "new":
                 Utility.INSTANCE.setTitleText(toolbar, R.id.cea_toolbar_tv_title, R.string.cea_title1);
                 tvCountFig.setText(String.valueOf(count));
+                User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
+                Address address = user.getAddress();
+                etLocation.setText(Objects.requireNonNull(Objects.requireNonNull(address).getStreet()).concat(" ").concat(Objects.requireNonNull(address.getCity())).concat(" ").concat(Objects.requireNonNull(address.getState())).concat("-").concat(Objects.requireNonNull(address.getZip())));
                 break;
 
             case "edit":

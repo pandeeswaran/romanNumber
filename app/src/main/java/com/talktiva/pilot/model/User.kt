@@ -1,33 +1,41 @@
 package com.talktiva.pilot.model
 
 import com.google.gson.annotations.SerializedName
-
 import java.io.Serializable
-import java.util.Date
+import java.util.*
 
 class User : Serializable {
 
     @SerializedName("userId")
-    val userId: Int? = null
+    var userId: Int? = null
+
+    @SerializedName("fullName")
+    var fullName: String? = null
 
     @SerializedName("firstName")
-    val firstName: String? = null
+    var firstName: String? = null
 
     @SerializedName("lastName")
-    val lastName: String? = null
+    var lastName: String? = null
 
     @SerializedName("email")
-    val email: String? = null
-
-    @SerializedName("username")
-    val username: String? = null
+    var email: String? = null
 
     @SerializedName("createdOn")
-    val createdOn: Date? = null
+    var createdOn: Date? = null
 
     @SerializedName("modifiedOn")
-    val modifiedOn: Date? = null
+    var modifiedOn: Date? = null
 
     @SerializedName("address")
-    val address: Address? = null
+    var address: Address? = null
+
+    @SerializedName("addressProofUploaded")
+    var addressProofUploaded: Boolean? = null
+
+    @SerializedName("addressVerified")
+    var addressVerified: Boolean? = null
+
+    @SerializedName("emailVerified")
+    var emailVerified: Boolean? = null
 }

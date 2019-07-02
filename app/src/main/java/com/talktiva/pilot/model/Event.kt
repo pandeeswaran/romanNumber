@@ -7,47 +7,47 @@ import java.util.*
 class Event : Serializable {
 
     @SerializedName("eventId")
-    val eventId: Int? = null
+    var eventId: Int? = null
 
     @SerializedName("createdBy")
-    val createdBy: Int? = null
+    var createdBy: Int? = null
 
     @SerializedName("createdOn")
-    val createdOn: Date? = null
+    var createdOn: Date? = null
 
     @SerializedName("modifiedOn")
-    val modifiedOn: Date? = null
+    var modifiedOn: Date? = null
 
     @SerializedName("eventDate")
-    val eventDate: Date? = null
+    var eventDate: Date? = null
 
     @SerializedName("status")
-    val status: String? = null
+    var status: String? = null
 
     @SerializedName("canInviteGuests")
-    val canInviteGuests: Boolean? = null
+    var canInviteGuests: Boolean? = null
 
     @SerializedName("title")
-    val title: String? = null
+    var title: String? = null
 
     @SerializedName("location")
-    val location: String? = null
+    var location: String? = null
 
     @SerializedName("creatorFirstName")
-    val creatorFirstName: String? = null
+    var creatorFirstName: String? = null
 
     @SerializedName("creatorLasttName")
-    val creatorLasttName: String? = null
+    var creatorLasttName: String? = null
 
     @SerializedName("invitations")
-    val invitations: List<Invitation>? = null
+    var invitations: List<Invitation>? = null
 
     @SerializedName("likeCount")
-    val likeCount: Int? = null
+    var likeCount: Int? = null
 
     @SerializedName("hasLiked")
-    val isHasLiked: Boolean? = null
+    var isHasLiked: Boolean? = null
 
     @SerializedName("private")
-    val isPrivate: Boolean? = null
+    var isPrivate: Boolean? = null
 }

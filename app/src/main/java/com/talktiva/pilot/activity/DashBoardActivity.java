@@ -23,8 +23,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -36,9 +41,11 @@ import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Count;
+import com.talktiva.pilot.model.User;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
 import com.talktiva.pilot.results.ResultError;
+import com.talktiva.pilot.results.ResultMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,15 +62,14 @@ public class DashBoardActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
     private final String[] appPermissions = {
-            Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.WRITE_CALENDAR,
             Manifest.permission.READ_CALENDAR};
 
     @BindView(R.id.db_bnv)
     BottomNavigationView bottomNavigationView;
 
-    private Dialog dialogPermission, dialogClose, internetDialog;
+    private Dialog dialogPermission, dialogClose, internetDialog, progressDialog;
+    private GoogleSignInClient mGoogleSignInClient;
     private BroadcastReceiver receiver;
 
     public static void showBadge(Context context, BottomNavigationView bottomNavigationView, int itemId, String value) {
@@ -87,6 +93,13 @@ public class DashBoardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
         ButterKnife.bind(this);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        progressDialog = Utility.INSTANCE.showProgress(DashBoardActivity.this);
 
         if (checkAndRequestPermission()) {
             setUpHome();
@@ -122,6 +135,7 @@ public class DashBoardActivity extends AppCompatActivity {
                     setUpHome();
                 } else {
                     dialogPermission = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_permission_msg, false, View.VISIBLE, R.string.dd_yes, v -> {
+                        dialogPermission.dismiss();
                         for (int i = 0; deniedPermissions.size() > i; i++) {
                             if (ActivityCompat.shouldShowRequestPermissionRationale(DashBoardActivity.this, deniedPermissions.get(i))) {
                                 checkAndRequestPermission();
@@ -160,7 +174,8 @@ public class DashBoardActivity extends AppCompatActivity {
             Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
             Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
             Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-
+            Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+            logoutFromGoogle();
             dialogClose.dismiss();
             finishAffinity();
         }, View.VISIBLE, R.string.dd_no, v -> dialogClose.dismiss());
@@ -182,26 +197,25 @@ public class DashBoardActivity extends AppCompatActivity {
     }
 
     private void setUpHome() {
-
-//        for (int i = 0; i < bottomNavigationView.getChildCount(); i++) {
-//            View child = bottomNavigationView.getChildAt(i);
-//            if (child instanceof BottomNavigationMenuView) {
-//                BottomNavigationMenuView menu = (BottomNavigationMenuView) child;
-//                for (int j = 0; j < menu.getChildCount(); j++) {
-//                    View item = menu.getChildAt(j);
-//                    View smallItemText = item.findViewById(R.id.smallLabel);
-//                    if (smallItemText instanceof TextView) {
-//                        ((TextView) smallItemText).setTypeface(Utility.INSTANCE.getFontRegular());
-//                        ((TextView) smallItemText).setTextSize(10);
-//                    }
-//                    View largeItemText = item.findViewById(R.id.largeLabel);
-//                    if (largeItemText instanceof TextView) {
-//                        ((TextView) largeItemText).setTypeface(Utility.INSTANCE.getFontRegular());
-//                        ((TextView) largeItemText).setTextSize(10);
-//                    }
-//                }
-//            }
-//        }
+        for (int i = 0; i < bottomNavigationView.getChildCount(); i++) {
+            View child = bottomNavigationView.getChildAt(i);
+            if (child instanceof BottomNavigationMenuView) {
+                BottomNavigationMenuView menu = (BottomNavigationMenuView) child;
+                for (int j = 0; j < menu.getChildCount(); j++) {
+                    View item = menu.getChildAt(j);
+                    View smallItemText = item.findViewById(R.id.smallLabel);
+                    if (smallItemText instanceof TextView) {
+                        ((TextView) smallItemText).setTypeface(Utility.INSTANCE.getFontRegular());
+                        ((TextView) smallItemText).setTextSize(10);
+                    }
+                    View largeItemText = item.findViewById(R.id.largeLabel);
+                    if (largeItemText instanceof TextView) {
+                        ((TextView) largeItemText).setTypeface(Utility.INSTANCE.getFontRegular());
+                        ((TextView) largeItemText).setTextSize(10);
+                    }
+                }
+            }
+        }
 
         bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getItemId()) {
@@ -275,6 +289,11 @@ public class DashBoardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
         receiver = new NetworkChangeReceiver();
         registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         if (Utility.INSTANCE.isConnectingToInternet()) {
@@ -289,14 +308,63 @@ public class DashBoardActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<Count> call, @NonNull Response<Count> response) {
                 if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        if (Objects.requireNonNull(response.body().getEventCount()) != 0) {
-                            showBadge(getApplicationContext(), bottomNavigationView, R.id.db_bnm_event, String.valueOf(response.body().getEventCount()));
-                        } else {
-                            removeBadge(bottomNavigationView, R.id.db_bnm_event);
-                        }
+                    if (Objects.requireNonNull(Objects.requireNonNull(response.body()).getEventCount()) != 0) {
+                        showBadge(getApplicationContext(), bottomNavigationView, R.id.db_bnm_event, String.valueOf(response.body().getEventCount()));
                     } else {
                         removeBadge(bottomNavigationView, R.id.db_bnm_event);
+                    }
+                    if (!response.body().getEmailVerified()) {
+                        if (internetDialog != null) {
+                            if (!internetDialog.isShowing()) {
+                                internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_email_verified, false, View.VISIBLE, R.string.dd_btn_resend, v -> {
+                                    Utility.INSTANCE.dismissDialog(internetDialog);
+                                    resendEmail();
+                                }, View.GONE, null, null);
+                                internetDialog.show();
+                            }
+                        } else {
+                            internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_email_verified, false, View.VISIBLE, R.string.dd_btn_resend, v -> {
+                                Utility.INSTANCE.dismissDialog(internetDialog);
+                                resendEmail();
+                            }, View.GONE, null, null);
+                            internetDialog.show();
+                        }
+                    } else if (!response.body().getAddressProofUploaded()) {
+                        if (internetDialog != null) {
+                            if (internetDialog.isShowing()) {
+                                internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_add, false, View.VISIBLE, R.string.dd_btn_add_click, v -> {
+                                    Utility.INSTANCE.dismissDialog(internetDialog);
+                                    Intent intent = new Intent(DashBoardActivity.this, AddressProofActivity.class);
+                                    intent.putExtra(AppConstant.FROM, AppConstant.DASHBOARD);
+                                    User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
+                                    intent.putExtra(AppConstant.ID, user.getUserId());
+                                    startActivity(intent);
+                                    finish();
+                                }, View.GONE, null, null);
+                                internetDialog.show();
+                            }
+                        } else {
+                            internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_add, false, View.VISIBLE, R.string.dd_btn_add_click, v -> {
+                                Utility.INSTANCE.dismissDialog(internetDialog);
+                                Intent intent = new Intent(DashBoardActivity.this, AddressProofActivity.class);
+                                intent.putExtra(AppConstant.FROM, AppConstant.DASHBOARD);
+                                User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
+                                intent.putExtra(AppConstant.ID, user.getUserId());
+                                startActivity(intent);
+                                finish();
+                            }, View.GONE, null, null);
+                            internetDialog.show();
+                        }
+                    } else if (!response.body().getAddressVerified()) {
+                        if (internetDialog != null) {
+                            if (internetDialog.isShowing()) {
+                                internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.color.font, R.string.dd_info_add_verified, false, View.GONE, null, null, View.GONE, null, null);
+                                internetDialog.show();
+                            }
+                        } else {
+                            internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.color.font, R.string.dd_info_add_verified, false, View.GONE, null, null, View.GONE, null, null);
+                            internetDialog.show();
+                        }
                     }
                 } else {
                     try {
@@ -313,6 +381,42 @@ public class DashBoardActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Count> call, @NonNull Throwable t) {
                 Log.e(Talktiva.Companion.getTAG(), "onFailure: ".concat(t.getMessage()));
+                if (t.getMessage().equalsIgnoreCase("timeout")) {
+                    internetDialog = Utility.INSTANCE.showError(DashBoardActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    internetDialog.show();
+                }
+            }
+        });
+    }
+
+    private void logoutFromGoogle() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, task -> {
+                });
+    }
+
+    private void resendEmail() {
+        progressDialog.show();
+
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
+        Call<ResultMessage> call = apiInterface.resendEmail(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))));
+        call.enqueue(new Callback<ResultMessage>() {
+            @Override
+            public void onResponse(@NonNull Call<ResultMessage> call, @NonNull Response<ResultMessage> response) {
+                if (response.isSuccessful()) {
+                    Utility.INSTANCE.dismissDialog(progressDialog);
+                    internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_email_resend, false, View.VISIBLE, R.string.dd_btn_continue, v -> {
+                        Utility.INSTANCE.dismissDialog(internetDialog);
+                        finish();
+                        LocalBroadcastManager.getInstance(DashBoardActivity.this).sendBroadcast(new Intent("CloseWelcome"));
+                    }, View.GONE, null, null);
+                    internetDialog.show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResultMessage> call, @NonNull Throwable t) {
+                Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
                     internetDialog = Utility.INSTANCE.showError(DashBoardActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();

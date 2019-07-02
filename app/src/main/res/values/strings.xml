@@ -5,7 +5,7 @@
     <!--endregion-->
 
     <!--region Google Server Client Id-->
-    <string name="server_client_id">129685831491-1u36kpn6dfid896fekdmgasujmt0p3rn.apps.googleusercontent.com</string>
+    <string name="server_client_id">129685831491-epi9fk1qhfn88quot41q04eien8s8l2f.apps.googleusercontent.com</string>
     <!--endregion-->
 
     <!--region Detail Event Activity Title-->
@@ -111,6 +111,15 @@
     <string name="dd_logout_msg">Are you sure you want to log out&#63;</string>
     <string name="dd_exit_msg">Are you sure you want to exit&#63;</string>
     <string name="dd_discard">Discard Changes&#63;</string>
+    <string name="dd_info_pass">Password should be 8 characters or more.\n\nIt can be any combination of letters, numbers and symbols (ASCII characters).\n\nYou can\'t use a password that:\n\t&#8226; Is particularly week.\n\t\tExample: "password123"\n\t&#8226; You\'ve used before on your account\n\t&#8226; Starts or ends with a blank space\n\t&#8226; Same as your email</string>
+    <string name="dd_info_email_verified">Action required: Please verify your email address from the email that we sent you during the sign-up process.</string>
+    <string name="dd_btn_resend">Re-send verification email</string>
+    <string name="dd_info_email_resend">We have sent a verification email to your registered email address. Please follow the instruction to verify your email address.</string>
+    <string name="dd_btn_continue">Continue</string>
+    <string name="dd_info_add">To ensure your community\'s privacy, address verification is required.</string>
+    <string name="dd_btn_add_click">Click here to action</string>
+    <string name="dd_info_add_verified">Your address proof verification is still pending on our end. Your concern has been acknowledged. We will notify you via email as soon as your address proof is verified.\n\nSorry for the inconvenience!</string>
+    <string name="dd_info_img">Accepted formats: PDF/JPEG/PNG\nDocuments such as Utility bill, Local library card</string>
     <!--endregion-->
 
     <!--region Event Fragment Tab Title-->
@@ -160,11 +169,11 @@
     <!--endregion-->
 
     <!--region Home Activity Footer-->
-    <string name="ha_footer">&#42; Privacy policies &#124; talktiva &#8482;</string>
+    <string name="ha_footer">&#42; Privacy policies &#124; talktiva&#8482;</string>
     <!--endregion-->
 
     <!--region Home Activity Button Text-->
-    <string name="ha_btn_login">Login</string>
+    <string name="ha_btn_login">Log In</string>
     <string name="ha_btn_create">Create Account</string>
     <!--endregion-->
 
@@ -206,13 +215,56 @@
     <!--endregion-->
 
     <!--region Community Activity Button/Text-->
-    <string name="ca_tv">Please enter your home address</string>
+    <string name="ca_tv_direct">Please enter your home address</string>
+    <string name="ca_tv_invitation">Please confirm your home address</string>
     <string name="ca_et_street">Street Name (Required)</string>
     <string name="ca_et_apart">Apartment/Unit (Optional)</string>
     <string name="ca_et_zip">Zip Code (Required)</string>
     <string name="ca_btn_fyc">Find your community</string>
     <string name="ca_et_street_error">Please enter street name</string>
     <string name="ca_et_zip_error">Please enter zip code</string>
+    <!--endregion-->
+
+    <!--region Invitation Activity Text-->
+    <string name="ia_tv">Please enter the invitation code that you\'ve received to join your community network.</string>
+    <string name="ia_et">Invitation Code</string>
+    <string name="ia_tv_error">Please enter invitation code</string>
+    <string name="ia_btn_next">Next</string>
+    <!--endregion-->
+
+    <!--region Community Found Activity-->
+    <string name="cfa_tv">Great news&#33; Based on your home address, we\'ve found your community</string>
+    <string name="cfa_tv_residents">residents from your community are already using our app</string>
+    <string name="cfa_tv_events">upcoming events</string>
+    <string name="cfa_btn_next">Next</string>
+    <!--endregion-->
+
+    <!--region Sign-Up Activity-->
+    <string name="sua_tv_1">We\'re exited for you to join your</string>
+    <string name="sua_tv_2">community network&#46;</string>
+    <string name="sua_btn_facebook">Sign-up with Facebook</string>
+    <string name="sua_btn_google">Sign-up with Google</string>
+    <string name="sua_btn_su">Sign-Up</string>
+    <string name="sua_et_full_name">Full Name</string>
+    <string name="sua_tv_fname_error">Please enter full name</string>
+    <string name="sua_tv_fname_val">Please enter valid full name</string>
+    <string name="sua_et_email">Email</string>
+    <string name="sua_tv_email_error">Please enter email</string>
+    <string name="sua_tv_email_val">Please enter valid email</string>
+    <string name="sua_et_phone">Phone (Optional)</string>
+    <string name="sua_et_pass">Password</string>
+    <string name="sua_tv_pass_error">Please enter password</string>
+    <string name="sua_tv_pass_val">Please enter valid password</string>
+    <!--endregion-->
+
+    <!--region Address Proof Activity-->
+    <string name="apa_tv">Almost there&#33; To ensure your community\'s privacy, address verification is required.</string>
+    <string name="apa_tv_missing">Upload is missing a document</string>
+    <string name="apa_tv_upload">Please upload your proof of address:</string>
+    <string name="apa_tv_privacy">Your privacy is very important to us. Uploaded document(s) will be permanently removed once your address is verified and will never be posted publicly.</string>
+    <string name="apa_tv_skip">&#42;when you skip, you should upload proof of address within 5 days to access full application.</string>
+    <string name="apa_tv_or">Or skip to upload later</string>
+    <string name="apa_btn_upload">Upload</string>
     <!--endregion-->
 
     <string name="sample_add">10 Taylor Ct&#44; Ridgefield CT 06877</string>
@@ -224,5 +276,8 @@
     <string name="title_activity_invitation">InvitationActivity</string>
     <string name="title_activity_forgot_result">ForgotResultActivity</string>
     <string name="title_activity_community">CommunityActivity</string>
+    <string name="title_activity_community_found">CommunityFoundActivity</string>
+    <string name="title_activity_signup">SignupActivity</string>
+    <string name="title_activity_address_proof">AddressProofActivity</string>
 
 </resources>

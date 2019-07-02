@@ -1,25 +1,35 @@
 package com.talktiva.pilot.results
 
 import com.google.gson.annotations.SerializedName
+import com.talktiva.pilot.model.Errors
 import java.io.Serializable
 
 class ResultError : Serializable {
 
     @SerializedName("error")
-    val error: String? = null
+    var error: String? = null
 
     @SerializedName("error_description")
-    val errorDescription: String? = null
+    var errorDescription: String? = null
 
     @SerializedName("title")
-    val title: String? = null
+    var title: String? = null
 
     @SerializedName("status")
-    val status: Int? = null
+    var status: Int? = null
 
     @SerializedName("message")
-    val message: String? = null
+    var message: String? = null
 
     @SerializedName("developerMessage")
-    val developerMessage: String? = null
+    var developerMessage: String? = null
+
+    @SerializedName("code")
+    var code: String? = null
+
+    @SerializedName("field")
+    var field: String? = null
+
+    @SerializedName("errors")
+    var errors: List<Errors>? = null
 }

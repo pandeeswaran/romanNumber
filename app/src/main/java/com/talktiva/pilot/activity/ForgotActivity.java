@@ -1,6 +1,10 @@
 package com.talktiva.pilot.activity;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -13,15 +17,18 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.helper.AppConstant;
+import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
 import com.talktiva.pilot.results.ResultError;
-import com.talktiva.pilot.results.ResultForgot;
+import com.talktiva.pilot.results.ResultMessage;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -63,6 +70,7 @@ public class ForgotActivity extends AppCompatActivity {
     TextView tvFooter;
 
     private Dialog progressDialog, internetDialog;
+    private BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +81,10 @@ public class ForgotActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         progressDialog = Utility.INSTANCE.showProgress(ForgotActivity.this);
+
+        if (getIntent().getStringExtra(AppConstant.EMAIL) != null) {
+            etEmail.setText(getIntent().getStringExtra(AppConstant.EMAIL));
+        }
 
         tvForgot.setTypeface(Utility.INSTANCE.getFontRegular());
         textView.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -89,8 +101,10 @@ public class ForgotActivity extends AppCompatActivity {
                 tvEmail.setText(R.string.la_tv_email_empty);
                 tvEmail.setVisibility(View.VISIBLE);
             } else {
-                if (Utility.INSTANCE.isConnectingToInternet()) {
-                    reset();
+                if (isValidate(etEmail.getText().toString().trim())) {
+                    if (Utility.INSTANCE.isConnectingToInternet()) {
+                        reset();
+                    }
                 }
             }
         });
@@ -99,14 +113,44 @@ public class ForgotActivity extends AppCompatActivity {
     @OnTextChanged(R.id.fa_et_email)
     void setEtEmailOnTextChange(CharSequence sequence) {
         String s = sequence.toString().trim();
-        if (s.length() == 0) {
+        if (isEmpty(s)) {
             tvEmail.setVisibility(View.GONE);
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(s).matches()) {
+        } else if (!isValidate(s)) {
             tvEmail.setVisibility(View.VISIBLE);
             tvEmail.setText(R.string.la_tv_email_error);
         } else {
             tvEmail.setVisibility(View.GONE);
         }
+    }
+
+    private Boolean isEmpty(String s) {
+        return s.length() == 0;
+    }
+
+    private Boolean isValidate(String s) {
+        return Patterns.EMAIL_ADDRESS.matcher(s).matches();
+    }
+
+    @Override
+    protected void onDestroy() {
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        receiver = new NetworkChangeReceiver();
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void reset() {
@@ -115,15 +159,18 @@ public class ForgotActivity extends AppCompatActivity {
         tvError.setVisibility(View.GONE);
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResultForgot> call = apiInterface.forgotPassword(etEmail.getText().toString().trim());
-        call.enqueue(new Callback<ResultForgot>() {
+        Call<ResultMessage> call = apiInterface.forgotPassword(etEmail.getText().toString().trim());
+        call.enqueue(new Callback<ResultMessage>() {
             @Override
-            public void onResponse(@NonNull Call<ResultForgot> call, @NonNull Response<ResultForgot> response) {
+            public void onResponse(@NonNull Call<ResultMessage> call, @NonNull Response<ResultMessage> response) {
                 if (response.isSuccessful()) {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, Objects.requireNonNull(response.body()).getResponseMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
                         Utility.INSTANCE.dismissDialog(internetDialog);
                         finish();
+                        Intent intent = new Intent("BlankEtPass");
+                        intent.putExtra(AppConstant.EMAIL, etEmail.getText().toString().trim());
+                        LocalBroadcastManager.getInstance(ForgotActivity.this).sendBroadcast(intent);
                     }, View.GONE, null, null);
                     internetDialog.show();
                 } else {
@@ -140,7 +187,7 @@ public class ForgotActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ResultForgot> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<ResultMessage> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
                     internetDialog = Utility.INSTANCE.showError(ForgotActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));

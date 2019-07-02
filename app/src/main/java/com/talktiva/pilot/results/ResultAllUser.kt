@@ -8,23 +8,23 @@ import java.io.Serializable
 class ResultAllUser : Serializable {
 
     @SerializedName("content")
-    val users: List<User>? = null
+    var users: List<User>? = null
 
     @SerializedName("totalElements")
-    val totalElements: Int? = null
+    var totalElements: Int? = null
 
     @SerializedName("totalPages")
-    val totalPages: Int? = null
+    var totalPages: Int? = null
 
     @SerializedName("totalCount")
-    val totalCount: Int? = null
+    var totalCount: Int? = null
 
     @SerializedName("size")
-    val size: Int? = null
+    var size: Int? = null
 
     @SerializedName("currentPage")
-    val currentPage: Int? = null
+    var currentPage: Int? = null
 
     @SerializedName("links")
-    val links: Links? = null
+    var links: Links? = null
 }

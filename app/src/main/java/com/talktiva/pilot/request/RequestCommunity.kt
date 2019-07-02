@@ -4,12 +4,13 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 class RequestCommunity : Serializable {
+
     @SerializedName("appartmentUnit")
-    val appartmentUnit: String? = null
+    var appartmentUnit: String? = null
 
     @SerializedName("street")
-    val street: String? = null
+    var street: String? = null
 
     @SerializedName("zip")
-    val zip: String? = null
+    var zip: String? = null
 }

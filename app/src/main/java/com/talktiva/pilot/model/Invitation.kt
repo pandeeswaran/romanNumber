@@ -14,13 +14,13 @@ class Invitation : Serializable {
     var inviteeId: Int? = null
 
     @SerializedName("status")
-    val status: String? = null
+    var status: String? = null
 
     @SerializedName("createdOn")
-    val createdOn: Date? = null
+    var createdOn: Date? = null
 
     @SerializedName("statusChangedDate")
-    val statusChangedDate: Date? = null
+    var statusChangedDate: Date? = null
 
     @SerializedName("guestUserEmail")
     var guestUserEmail: String? = null
@@ -29,11 +29,11 @@ class Invitation : Serializable {
     var guestUserPhone: String? = null
 
     @SerializedName("inviteeFirstName")
-    val inviteeFirstName: String? = null
+    var inviteeFirstName: String? = null
 
     @SerializedName("inviteeLasttName")
-    val inviteeLasttName: String? = null
+    var inviteeLasttName: String? = null
 
     @SerializedName("inviteeAddress")
-    val inviteeAddress: String? = null
+    var inviteeAddress: String? = null
 }

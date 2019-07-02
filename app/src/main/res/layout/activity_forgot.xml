@@ -36,7 +36,7 @@
         android:padding="@dimen/et_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_back_theme"
+        app:srcCompat="@drawable/ic_cancel_theme"
         tools:ignore="UnusedAttribute" />
 
     <ImageView
@@ -100,7 +100,8 @@
         android:autofillHints="@string/fa_et_email"
         android:hint="@string/fa_et_email"
         android:inputType="textEmailAddress"
-        android:textColorHint="@color/colorPrimary"
+        android:textColor="@color/colorPrimary"
+        android:textColorHint="@color/grey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fa_tv_error"

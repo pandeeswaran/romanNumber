@@ -9,14 +9,16 @@
 
     <TextView
         android:id="@+id/dialog_msg"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="28dp"
+        android:layout_marginBottom="28dp"
         android:gravity="center"
         android:textColor="@color/black"
         android:textSize="@dimen/normal_label_font_size"
+        app:layout_constraintBottom_toTopOf="@+id/dialog_positive"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,7 +28,6 @@
         android:layout_width="0dp"
         android:layout_height="36dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
         android:background="@drawable/bg_theme"
@@ -35,7 +36,7 @@
         android:textColor="@color/white"
         android:textSize="@dimen/normal_label_font_size"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/dialog_negative"
+        app:layout_constraintEnd_toStartOf="@id/dialog_negative"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_msg" />
@@ -44,17 +45,15 @@
         android:id="@+id/dialog_negative"
         android:layout_width="0dp"
         android:layout_height="36dp"
-        android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="24dp"
         android:background="@drawable/bg_grey"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="@dimen/normal_label_font_size"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/dialog_positive"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/dialog_positive"
-        app:layout_constraintTop_toBottomOf="@+id/dialog_msg" />
+        app:layout_constraintStart_toEndOf="@id/dialog_positive"
+        app:layout_constraintTop_toTopOf="@+id/dialog_positive" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

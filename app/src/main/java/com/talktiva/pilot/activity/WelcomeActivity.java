@@ -1,12 +1,17 @@
 package com.talktiva.pilot.activity;
 
+import android.Manifest;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +23,16 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.github.vivchar.viewpagerindicator.ViewPagerIndicator;
 import com.squareup.picasso.Picasso;
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Slider;
@@ -56,14 +65,30 @@ public class WelcomeActivity extends AppCompatActivity {
     @BindView(R.id.ha_tv_content)
     TextView tvContent;
 
+    private static final int PERMISSION_REQUEST_CODE = 123;
+
+    private final String[] appPermissions = {
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
     private Boolean doubleBackToExitPressedOnce = false;
     private MyPagerAdapter pagerAdapter;
     private BroadcastReceiver receiver;
+    private Dialog dialogPermission;
     private List<Slider> sliders;
     private Handler handler;
 
     private Integer delay = 4000;
     private Integer page = 0;
+
+    private BroadcastReceiver r = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            finish();
+        }
+    };
 
     Runnable runnable = new Runnable() {
         public void run() {
@@ -109,9 +134,62 @@ public class WelcomeActivity extends AppCompatActivity {
         viewPager.setOffscreenPageLimit(5);
         tvContent.setText(Objects.requireNonNull(sliders.get(0).getText()));
 
+        checkAndRequestPermission();
+
         btnCreate.setOnClickListener(v -> startActivity(new Intent(WelcomeActivity.this, FindCommunityActivity.class)));
 
         btnLogin.setOnClickListener(v -> startActivity(new Intent(WelcomeActivity.this, LoginActivity.class)));
+    }
+
+    private void checkAndRequestPermission() {
+        List<String> listPermissionNeeded = new ArrayList<>();
+        for (String permission : appPermissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                listPermissionNeeded.add(permission);
+            }
+        }
+        if (!listPermissionNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionNeeded.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            final List<String> deniedPermissions = new ArrayList<>();
+            if (grantResults.length > 0) {
+                for (int i = 0; grantResults.length > i; i++) {
+                    if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                        deniedPermissions.add(permissions[i]);
+                    }
+                }
+                if (!deniedPermissions.isEmpty()) {
+                    dialogPermission = Utility.INSTANCE.showAlert(WelcomeActivity.this, R.string.dd_permission_msg, false, View.VISIBLE, R.string.dd_yes, v -> {
+                        dialogPermission.dismiss();
+                        for (int i = 0; deniedPermissions.size() > i; i++) {
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(WelcomeActivity.this, deniedPermissions.get(i))) {
+                                checkAndRequestPermission();
+                            }
+                        }
+                    }, View.VISIBLE, R.string.dd_setting, v -> {
+                        dialogPermission.dismiss();
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivity(intent);
+                    });
+                    dialogPermission.show();
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        handler.removeCallbacks(runnable);
+        super.onPause();
     }
 
     @Override
@@ -121,7 +199,7 @@ public class WelcomeActivity extends AppCompatActivity {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        handler.removeCallbacks(runnable);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
         super.onDestroy();
     }
 
@@ -136,6 +214,7 @@ public class WelcomeActivity extends AppCompatActivity {
         receiver = new NetworkChangeReceiver();
         registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         handler.postDelayed(runnable, delay);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r, new IntentFilter("CloseWelcome"));
     }
 
     private class MyPagerAdapter extends PagerAdapter {
@@ -184,4 +263,6 @@ public class WelcomeActivity extends AppCompatActivity {
         Utility.INSTANCE.showMsg(R.string.exit);
         new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }
+
+
 }
