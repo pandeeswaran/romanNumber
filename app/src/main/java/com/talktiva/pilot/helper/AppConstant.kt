@@ -70,6 +70,7 @@ object AppConstant {
     //    public static final String ALL_USERS = "api/v1/users";
 
     const val LOGIN_TOKEN = "Basic dGFsa3RpdmFBcHA6dGFsa0BUaXZhITE="
+    const val DESCRIPTION = "Document is using for address proof verification"
 
     const val PREF_R_TOKEN = "refresh_token"
     const val PREF_A_TOKEN = "access_token"

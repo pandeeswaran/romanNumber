@@ -28,8 +28,15 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "129685831491-epi9fk1qhfn88quot41q04eien8s8l2f.apps.googleusercontent.com",
+              "client_id": "129685831491-5icbfmmqmu1fgbfbpbm98q9gm8laa5gv.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "129685831491-oc6ce72n9chio297a2phutj44r86brig.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.talkTiva.pilot"
+              }
             }
           ]
         }

@@ -3,6 +3,7 @@ package com.talktiva.pilot.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Paint;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.View;
 import android.view.Window;
@@ -23,15 +25,19 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.Utility;
-import com.talktiva.pilot.rest.ApiClient;
-import com.talktiva.pilot.rest.ApiInterface;
+import com.talktiva.pilot.rest.FileUploader;
+import com.talktiva.pilot.rest.FileUploaderCallback;
 import com.talktiva.pilot.results.ResultError;
+import com.talktiva.pilot.results.ResultMessage;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,12 +48,9 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
+import id.zelory.compressor.Compressor;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AddressProofActivity extends AppCompatActivity {
@@ -55,12 +58,12 @@ public class AddressProofActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 123;
     private static final int REQUEST_IMAGE_GALLERY = 1;
     private static final int REQUEST_IMAGE_CAMERA = 2;
+
     private final String[] appPermissions = {
             Manifest.permission.CAMERA};
+
     @BindView(R.id.apa_iv_info)
     ImageView ivInfo;
-    @BindView(R.id.apa_iv_back)
-    ImageView ivBack;
     @BindView(R.id.apa_tv)
     TextView textView;
     @BindView(R.id.apa_tv_error)
@@ -81,9 +84,12 @@ public class AddressProofActivity extends AppCompatActivity {
     TextView tvOr;
     @BindView(R.id.apa_tv_skip)
     TextView tvSkip;
-    private Dialog progressDialog, internetDialog, dialogPermission;
+
+    private Dialog internetDialog, dialogPermission;
+    private ProgressDialog dialog;
     private Integer id;
     private File file;
+    private Uri uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +101,6 @@ public class AddressProofActivity extends AppCompatActivity {
 
         String from = getIntent().getStringExtra(AppConstant.FROM);
         id = getIntent().getIntExtra(AppConstant.ID, 0);
-
-        progressDialog = Utility.INSTANCE.showProgress(AddressProofActivity.this);
 
         textView.setTypeface(Utility.INSTANCE.getFontRegular());
         tvError.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -117,16 +121,12 @@ public class AddressProofActivity extends AppCompatActivity {
         }
 
         if (from.equals(AppConstant.SIGNUP)) {
-            ivBack.setVisibility(View.GONE);
             tvOr.setVisibility(View.VISIBLE);
             tvSkip.setVisibility(View.VISIBLE);
         } else {
-            ivBack.setVisibility(View.VISIBLE);
             tvOr.setVisibility(View.GONE);
             tvSkip.setVisibility(View.GONE);
         }
-
-        ivBack.setOnClickListener(v -> onBackPressed());
 
         tvOr.setOnClickListener(v -> {
             startActivity(new Intent(AddressProofActivity.this, DashBoardActivity.class));
@@ -135,7 +135,17 @@ public class AddressProofActivity extends AppCompatActivity {
 
         ivFolder.setOnClickListener(v -> startActivityForResult(Utility.INSTANCE.getPickImageChooserForGallery(AddressProofActivity.this), REQUEST_IMAGE_GALLERY));
 
-        ivCamera.setOnClickListener(v -> startActivityForResult(Utility.INSTANCE.getPickImageChooserForCamera(AddressProofActivity.this), REQUEST_IMAGE_CAMERA));
+        ivCamera.setOnClickListener(v -> {
+            Intent pictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (pictureIntent.resolveActivity(getPackageManager()) != null) {
+                File photoFile = Utility.INSTANCE.createImageFile();
+                if (photoFile != null) {
+                    uri = FileProvider.getUriForFile(this, "com.talktiva.pilot.provider", photoFile);
+                    pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                    startActivityForResult(pictureIntent, REQUEST_IMAGE_CAMERA);
+                }
+            }
+        });
 
         ivHelp.setOnClickListener(v -> {
             internetDialog = Utility.INSTANCE.showAlert(AddressProofActivity.this, R.color.colorPrimary, R.string.dd_info_img, true, View.GONE, null, null, View.GONE, null, null);
@@ -150,7 +160,9 @@ public class AddressProofActivity extends AppCompatActivity {
             } else {
                 tvError.setText(null);
                 tvError.setVisibility(View.GONE);
-                uploadFile(file);
+                if (Utility.INSTANCE.isConnectingToInternet()) {
+                    uploadFile(uri, file);
+                }
             }
         });
 
@@ -206,48 +218,67 @@ public class AddressProofActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            Uri picUri;
             switch (requestCode) {
                 case REQUEST_IMAGE_GALLERY:
                     if (data != null) {
-                        picUri = data.getData();
-                        File f = new File(Objects.requireNonNull(picUri).getPath());
-                        file = f.getAbsoluteFile();
+                        uri = data.getData();
+                        file = new File(Utility.INSTANCE.getRealPathFromURI(Objects.requireNonNull(uri)));
                         tvError.setText(file.getName());
                         tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
                         tvError.setVisibility(View.VISIBLE);
                     }
                     break;
                 case REQUEST_IMAGE_CAMERA:
-                    picUri = Utility.INSTANCE.getCaptureImageOutputUri();
-                    file = new File(Objects.requireNonNull(picUri).getPath());
-                    tvError.setText(file.getName());
-                    tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
-                    tvError.setVisibility(View.VISIBLE);
+                    try {
+                        File f = new File(Utility.INSTANCE.getImageFilePath());
+                        file = new Compressor(AddressProofActivity.this).compressToFile(f, f.getName());
+                        tvError.setText(file.getName());
+                        tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
+                        tvError.setVisibility(View.VISIBLE);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
             }
         }
     }
 
-    private void uploadFile(File file) {
-        progressDialog.show();
+    private void uploadFile(Uri uri, File file) {
+        dialog = new ProgressDialog(AddressProofActivity.this);
+        dialog.setCancelable(false);
+        dialog.setTitle("Please wait");
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setMax(100);
+        dialog.setMessage("Uploading document...");
+        if (dialog.isShowing()) {
+            dialog.dismiss();
+        }
+        dialog.show();
 
-        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-        String descriptionString = "Sample description";
-        RequestBody description = RequestBody.create(MediaType.parse("multipart/form-data"), descriptionString);
-
-        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResponseBody> call = apiInterface.uploadImage(id, body, description);
-        call.enqueue(new Callback<ResponseBody>() {
+        FileUploader fileUploader = new FileUploader();
+        fileUploader.uploadFile(AddressProofActivity.this, uri, file, AppConstant.FILE, id);
+        fileUploader.setOnUploadListener(new FileUploaderCallback() {
             @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+            public void onResponse(@NotNull Call<ResponseBody> call, @NotNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
-                    Utility.INSTANCE.dismissDialog(progressDialog);
-                    startActivity(new Intent(AddressProofActivity.this, DashBoardActivity.class));
-                    finish();
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+                    try {
+                        ResultMessage resultMessage = new Gson().fromJson(Objects.requireNonNull(response.body()).string(), new TypeToken<ResultMessage>() {
+                        }.getType());
+                        internetDialog = Utility.INSTANCE.showAlert(AddressProofActivity.this, resultMessage.getResponseMessage(), true, View.VISIBLE, R.string.dd_ok, v -> {
+                            startActivity(new Intent(AddressProofActivity.this, DashBoardActivity.class));
+                            finish();
+                        }, View.GONE, null, null);
+                        internetDialog.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 } else {
-                    Utility.INSTANCE.dismissDialog(progressDialog);
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
                     try {
                         ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
                         }.getType());
@@ -260,13 +291,24 @@ public class AddressProofActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Utility.INSTANCE.dismissDialog(progressDialog);
+            public void onFailure(@NotNull Call<ResponseBody> call, @NotNull Throwable t) {
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                }
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
                     internetDialog = Utility.INSTANCE.showError(AddressProofActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 }
             }
+
+            @Override
+            public void onProgressUpdate(int progress) {
+                dialog.setProgress(progress);
+            }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 }

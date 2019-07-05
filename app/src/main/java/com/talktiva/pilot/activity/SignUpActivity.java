@@ -179,7 +179,7 @@ public class SignUpActivity extends AppCompatActivity {
                 tvPass.setVisibility(View.VISIBLE);
             } else {
                 if (Utility.INSTANCE.isConnectingToInternet()) {
-                    register();
+                    getNormalRegister();
                 }
             }
         });
@@ -231,7 +231,66 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-    private void register() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GOOGLE_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                // Signed in successfully, show authenticated UI.
+                updateUI(account);
+            } catch (ApiException e) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                Log.w(Talktiva.Companion.getTAG(), "signInResult:failed code=" + e.getStatusCode());
+                updateUI(null);
+            }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        updateUI(account);
+    }
+
+    @Override
+    protected void onDestroy() {
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        receiver = new NetworkChangeReceiver();
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    private void updateUI(GoogleSignInAccount account) {
+        if (account != null) {
+            Log.d(Talktiva.Companion.getTAG(), "DisplayName: ".concat(Objects.requireNonNull(account.getDisplayName())));
+            Log.d(Talktiva.Companion.getTAG(), "Email: ".concat(Objects.requireNonNull(account.getEmail())));
+            Log.d(Talktiva.Companion.getTAG(), "FamilyName: ".concat(Objects.requireNonNull(account.getFamilyName())));
+            Log.d(Talktiva.Companion.getTAG(), "GivenName: ".concat(Objects.requireNonNull(account.getGivenName())));
+            Log.d(Talktiva.Companion.getTAG(), "Id: ".concat(Objects.requireNonNull(account.getId())));
+            Log.d(Talktiva.Companion.getTAG(), "IdToken: ".concat(Objects.requireNonNull(account.getIdToken())));
+            getSocialRegister(Objects.requireNonNull(account.getDisplayName()), Objects.requireNonNull(account.getEmail()), Objects.requireNonNull(account.getIdToken()), Objects.requireNonNull(account.getId()));
+        }
+    }
+
+    private void getNormalRegister() {
         progressDialog.show();
 
         RequestSignUp requestSignUp = new RequestSignUp();
@@ -302,65 +361,6 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == GOOGLE_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                // Signed in successfully, show authenticated UI.
-                updateUI(account);
-            } catch (ApiException e) {
-                // The ApiException status code indicates the detailed failure reason.
-                // Please refer to the GoogleSignInStatusCodes class reference for more information.
-                Log.w(Talktiva.Companion.getTAG(), "signInResult:failed code=" + e.getStatusCode());
-                updateUI(null);
-            }
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        updateUI(account);
-    }
-
-    @Override
-    protected void onDestroy() {
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        receiver = new NetworkChangeReceiver();
-        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-    }
-
-    private void updateUI(GoogleSignInAccount account) {
-        if (account != null) {
-            Log.d(Talktiva.Companion.getTAG(), "DisplayName: ".concat(Objects.requireNonNull(account.getDisplayName())));
-            Log.d(Talktiva.Companion.getTAG(), "Email: ".concat(Objects.requireNonNull(account.getEmail())));
-            Log.d(Talktiva.Companion.getTAG(), "FamilyName: ".concat(Objects.requireNonNull(account.getFamilyName())));
-            Log.d(Talktiva.Companion.getTAG(), "GivenName: ".concat(Objects.requireNonNull(account.getGivenName())));
-            Log.d(Talktiva.Companion.getTAG(), "Id: ".concat(Objects.requireNonNull(account.getId())));
-            Log.d(Talktiva.Companion.getTAG(), "IdToken: ".concat(Objects.requireNonNull(account.getIdToken())));
-            getSocialRegister(Objects.requireNonNull(account.getDisplayName()), Objects.requireNonNull(account.getEmail()), Objects.requireNonNull(account.getIdToken()), Objects.requireNonNull(account.getId()));
-        }
     }
 
     private void getAutoLogin() {
@@ -461,40 +461,19 @@ public class SignUpActivity extends AppCompatActivity {
                                 if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.F_NAME)) {
                                     internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), true, View.VISIBLE, R.string.dd_ok, v -> {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
-                                        startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
-                                        finish();
-                                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunityFound"));
-                                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunity"));
-                                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseFindCommunity"));
-                                        if (invitationCode != null && invitationCode.trim().length() != 0) {
-                                            LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseInvitation"));
-                                        }
+                                        logoutFromGoogle();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
                                 } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.EMAIL)) {
                                     internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), true, View.VISIBLE, R.string.dd_ok, v -> {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
-                                        startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
-                                        finish();
-                                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunityFound"));
-                                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunity"));
-                                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseFindCommunity"));
-                                        if (invitationCode != null && invitationCode.trim().length() != 0) {
-                                            LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseInvitation"));
-                                        }
+                                        logoutFromGoogle();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
                                 } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.PASS)) {
                                     internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), true, View.VISIBLE, R.string.dd_ok, v -> {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
-                                        startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
-                                        finish();
-                                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunityFound"));
-                                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunity"));
-                                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseFindCommunity"));
-                                        if (invitationCode != null && invitationCode.trim().length() != 0) {
-                                            LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseInvitation"));
-                                        }
+                                        logoutFromGoogle();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
                                 }

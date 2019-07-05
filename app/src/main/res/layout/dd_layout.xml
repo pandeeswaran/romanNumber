@@ -18,7 +18,7 @@
         android:gravity="center"
         android:textColor="@color/black"
         android:textSize="@dimen/normal_label_font_size"
-        app:layout_constraintBottom_toTopOf="@+id/dialog_positive"
+        app:layout_constraintBottom_toTopOf="@id/dialog_positive"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -50,10 +50,10 @@
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="@dimen/normal_label_font_size"
-        app:layout_constraintBottom_toBottomOf="@+id/dialog_positive"
+        app:layout_constraintBottom_toBottomOf="@id/dialog_positive"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@id/dialog_positive"
-        app:layout_constraintTop_toTopOf="@+id/dialog_positive" />
+        app:layout_constraintTop_toTopOf="@id/dialog_positive" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

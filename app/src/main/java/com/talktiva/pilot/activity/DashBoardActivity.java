@@ -49,6 +49,8 @@ import com.talktiva.pilot.results.ResultMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -308,62 +310,130 @@ public class DashBoardActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<Count> call, @NonNull Response<Count> response) {
                 if (response.isSuccessful()) {
+
                     if (Objects.requireNonNull(Objects.requireNonNull(response.body()).getEventCount()) != 0) {
                         showBadge(getApplicationContext(), bottomNavigationView, R.id.db_bnm_event, String.valueOf(response.body().getEventCount()));
                     } else {
                         removeBadge(bottomNavigationView, R.id.db_bnm_event);
                     }
+
+                    User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
+                    Date curDate = Calendar.getInstance().getTime();
+                    Date regDate = user.getCreatedOn();
+
                     if (!response.body().getEmailVerified()) {
                         if (internetDialog != null) {
                             if (!internetDialog.isShowing()) {
-                                internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_email_verified, false, View.VISIBLE, R.string.dd_btn_resend, v -> {
+                                internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_email_verified, View.VISIBLE, R.string.dd_btn_resend, v -> {
                                     Utility.INSTANCE.dismissDialog(internetDialog);
                                     resendEmail();
-                                }, View.GONE, null, null);
+                                }, v -> {
+                                    Utility.INSTANCE.dismissDialog(internetDialog);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                    Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                    logoutFromGoogle();
+                                    finishAffinity();
+                                });
                                 internetDialog.show();
                             }
                         } else {
-                            internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_email_verified, false, View.VISIBLE, R.string.dd_btn_resend, v -> {
+                            internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_email_verified, View.VISIBLE, R.string.dd_btn_resend, v -> {
                                 Utility.INSTANCE.dismissDialog(internetDialog);
                                 resendEmail();
-                            }, View.GONE, null, null);
+                            }, v -> {
+                                Utility.INSTANCE.dismissDialog(internetDialog);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                logoutFromGoogle();
+                                finishAffinity();
+                            });
                             internetDialog.show();
                         }
-                    } else if (!response.body().getAddressProofUploaded()) {
-                        if (internetDialog != null) {
-                            if (internetDialog.isShowing()) {
-                                internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_add, false, View.VISIBLE, R.string.dd_btn_add_click, v -> {
+                    } else if ((Objects.requireNonNull(regDate).getDate() + 5) >= curDate.getDate() && regDate.getMonth() == curDate.getMonth() && regDate.getYear() == curDate.getYear()) {
+                        return;
+                    } else {
+                        if (!response.body().getAddressProofUploaded()) {
+                            if (internetDialog != null) {
+                                if (internetDialog.isShowing()) {
+                                    internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_add, View.VISIBLE, R.string.dd_btn_add_click, v -> {
+                                        Utility.INSTANCE.dismissDialog(internetDialog);
+                                        Intent intent = new Intent(DashBoardActivity.this, AddressProofActivity.class);
+                                        intent.putExtra(AppConstant.FROM, AppConstant.DASHBOARD);
+                                        intent.putExtra(AppConstant.ID, user.getUserId());
+                                        startActivity(intent);
+                                        finish();
+                                    }, v -> {
+                                        Utility.INSTANCE.dismissDialog(internetDialog);
+                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                        Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                        logoutFromGoogle();
+                                        finishAffinity();
+                                    });
+                                    internetDialog.show();
+                                }
+                            } else {
+                                internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_add, View.VISIBLE, R.string.dd_btn_add_click, v -> {
                                     Utility.INSTANCE.dismissDialog(internetDialog);
                                     Intent intent = new Intent(DashBoardActivity.this, AddressProofActivity.class);
                                     intent.putExtra(AppConstant.FROM, AppConstant.DASHBOARD);
-                                    User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
                                     intent.putExtra(AppConstant.ID, user.getUserId());
                                     startActivity(intent);
                                     finish();
-                                }, View.GONE, null, null);
+                                }, v -> {
+                                    Utility.INSTANCE.dismissDialog(internetDialog);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                    Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                    logoutFromGoogle();
+                                    finishAffinity();
+                                });
                                 internetDialog.show();
                             }
-                        } else {
-                            internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_add, false, View.VISIBLE, R.string.dd_btn_add_click, v -> {
-                                Utility.INSTANCE.dismissDialog(internetDialog);
-                                Intent intent = new Intent(DashBoardActivity.this, AddressProofActivity.class);
-                                intent.putExtra(AppConstant.FROM, AppConstant.DASHBOARD);
-                                User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
-                                intent.putExtra(AppConstant.ID, user.getUserId());
-                                startActivity(intent);
-                                finish();
-                            }, View.GONE, null, null);
-                            internetDialog.show();
-                        }
-                    } else if (!response.body().getAddressVerified()) {
-                        if (internetDialog != null) {
-                            if (internetDialog.isShowing()) {
-                                internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.color.font, R.string.dd_info_add_verified, false, View.GONE, null, null, View.GONE, null, null);
+                        } else if (!response.body().getAddressVerified()) {
+                            if (internetDialog != null) {
+                                if (internetDialog.isShowing()) {
+                                    internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.color.font, R.string.dd_info_add_verified, v -> {
+                                        Utility.INSTANCE.dismissDialog(internetDialog);
+                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                        Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                        logoutFromGoogle();
+                                        finishAffinity();
+                                    });
+                                    internetDialog.show();
+                                }
+                            } else {
+                                internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.color.font, R.string.dd_info_add_verified, v -> {
+                                    Utility.INSTANCE.dismissDialog(internetDialog);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                    Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                    logoutFromGoogle();
+                                    finishAffinity();
+                                });
                                 internetDialog.show();
                             }
-                        } else {
-                            internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.color.font, R.string.dd_info_add_verified, false, View.GONE, null, null, View.GONE, null, null);
-                            internetDialog.show();
                         }
                     }
                 } else {

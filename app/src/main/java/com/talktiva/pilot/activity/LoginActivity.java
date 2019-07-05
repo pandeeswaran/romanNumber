@@ -149,7 +149,8 @@ public class LoginActivity extends AppCompatActivity {
                 tvPass.setText(R.string.la_tv_pass_empty);
                 tvPass.setVisibility(View.VISIBLE);
             } else {
-                if (isEmailValidate(etEmail.getText().toString().trim()) && isPassValidate(etPass.getText().toString().trim())) {
+//                 && isPassValidate(etPass.getText().toString().trim())
+                if (isEmailValidate(etEmail.getText().toString().trim())) {
                     if (Utility.INSTANCE.isConnectingToInternet()) {
                         login();
                     }
@@ -222,9 +223,9 @@ public class LoginActivity extends AppCompatActivity {
         String s = sequence.toString().trim();
         if (sequence.length() == 0) {
             tvPass.setVisibility(View.GONE);
-        } else if (!isPassValidate(s)) {
-            tvPass.setVisibility(View.VISIBLE);
-            tvPass.setText(R.string.la_tv_pass_error);
+//        } else if (!isPassValidate(s)) {
+//            tvPass.setVisibility(View.VISIBLE);
+//            tvPass.setText(R.string.la_tv_pass_error);
         } else {
             tvPass.setVisibility(View.GONE);
         }

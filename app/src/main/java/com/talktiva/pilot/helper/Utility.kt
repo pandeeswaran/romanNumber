@@ -1,3 +1,5 @@
+@file:Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+
 package com.talktiva.pilot.helper
 
 import android.annotation.SuppressLint
@@ -6,11 +8,12 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.database.Cursor
 import android.graphics.Typeface
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
-import android.os.Build
+import android.os.Environment
 import android.os.Parcelable
 import android.provider.MediaStore
 import android.provider.Settings
@@ -20,6 +23,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
@@ -28,16 +32,19 @@ import com.airbnb.lottie.LottieAnimationView
 import com.talktiva.pilot.R
 import com.talktiva.pilot.Talktiva
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.*
 
 
 object Utility {
 
+    var imageFilePath: String? = null
+
     private var dialogInternet: Dialog? = null
     private var preferences: SharedPreferences? = null
 
-    private const val STRING_LENGTH = 10
-    private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+//    private const val STRING_LENGTH = 10
+//    private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
     //region Get Fonts
     val fontRegular: Typeface
@@ -53,11 +60,11 @@ object Utility {
         return Settings.Secure.getString(Talktiva.instance?.contentResolver, Settings.Secure.ANDROID_ID)
     }
 
-    fun getDeviceName(): String {
-        val fields = Build.VERSION_CODES::class.java.fields
-        val versionName = fields[Build.VERSION.SDK_INT].name
-        return Build.MANUFACTURER.plus(" ").plus(Build.MODEL).plus(" ").plus(Build.VERSION.RELEASE).plus(" ").plus(versionName)
-    }
+//    fun getDeviceName(): String {
+//        val fields = Build.VERSION_CODES::class.java.fields
+//        val versionName = fields[Build.VERSION.SDK_INT].name
+//        return Build.MANUFACTURER.plus(" ").plus(Build.MODEL).plus(" ").plus(Build.VERSION.RELEASE).plus(" ").plus(versionName)
+//    }
     //endregion
 
     //region Connection
@@ -160,32 +167,83 @@ object Utility {
         dialog.setContentView(R.layout.dd_layout)
         dialog.setCancelable(bool!!)
 
-        (dialog.findViewById<TextView>(R.id.dialog_msg)).typeface = fontBold
+        (dialog.findViewById<TextView>(R.id.dialog_msg)).typeface = fontRegular
         (dialog.findViewById<TextView>(R.id.dialog_msg)).setText(msg!!)
         (dialog.findViewById<TextView>(R.id.dialog_msg)).setTextColor(context.resources.getColor(color!!))
         (dialog.findViewById<TextView>(R.id.dialog_msg)).gravity = Gravity.START
         (dialog.findViewById<TextView>(R.id.dialog_msg)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
 
-        dialog.findViewById<Button>(R.id.dialog_positive).visibility = positiveVisibility!!
+        dialog.findViewById<View>(R.id.dialog_positive).visibility = positiveVisibility!!
 
         if (positiveVisibility != GONE) {
-            (dialog.findViewById<Button>(R.id.dialog_positive)).typeface = fontRegular
-            (dialog.findViewById<Button>(R.id.dialog_positive)).setText(positiveTitle!!)
-            dialog.findViewById<Button>(R.id.dialog_positive).setOnClickListener(positiveClickListener)
+            (dialog.findViewById<View>(R.id.dialog_positive) as Button).typeface = fontRegular
+            (dialog.findViewById<View>(R.id.dialog_positive) as Button).setText(positiveTitle!!)
+            dialog.findViewById<View>(R.id.dialog_positive).setOnClickListener(positiveClickListener)
         }
 
-        dialog.findViewById<Button>(R.id.dialog_negative).visibility = negativeVisibility!!
+        dialog.findViewById<View>(R.id.dialog_negative).visibility = negativeVisibility!!
 
         if (negativeVisibility != GONE) {
-            (dialog.findViewById<Button>(R.id.dialog_negative)).typeface = fontRegular
-            (dialog.findViewById<Button>(R.id.dialog_negative)).setText(negativeTitle!!)
-            dialog.findViewById<Button>(R.id.dialog_negative).setOnClickListener(negativeClickListener)
+            (dialog.findViewById<View>(R.id.dialog_negative) as Button).typeface = fontRegular
+            (dialog.findViewById<View>(R.id.dialog_negative) as Button).setText(negativeTitle!!)
+            dialog.findViewById<View>(R.id.dialog_negative).setOnClickListener(negativeClickListener)
         }
 
         dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
         dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
+
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    fun showAlert(context: Context, color: Int?, msg: Int?, closeClickListener: View.OnClickListener): Dialog {
+        val dialog = Dialog(context)
+        dialog.setContentView(R.layout.dd_dialog_dash)
+        dialog.setCancelable(false)
+
+        (dialog.findViewById<View>(R.id.dd_tv_msg) as TextView).typeface = fontRegular
+        (dialog.findViewById<View>(R.id.dd_tv_msg) as TextView).setText(msg!!)
+        (dialog.findViewById<View>(R.id.dd_tv_msg) as TextView).setTextColor(context.resources.getColor(color!!))
+        (dialog.findViewById<View>(R.id.dd_tv_msg) as TextView).gravity = Gravity.START
+        (dialog.findViewById<TextView>(R.id.dd_tv_msg)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+
+        dialog.findViewById<View>(R.id.dd_btn_positive).visibility = GONE
+
+        dialog.findViewById<View>(R.id.dd_btn_negative).visibility = GONE
+
+        dialog.findViewById<ImageView>(R.id.dd_iv_close).setOnClickListener(closeClickListener)
+
+        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        return dialog
+    }
+
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    fun showAlert(context: Context, msg: Int?, positiveVisibility: Int?, positiveTitle: Int?, positiveClickListener: View.OnClickListener?, closeClickListener: View.OnClickListener): Dialog {
+        val dialog = Dialog(context)
+        dialog.setContentView(R.layout.dd_dialog_dash)
+        dialog.setCancelable(false)
+
+        (dialog.findViewById<TextView>(R.id.dd_tv_msg)).typeface = fontBold
+        (dialog.findViewById<TextView>(R.id.dd_tv_msg)).setText(msg!!)
+
+        dialog.findViewById<Button>(R.id.dd_btn_positive).visibility = positiveVisibility!!
+
+        if (positiveVisibility != GONE) {
+            (dialog.findViewById<Button>(R.id.dd_btn_positive)).typeface = fontRegular
+            (dialog.findViewById<Button>(R.id.dd_btn_positive)).setText(positiveTitle!!)
+            dialog.findViewById<Button>(R.id.dd_btn_positive).setOnClickListener(positiveClickListener)
+        }
+
+        dialog.findViewById<Button>(R.id.dd_btn_negative).visibility = GONE
+
+        dialog.findViewById<ImageView>(R.id.dd_iv_close).setOnClickListener(closeClickListener)
+
+        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        return dialog
+    }
+
+
     //endregion
 
     //region Progress Dialog
@@ -250,10 +308,6 @@ object Utility {
     fun showMsg(id: Int?) {
         Toast.makeText(Talktiva.instance, Talktiva.instance!!.resources!!.getString(id!!), Toast.LENGTH_SHORT).show()
     }
-
-//    fun showMsg(string: String) {
-//        Toast.makeText(Talktiva.instance, string, Toast.LENGTH_SHORT).show()
-//    }
     //endregion
 
     //region Shared Preference
@@ -275,12 +329,6 @@ object Utility {
         editor.putString(key!!, null)
         return editor.commit()
     }
-    //endregion
-
-    //region Snack Bar Message
-//    fun showMsgSnack(view: View, message: String, action: String, listener: View.OnClickListener) {
-//        Snackbar.make(view, message, Snackbar.LENGTH_LONG).setAction(action, listener).show()
-//    }
     //endregion
 
     //region Store data to system local storage privately
@@ -306,59 +354,14 @@ object Utility {
     }
     //endregion
 
-    //region Get image uri captured by camera
-    fun getCaptureImageOutputUri(): Uri? {
-        val file = File(Talktiva.instance?.filesDir?.absolutePath + "/" + random().plus(".png"))
-        if (file.exists()) {
-            if (file.delete()) {
-                file.createNewFile()
-            }
-        } else {
-            file.createNewFile()
-        }
-        return Uri.fromFile(file)
-    }
-    //endregion
-
-    //region Image Popup
-    fun getPickImageChooserForCamera(context: Context): Intent {
-        val outputFileUri = getCaptureImageOutputUri()
-        val allIntents = ArrayList<Intent>()
-        val packageManager = context.packageManager
-        var intent1: Intent
-
-        //region Add camera apps from installed apps
-        val captureIntent = Intent()
-        captureIntent.action = MediaStore.ACTION_IMAGE_CAPTURE
-        val infos = packageManager.queryIntentActivities(captureIntent, 0)
-        for (resolveInfo in infos) {
-            intent1 = Intent(captureIntent)
-            intent1.component = ComponentName(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.name)
-            intent1.setPackage(resolveInfo.activityInfo.packageName)
-            if (outputFileUri != null) {
-                intent1.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri)
-            }
-            allIntents.add(intent1)
-        }
-        //endregion
-
-        //region Remove document app from intent list
-        var mainIntent = allIntents[allIntents.size - 1]
-        for (intent in allIntents) {
-            if (intent.component!!.className == "com.android.documentsui.DocumentsActivity") {
-                mainIntent = intent
-                break
-            }
-        }
-        allIntents.remove(mainIntent)
-        //endregion
-
-        //region Create chooser for photo
-        val chooserIntent = Intent.createChooser(mainIntent, "Select source")
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, allIntents.toTypedArray<Parcelable>())
-        //endregion
-
-        return chooserIntent
+    //region Create image file in pictures folder
+    fun createImageFile(): File? {
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss_", Locale.getDefault()).format(Date())
+        val imageFileName = "IMG_".plus(timestamp)
+        val storageFile = Talktiva.instance?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val image = createTempFile(imageFileName, ".jpeg", storageFile)
+        imageFilePath = image.absolutePath
+        return image
     }
     //endregion
 
@@ -401,88 +404,12 @@ object Utility {
     }
     //endregion
 
-    private fun random(): String {
-        return (1..STRING_LENGTH).map { kotlin.random.Random.nextInt(0, charPool.size) }.map(charPool::get).joinToString("")
+    @SuppressLint("Recycle")
+    fun getRealPathFromURI(contentUri: Uri): String {
+        val cursor: Cursor = Talktiva.instance?.contentResolver!!.query(contentUri, arrayOf(MediaStore.Images.Media.DATA), null, null, null)
+        val columnIndex: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+        cursor.moveToFirst()
+        return cursor.getString(columnIndex)
     }
 
-    //region Get pick image result uri
-//    fun isGallery(data: Intent?): Boolean {
-//        var isGallery = false
-//        if (data != null) {
-//            isGallery = data.data != null
-//        }
-//        return isGallery
-//    }
-    //endregion
-
-    //region Rotate image if required
-//    @Throws(IOException::class)
-//    fun rotateImageIfRequired(context: Activity, img: Bitmap, selectedImage: Uri): Bitmap {
-//        val path = ImagePath(context, context.contentResolver).getUriRealPathAboveKitkat(selectedImage)
-//        val ei = ExifInterface(path)
-//        return when (ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
-//            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(img, 90)
-//            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(img, 180)
-//            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(img, 270)
-//            else -> img
-//        }
-//    }
-    //endregion
-
-    //region Rotate image
-//    private fun rotateImage(img: Bitmap, degree: Int): Bitmap {
-//        val matrix = Matrix()
-//        matrix.postRotate(degree.toFloat())
-//        val rotatedImg = Bitmap.createBitmap(img, 0, 0, img.width, img.height, matrix, true)
-//        img.recycle()
-//        return rotatedImg
-//    }
-    //endregion
-
-    //region Resized bitmap
-//    fun getResizedBitmap(image: Bitmap, maxSize: Int): Bitmap {
-//        var width = image.width
-//        var height = image.height
-//
-//        val bitmapRatio = width.toFloat() / height.toFloat()
-//        if (bitmapRatio > 0) {
-//            width = maxSize
-//            height = (width / bitmapRatio).toInt()
-//        } else {
-//            height = maxSize
-//            width = (height * bitmapRatio).toInt()
-//        }
-//
-//        return Bitmap.createScaledBitmap(image, width, height, true)
-//    }
-    //endregion
-
-    //region Convert Bitmap to Base64 String
-//    fun convertBitmapToBase64String(bitmap: Bitmap): String {
-//        val baos = ByteArrayOutputStream()
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
-//        val b = baos.toByteArray()
-//        return Base64.encodeToString(b, Base64.DEFAULT)
-//    }
-    //endregion
-
-    //region Convert Bitmap64 from image path
-//    private fun convertBase64(path: String): String {
-//        val encoded: String
-//        var fis: FileInputStream? = null
-//        try {
-//            fis = FileInputStream(File(path))
-//        } catch (e: FileNotFoundException) {
-//            e.printStackTrace()
-//        }
-//
-//        val bm = BitmapFactory.decodeStream(fis)
-//        val baos = ByteArrayOutputStream()
-//        bm.compress(Bitmap.CompressFormat.JPEG, 60, baos)
-//        val b = baos.toByteArray()
-//        encoded = Base64.encodeToString(b, Base64.DEFAULT)
-//
-//        return encoded
-//    }
-    //endregion
 }
