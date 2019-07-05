@@ -63,7 +63,7 @@ object AppConstant {
     const val ADD_DOC_UPLOAD = "ms-event/api/v1/users/{id}/addressProof"
     const val SOCIAL_LOGIN = "ms-event/api/v1/users/login/{provider}"
     const val MY_DATA = "ms-event/api/v1/users/me"
-    const val RESEND_EMAIL = "ms-event/api/v1/users/resendVerificationEmail"
+    const val RESEND_EMAIL = "ms-event/api/v1/users/resendVerificationEmail/{email}"
 
     const val LOGIN = "uaa/oauth/token"
 

@@ -468,8 +468,9 @@ public class DashBoardActivity extends AppCompatActivity {
     private void resendEmail() {
         progressDialog.show();
 
+        User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResultMessage> call = apiInterface.resendEmail(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))));
+        Call<ResultMessage> call = apiInterface.resendEmail(user.getEmail());
         call.enqueue(new Callback<ResultMessage>() {
             @Override
             public void onResponse(@NonNull Call<ResultMessage> call, @NonNull Response<ResultMessage> response) {

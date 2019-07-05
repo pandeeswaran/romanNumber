@@ -129,7 +129,7 @@ interface ApiInterface {
 
     //region Resend Email
     @GET(AppConstant.RESEND_EMAIL)
-    fun resendEmail(@Header(AppConstant.AUTH) token: String): Call<ResultMessage>
+    fun resendEmail(@Path(AppConstant.EMAIL) email: String): Call<ResultMessage>
     //endregion
 
     /* Demo Api Calling With Token

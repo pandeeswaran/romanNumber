@@ -25,6 +25,7 @@ import com.talktiva.pilot.R;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
+import com.talktiva.pilot.model.User;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
 import com.talktiva.pilot.results.ResultError;
@@ -178,20 +179,19 @@ public class ForgotActivity extends AppCompatActivity {
                     try {
                         ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
                         }.getType());
-                        tvError.setText(resultError.getMessage());
-                        tvError.setVisibility(View.VISIBLE);
+                        if (response.code() == 412) {
+                            internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, resultError.getMessage(), false, View.VISIBLE, R.string.dd_btn_resend, v -> {
+                                Utility.INSTANCE.dismissDialog(internetDialog);
+                                resendEmail();
+                            }, View.GONE, null, null);
+                            internetDialog.show();
+                        } else {
+                            tvError.setText(resultError.getMessage());
+                            tvError.setVisibility(View.VISIBLE);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-//                    if (response.code()==412){
-//                        internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, resultError.getMessage(), false, View.VISIBLE, R.string.dd_btn_resend, v -> {
-//                            Utility.INSTANCE.dismissDialog(internetDialog);
-////                                resendEmail();
-//                        }, View.GONE, null, null);
-//                        internetDialog.show();
-//                    } else {
-//
-//                    }
                 }
             }
 
@@ -206,35 +206,36 @@ public class ForgotActivity extends AppCompatActivity {
         });
     }
 
-//    private void resendEmail() {
-//        progressDialog.show();
-//
-//        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-//        Call<ResultMessage> call = apiInterface.resendEmail(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))));
-//        call.enqueue(new Callback<ResultMessage>() {
-//            @Override
-//            public void onResponse(@NonNull Call<ResultMessage> call, @NonNull Response<ResultMessage> response) {
-//                if (response.isSuccessful()) {
-//                    Utility.INSTANCE.dismissDialog(progressDialog);
-//                    internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, R.string.dd_info_email_resend, false, View.VISIBLE, R.string.dd_btn_continue, v -> {
-//                        Utility.INSTANCE.dismissDialog(internetDialog);
-//                        finish();
-//                        Intent intent = new Intent("BlankEtPass");
-//                        intent.putExtra(AppConstant.EMAIL, etEmail.getText().toString().trim());
-//                        LocalBroadcastManager.getInstance(ForgotActivity.this).sendBroadcast(intent);
-//                    }, View.GONE, null, null);
-//                    internetDialog.show();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<ResultMessage> call, @NonNull Throwable t) {
-//                Utility.INSTANCE.dismissDialog(progressDialog);
-//                if (t.getMessage().equalsIgnoreCase("timeout")) {
-//                    internetDialog = Utility.INSTANCE.showError(ForgotActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-//                    internetDialog.show();
-//                }
-//            }
-//        });
-//    }
+    private void resendEmail() {
+        progressDialog.show();
+
+        User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
+        Call<ResultMessage> call = apiInterface.resendEmail(user.getEmail());
+        call.enqueue(new Callback<ResultMessage>() {
+            @Override
+            public void onResponse(@NonNull Call<ResultMessage> call, @NonNull Response<ResultMessage> response) {
+                if (response.isSuccessful()) {
+                    Utility.INSTANCE.dismissDialog(progressDialog);
+                    internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, R.string.dd_info_email_resend, false, View.VISIBLE, R.string.dd_btn_continue, v -> {
+                        Utility.INSTANCE.dismissDialog(internetDialog);
+                        finish();
+                        Intent intent = new Intent("BlankEtPass");
+                        intent.putExtra(AppConstant.EMAIL, etEmail.getText().toString().trim());
+                        LocalBroadcastManager.getInstance(ForgotActivity.this).sendBroadcast(intent);
+                    }, View.GONE, null, null);
+                    internetDialog.show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResultMessage> call, @NonNull Throwable t) {
+                Utility.INSTANCE.dismissDialog(progressDialog);
+                if (t.getMessage().equalsIgnoreCase("timeout")) {
+                    internetDialog = Utility.INSTANCE.showError(ForgotActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    internetDialog.show();
+                }
+            }
+        });
+    }
 }
