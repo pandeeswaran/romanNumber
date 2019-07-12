@@ -92,6 +92,7 @@
         android:layout_marginBottom="8dp"
         android:clickable="true"
         android:focusable="true"
+        android:padding="@dimen/et_padding"
         android:text="@string/fca_tv_invitation"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/normal_label_font_size"

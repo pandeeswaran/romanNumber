@@ -180,11 +180,18 @@ public class ForgotActivity extends AppCompatActivity {
                         ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
                         }.getType());
                         if (response.code() == 412) {
-                            internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, resultError.getMessage(), false, View.VISIBLE, R.string.dd_btn_resend, v -> {
-                                Utility.INSTANCE.dismissDialog(internetDialog);
-                                resendEmail();
-                            }, View.GONE, null, null);
-                            internetDialog.show();
+                            if (resultError.getMessage().contains("google")) {
+                                internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, resultError.getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
+                                    Utility.INSTANCE.dismissDialog(internetDialog);
+                                }, View.GONE, null, null);
+                                internetDialog.show();
+                            } else {
+                                internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, resultError.getMessage(), false, View.VISIBLE, R.string.dd_btn_resend, v -> {
+                                    Utility.INSTANCE.dismissDialog(internetDialog);
+                                    resendEmail();
+                                }, View.GONE, null, null);
+                                internetDialog.show();
+                            }
                         } else {
                             tvError.setText(resultError.getMessage());
                             tvError.setVisibility(View.VISIBLE);

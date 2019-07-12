@@ -161,7 +161,7 @@
     <string name="event_cancel_msg">Event canceled successfully</string>
     <string name="event_guest_added">Guest added successfully</string>
     <string name="event_guest_exist">Guest already selected</string>
-    <string name="event_success">Event added successfully</string>
+    <string name="event_success">This event has been added to your calender.</string>
     <!--endregion-->
 
     <!--region Context Menu Title-->
@@ -249,7 +249,7 @@
     <string name="sua_tv_fname_error">Please enter full name</string>
     <string name="sua_tv_fname_val">Please enter valid full name</string>
     <string name="sua_et_email">Email</string>
-    <string name="sua_tv_email_error">Please enter email</string>
+    <string name="sua_tv_email_error">Please enter email address</string>
     <string name="sua_tv_email_val">Please enter valid email</string>
     <string name="sua_et_phone">Phone (Optional)</string>
     <string name="sua_et_pass">Password</string>

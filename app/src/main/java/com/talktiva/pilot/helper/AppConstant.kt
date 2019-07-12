@@ -1,7 +1,5 @@
 package com.talktiva.pilot.helper
 
-import com.talktiva.pilot.Talktiva
-
 object AppConstant {
 
     //region Headers
@@ -33,7 +31,13 @@ object AppConstant {
     const val COMMUNITY_ID = "communityId"
     const val INVITATION = "invitation"
     const val INVITATION_CODE = "invitationCode"
+    const val ZIPCODE = "zipCode"
+
+
+    const val STREET = "street"
+    const val APRTMENT = "apartment"
     const val COMMUNITY = "community"
+
     const val FILE = "file"
     const val GT = "grant_type"
     const val USERNAME = "username"

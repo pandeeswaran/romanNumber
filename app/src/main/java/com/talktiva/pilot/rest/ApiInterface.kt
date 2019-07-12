@@ -12,7 +12,6 @@ import com.talktiva.pilot.results.ResultEvents
 import com.talktiva.pilot.results.ResultLogin
 import com.talktiva.pilot.results.ResultMessage
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
@@ -97,7 +96,7 @@ interface ApiInterface {
 
     //region Check Invitation
     @GET(AppConstant.CHECK_INVITATION)
-    fun checkInvitation(@Path(AppConstant.CODE) code: String): Call<ResultMessage>
+    fun checkInvitation(@Path(AppConstant.CODE) code: String): Call<Community>
     //endregion
 
     //region Get Residents Count

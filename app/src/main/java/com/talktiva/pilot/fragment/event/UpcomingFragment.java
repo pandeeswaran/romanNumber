@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -116,7 +117,7 @@ public class UpcomingFragment extends Fragment {
 
                         @SuppressLint("UseSparseArrays") HashMap<Integer, List<Event>> groupByEvents = new HashMap<>();
                         for (Event event : resultEvents.getEvents()) {
-                            Date curDate = Calendar.getInstance().getTime();
+                            Date curDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime();
                             int day;
                             if (curDate.getDate() == Objects.requireNonNull(event.getEventDate()).getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
                                 day = 0;
@@ -217,7 +218,18 @@ public class UpcomingFragment extends Fragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getTitle().toString().equalsIgnoreCase(getResources().getString(R.string.atc))) {
-            Cursor cursor = Objects.requireNonNull(Talktiva.Companion.getInstance()).getApplicationContext().getContentResolver().query(CalendarContract.Calendars.CONTENT_URI, null, null, null, null);
+
+            long begin, end;
+            begin = end = Objects.requireNonNull(curEvent.getEventDate()).getTime() + 60 * 60 * 1000;
+
+//            String[] proj = new String[]{CalendarContract.Instances._ID, CalendarContract.Instances.BEGIN, CalendarContract.Instances.END, CalendarContract.Instances.EVENT_ID};
+
+//            Cursor c = CalendarContract.Instances.query(getActivity().getContentResolver(), proj, begin, end, curEvent.getTitle());
+//            if (c.getCount() > 0) {
+
+//            }
+
+            Cursor cursor = getActivity().getContentResolver().query(CalendarContract.Calendars.CONTENT_URI, null, null, null, null);
             long calenderId = 0;
 
             if (Objects.requireNonNull(cursor).moveToFirst()) {
@@ -231,8 +243,8 @@ public class UpcomingFragment extends Fragment {
             contentValues.put(CalendarContract.Events.ALL_DAY, false);
             contentValues.put(CalendarContract.Events.STATUS, true);
             contentValues.put(CalendarContract.Events.HAS_ALARM, true);
-            contentValues.put(CalendarContract.Events.DTSTART, (Objects.requireNonNull(curEvent.getEventDate()).getTime() + 60 * 60 * 1000));
-            contentValues.put(CalendarContract.Events.DTEND, curEvent.getEventDate().getTime() + 60 * 60 * 1000);
+            contentValues.put(CalendarContract.Events.DTSTART, begin);
+            contentValues.put(CalendarContract.Events.DTEND, end);
             contentValues.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().toString());
 
             Uri eventUri = Objects.requireNonNull(Talktiva.Companion.getInstance()).getContentResolver().insert(CalendarContract.Events.CONTENT_URI, contentValues);
@@ -245,7 +257,7 @@ public class UpcomingFragment extends Fragment {
             String reminderUriString = "content://com.android.calendar/reminders";
             Talktiva.Companion.getInstance().getApplicationContext().getContentResolver().insert(Uri.parse(reminderUriString), reminders);
 
-            internetDialog = Utility.INSTANCE.showAlert(Objects.requireNonNull(getActivity()), R.string.event_success, false, View.VISIBLE, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+            internetDialog = Utility.INSTANCE.showAlert(Objects.requireNonNull(getActivity()), R.string.event_success, false, View.VISIBLE, R.string.dd_btn_continue, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
             internetDialog.show();
             return true;
         } else {

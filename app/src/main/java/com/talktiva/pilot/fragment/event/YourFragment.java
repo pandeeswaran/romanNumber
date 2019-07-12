@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -116,7 +117,7 @@ public class YourFragment extends Fragment {
 
                         @SuppressLint("UseSparseArrays") HashMap<Integer, List<Event>> groupByEvents = new HashMap<>();
                         for (Event event : resultEvents.getEvents()) {
-                            Date curDate = Calendar.getInstance().getTime();
+                            Date curDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime();
                             int day;
                             if (curDate.getDate() == Objects.requireNonNull(event.getEventDate()).getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
                                 day = 0;
@@ -246,7 +247,7 @@ public class YourFragment extends Fragment {
             String reminderUriString = "content://com.android.calendar/reminders";
             Talktiva.Companion.getInstance().getApplicationContext().getContentResolver().insert(Uri.parse(reminderUriString), reminders);
 
-            internetDialog = Utility.INSTANCE.showAlert(Objects.requireNonNull(getActivity()), R.string.event_success, false, View.VISIBLE, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+            internetDialog = Utility.INSTANCE.showAlert(Objects.requireNonNull(getActivity()), R.string.event_success, false, View.VISIBLE, R.string.dd_btn_continue, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
             internetDialog.show();
             return true;
         } else {

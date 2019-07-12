@@ -49,6 +49,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -149,7 +150,7 @@ public class CreateEventActivity extends AppCompatActivity {
                 tvCountFig.setText(String.valueOf(count));
                 User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
                 Address address = user.getAddress();
-                etLocation.setText(Objects.requireNonNull(Objects.requireNonNull(address).getStreet()).concat(" ").concat(Objects.requireNonNull(address.getCity())).concat(" ").concat(Objects.requireNonNull(address.getState())).concat("-").concat(Objects.requireNonNull(address.getZip())));
+                etLocation.setText(Objects.requireNonNull(Objects.requireNonNull(address).getStreet()).concat(", ").concat(Objects.requireNonNull(address.getCity())).concat(", ").concat(Objects.requireNonNull(address.getState())).concat(" ").concat(Objects.requireNonNull(address.getZip())));
                 break;
 
             case "edit":
@@ -163,26 +164,26 @@ public class CreateEventActivity extends AppCompatActivity {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 switch (from) {
                     case "new":
-                        currentDate = Calendar.getInstance(Locale.US);
+                        currentDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
                         break;
                     case "edit":
-                        currentDate = Calendar.getInstance(Locale.US);
+                        currentDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
                         currentDate.setTimeInMillis(Objects.requireNonNull(curEvent.getEventDate()).getTime());
                         break;
                 }
 
                 DatePickerDialog datePickerDialog = new DatePickerDialog(CreateEventActivity.this, (view, year, month, dayOfMonth) -> {
-                    newDate = Calendar.getInstance();
+                    newDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
                     newDate.set(year, month, dayOfMonth);
 
                     TimePickerDialog timePickerDialog = new TimePickerDialog(CreateEventActivity.this, (view1, hourOfDay, minute) -> {
                         newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         newDate.set(Calendar.MINUTE, minute);
 
-                        Date dt1 = new Date(newDate.getTime().getYear(), newDate.getTime().getMonth(), newDate.getTime().getDay(), newDate.getTime().getHours(), newDate.getTime().getMinutes());
+                        Date dt1 = new Date(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DAY_OF_MONTH), newDate.get(Calendar.HOUR_OF_DAY), newDate.get(Calendar.MINUTE));
 
-                        Calendar c = Calendar.getInstance();
-                        Date dt2 = new Date(c.getTime().getYear(), c.getTime().getMonth(), c.getTime().getDay(), c.getTime().getHours(), c.getTime().getMinutes());
+                        Calendar c = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+                        Date dt2 = new Date(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
 
                         if (dt1.getTime() > dt2.getTime()) {
                             etDate.setText(dateFormat.format(dt1));
@@ -191,10 +192,10 @@ public class CreateEventActivity extends AppCompatActivity {
                             errorDialog.show();
                         }
                     }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false);
-                    timePickerDialog.updateTime(Calendar.getInstance(Locale.US).getTime().getHours(), Calendar.getInstance(Locale.US).getTime().getMinutes());
+                    timePickerDialog.updateTime(Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime().getHours(), Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime().getMinutes());
                     timePickerDialog.show();
                 }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH));
-                datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance(Locale.US).getTimeInMillis());
+                datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTimeInMillis());
                 datePickerDialog.show();
                 return true;
             } else {
@@ -276,33 +277,33 @@ public class CreateEventActivity extends AppCompatActivity {
     void setTvInviteeOnClick() {
         switch (from) {
             case "new":
-                if (invitations == null) {
-                    invitations = getInvitations();
-                    count = invitations.size();
-                    tvCountFig.setText(String.valueOf(count));
-                } else {
-                    errorDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.event_guest_added, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
-                    errorDialog.show();
-                }
+//                if (invitations == null) {
+//                    invitations = getInvitations();
+//                    count = invitations.size();
+//                    tvCountFig.setText(String.valueOf(count));
+//                } else {
+//                    errorDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.event_guest_added, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
+//                    errorDialog.show();
+//                }
                 break;
             case "edit":
-                if (invitations != null) {
-                    if (invitations.size() != 0) {
-                        errorDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.event_guest_exist, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
-                        errorDialog.show();
-                    } else {
-                        invitations = getInvitations();
-                        count = invitations.size();
-                        tvCountFig.setText(String.valueOf(count));
-                    }
-                }
+//                if (invitations != null) {
+//                    if (invitations.size() != 0) {
+//                        errorDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.event_guest_exist, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
+//                        errorDialog.show();
+//                    } else {
+//                        invitations = getInvitations();
+//                        count = invitations.size();
+//                        tvCountFig.setText(String.valueOf(count));
+//                    }
+//                }
                 break;
         }
     }
 
     private void getEventDetails(Event event) {
         etName.setText(event.getTitle());
-        newDate = Calendar.getInstance();
+        newDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
         newDate.setTimeInMillis(Objects.requireNonNull(event.getEventDate()).getTime());
         etDate.setText(dateFormat.format(event.getEventDate()));
         etLocation.setText(event.getLocation());

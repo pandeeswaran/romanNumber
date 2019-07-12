@@ -52,7 +52,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,6 +65,7 @@ import retrofit2.Response;
 public class DashBoardActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
+
     private final String[] appPermissions = {
             Manifest.permission.WRITE_CALENDAR,
             Manifest.permission.READ_CALENDAR};
@@ -99,6 +102,7 @@ public class DashBoardActivity extends AppCompatActivity {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
+
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         progressDialog = Utility.INSTANCE.showProgress(DashBoardActivity.this);
@@ -318,7 +322,7 @@ public class DashBoardActivity extends AppCompatActivity {
                     }
 
                     User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
-                    Date curDate = Calendar.getInstance().getTime();
+                    Date curDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime();
                     Date regDate = user.getCreatedOn();
 
                     if (!response.body().getEmailVerified()) {
@@ -336,7 +340,8 @@ public class DashBoardActivity extends AppCompatActivity {
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
                                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                     logoutFromGoogle();
-                                    finishAffinity();
+                                    finish();
+                                    startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
                                 });
                                 internetDialog.show();
                             }
@@ -353,7 +358,8 @@ public class DashBoardActivity extends AppCompatActivity {
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
                                 Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                 logoutFromGoogle();
-                                finishAffinity();
+                                finish();
+                                startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
                             });
                             internetDialog.show();
                         }
@@ -379,7 +385,8 @@ public class DashBoardActivity extends AppCompatActivity {
                                         Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
                                         Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                         logoutFromGoogle();
-                                        finishAffinity();
+                                        finish();
+                                        startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
                                     });
                                     internetDialog.show();
                                 }
@@ -400,7 +407,8 @@ public class DashBoardActivity extends AppCompatActivity {
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
                                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                     logoutFromGoogle();
-                                    finishAffinity();
+                                    finish();
+                                    startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
                                 });
                                 internetDialog.show();
                             }
@@ -416,7 +424,8 @@ public class DashBoardActivity extends AppCompatActivity {
                                         Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
                                         Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                         logoutFromGoogle();
-                                        finishAffinity();
+                                        finish();
+                                        startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
                                     });
                                     internetDialog.show();
                                 }
@@ -430,7 +439,8 @@ public class DashBoardActivity extends AppCompatActivity {
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
                                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                     logoutFromGoogle();
-                                    finishAffinity();
+                                    finish();
+                                    startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
                                 });
                                 internetDialog.show();
                             }

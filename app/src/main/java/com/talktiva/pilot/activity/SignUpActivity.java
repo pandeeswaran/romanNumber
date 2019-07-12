@@ -108,7 +108,7 @@ public class SignUpActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private Dialog progressDialog, internetDialog;
     private BroadcastReceiver receiver;
-    private String invitationCode;
+    private String invitationCode, apartment, street;
     private Community community;
 
     private int GOOGLE_SIGN_IN = 101;
@@ -133,6 +133,8 @@ public class SignUpActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         community = (Community) Objects.requireNonNull(bundle).getSerializable(AppConstant.COMMUNITY);
+        apartment = bundle.getString(AppConstant.APRTMENT);
+        street = bundle.getString(AppConstant.STREET);
         String str1 = getResources().getString(R.string.sua_tv_1);
         String str2 = "<font color='#8CA5FF'>".concat(Objects.requireNonNull(Objects.requireNonNull(community).getCommunityName())).concat("</font>");
         String str3 = getResources().getString(R.string.sua_tv_2);
@@ -294,7 +296,7 @@ public class SignUpActivity extends AppCompatActivity {
         progressDialog.show();
 
         RequestSignUp requestSignUp = new RequestSignUp();
-        requestSignUp.setAppartmentUnit(community.getCommunityName());
+        requestSignUp.setAppartmentUnit(apartment);
         requestSignUp.setCommunityId(community.getLocationId());
         requestSignUp.setDeviceType(AppConstant.ANDROID);
         requestSignUp.setEmail(etEmail.getText().toString().trim());
@@ -315,7 +317,7 @@ public class SignUpActivity extends AppCompatActivity {
                 requestSignUp.setRegistrationType(AppConstant.FACEBOOK);
                 break;
         }
-        requestSignUp.setStreet(community.getStreet());
+        requestSignUp.setStreet(street);
         requestSignUp.setUdid(Utility.INSTANCE.getDeviceId());
 
         Log.d(Talktiva.Companion.getTAG(), new Gson().toJson(requestSignUp));
@@ -338,12 +340,20 @@ public class SignUpActivity extends AppCompatActivity {
                                 if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.F_NAME)) {
                                     tvFullName.setText(resultError.getErrors().get(i).getMessage());
                                     tvFullName.setVisibility(View.VISIBLE);
+                                    return;
                                 } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.EMAIL)) {
                                     tvEmail.setText(resultError.getErrors().get(i).getMessage());
                                     tvEmail.setVisibility(View.VISIBLE);
+                                    return;
                                 } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.PASS)) {
                                     tvPass.setText(resultError.getErrors().get(i).getMessage());
                                     tvPass.setVisibility(View.VISIBLE);
+                                    return;
+                                } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.COMMUNITY_ID)) {
+                                    internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
+                                        Utility.INSTANCE.dismissDialog(internetDialog);
+                                    }, View.GONE, null, null);
+                                    internetDialog.show();
                                 }
                         }
                     } catch (IOException e) {
@@ -417,7 +427,7 @@ public class SignUpActivity extends AppCompatActivity {
         progressDialog.show();
 
         RequestSignUp requestSignUp = new RequestSignUp();
-        requestSignUp.setAppartmentUnit(community.getCommunityName());
+        requestSignUp.setAppartmentUnit(apartment);
         requestSignUp.setCommunityId(community.getLocationId());
         requestSignUp.setDeviceType(AppConstant.ANDROID);
         requestSignUp.setEmail(email);
@@ -438,7 +448,7 @@ public class SignUpActivity extends AppCompatActivity {
                 requestSignUp.setRegistrationType(AppConstant.FACEBOOK);
                 break;
         }
-        requestSignUp.setStreet(community.getStreet());
+        requestSignUp.setStreet(street);
         requestSignUp.setUdid(Utility.INSTANCE.getDeviceId());
 
         Log.d(Talktiva.Companion.getTAG(), new Gson().toJson(requestSignUp));
@@ -459,19 +469,28 @@ public class SignUpActivity extends AppCompatActivity {
                         if (Objects.requireNonNull(resultError.getErrors()).size() != 0) {
                             for (int i = 0; resultError.getErrors().size() > i; i++)
                                 if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.F_NAME)) {
-                                    internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), true, View.VISIBLE, R.string.dd_ok, v -> {
+                                    internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
                                         logoutFromGoogle();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
+                                    return;
                                 } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.EMAIL)) {
-                                    internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), true, View.VISIBLE, R.string.dd_ok, v -> {
+                                    internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
                                         logoutFromGoogle();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
+                                    return;
                                 } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.PASS)) {
-                                    internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), true, View.VISIBLE, R.string.dd_ok, v -> {
+                                    internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
+                                        Utility.INSTANCE.dismissDialog(internetDialog);
+                                        logoutFromGoogle();
+                                    }, View.GONE, null, null);
+                                    internetDialog.show();
+                                    return;
+                                } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.COMMUNITY_ID)) {
+                                    internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
                                         logoutFromGoogle();
                                     }, View.GONE, null, null);

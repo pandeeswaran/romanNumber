@@ -75,22 +75,9 @@
                     android:maxLines="1"
                     android:textColor="@color/font"
                     android:textSize="@dimen/normal_label_font_size"
-                    app:layout_constraintEnd_toStartOf="@id/dea_iv_private"
+                    app:layout_constraintEnd_toStartOf="@id/dea_iv_chat"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/dea_iv_private"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="@string/rv_iv_private"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="@id/dea_tv_title"
-                    app:layout_constraintEnd_toStartOf="@id/dea_iv_chat"
-                    app:layout_constraintTop_toTopOf="@id/dea_tv_title"
-                    app:layout_constraintVertical_bias="1.0"
-                    app:srcCompat="@drawable/ic_lock" />
 
                 <ImageView
                     android:id="@+id/dea_iv_chat"
@@ -174,6 +161,21 @@
                     app:layout_constraintTop_toTopOf="@id/dea_tv_title"
                     app:srcCompat="@drawable/ic_accept"
                     tools:ignore="UnusedAttribute" />
+
+                <ImageView
+                    android:id="@+id/dea_iv_private"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:contentDescription="@string/rv_iv_private"
+                    android:padding="4dp"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/dea_iv_share"
+                    app:layout_constraintTop_toBottomOf="@+id/dea_tv_date"
+                    app:srcCompat="@drawable/ic_private" />
 
                 <ImageView
                     android:id="@+id/dea_iv_share"

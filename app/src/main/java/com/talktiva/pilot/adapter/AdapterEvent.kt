@@ -66,7 +66,7 @@ class AdapterEvent internal constructor(private val context: Context, private va
 
             val dateFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT)
             tvFullDate.text = dateFormat.format(event.eventDate)
-            tvAddress.text = event.creatorFirstName.plus(" ").plus(event.creatorLasttName).plus(" | ").plus(event.location)
+            tvAddress.text = event.creatorFullName.plus(" | ").plus(event.location)
             tvLikeCount.text = event.likeCount.toString()
 
             if (event.isPrivate!!) {

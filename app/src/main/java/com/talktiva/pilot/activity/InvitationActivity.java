@@ -26,10 +26,10 @@ import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
+import com.talktiva.pilot.model.Community;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
 import com.talktiva.pilot.results.ResultError;
-import com.talktiva.pilot.results.ResultMessage;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -147,15 +147,16 @@ public class InvitationActivity extends AppCompatActivity {
         tvError.setVisibility(View.GONE);
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResultMessage> call = apiInterface.checkInvitation(editText.getText().toString().trim());
-        call.enqueue(new Callback<ResultMessage>() {
+        Call<Community> call = apiInterface.checkInvitation(editText.getText().toString().trim());
+        call.enqueue(new Callback<Community>() {
             @Override
-            public void onResponse(@NonNull Call<ResultMessage> call, @NonNull Response<ResultMessage> response) {
+            public void onResponse(@NonNull Call<Community> call, @NonNull Response<Community> response) {
                 if (response.isSuccessful()) {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     Intent intent = new Intent(InvitationActivity.this, CommunityActivity.class);
                     intent.putExtra(AppConstant.FROM, AppConstant.INVITATION);
                     intent.putExtra(AppConstant.INVITATION_CODE, editText.getText().toString().trim());
+                    intent.putExtra(AppConstant.ZIPCODE, Objects.requireNonNull(response.body()).getZip());
                     startActivity(intent);
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
@@ -171,7 +172,7 @@ public class InvitationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ResultMessage> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Community> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
                 if (t.getMessage().equalsIgnoreCase("timeout")) {
                     internetDialog = Utility.INSTANCE.showError(InvitationActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));

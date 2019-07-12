@@ -39,6 +39,9 @@ class Event : Serializable {
     @SerializedName("creatorLasttName")
     var creatorLasttName: String? = null
 
+    @SerializedName("creatorFullName")
+    var creatorFullName: String? = null
+
     @SerializedName("invitations")
     var invitations: List<Invitation>? = null
 

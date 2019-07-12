@@ -105,6 +105,7 @@ public class CommunityActivity extends AppCompatActivity {
         } else {
             textView.setText(R.string.ca_tv_invitation);
             invitationCode = getIntent().getStringExtra(AppConstant.INVITATION_CODE);
+            etZip.setText(getIntent().getStringExtra(AppConstant.ZIPCODE));
         }
 
         progressDialog = Utility.INSTANCE.showProgress(CommunityActivity.this);
@@ -200,6 +201,8 @@ public class CommunityActivity extends AppCompatActivity {
                     bundle.putString(AppConstant.FROM, from);
                     bundle.putString(AppConstant.INVITATION_CODE, invitationCode);
                     bundle.putSerializable(AppConstant.COMMUNITY, Objects.requireNonNull(response.body()).get(0));
+                    bundle.putString(AppConstant.APRTMENT, etApartment.getText().toString().trim());
+                    bundle.putString(AppConstant.STREET, etStreet.getText().toString().trim());
                     intent.putExtras(bundle);
                     startActivity(intent);
                 } else {

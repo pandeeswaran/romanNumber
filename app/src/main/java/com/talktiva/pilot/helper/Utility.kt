@@ -8,14 +8,11 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.database.Cursor
 import android.graphics.Typeface
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import android.net.Uri
 import android.os.Environment
 import android.os.Parcelable
-import android.provider.MediaStore
 import android.provider.Settings
 import android.util.TypedValue
 import android.view.Gravity
@@ -374,9 +371,9 @@ object Utility {
         //region Add gallery apps from installed apps
         val galleryIntent = Intent()
         galleryIntent.action = Intent.ACTION_GET_CONTENT
-        galleryIntent.type = "image/*"
-        val infos = packageManager.queryIntentActivities(galleryIntent, 0)
-        for (resolveInfo in infos) {
+        galleryIntent.type = "*/*"
+        val info = packageManager.queryIntentActivities(galleryIntent, 0)
+        for (resolveInfo in info) {
             intent1 = Intent(galleryIntent)
             intent1.component = ComponentName(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.name)
             intent1.setPackage(resolveInfo.activityInfo.packageName)
@@ -403,13 +400,5 @@ object Utility {
         return chooserIntent
     }
     //endregion
-
-    @SuppressLint("Recycle")
-    fun getRealPathFromURI(contentUri: Uri): String {
-        val cursor: Cursor = Talktiva.instance?.contentResolver!!.query(contentUri, arrayOf(MediaStore.Images.Media.DATA), null, null, null)
-        val columnIndex: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-        cursor.moveToFirst()
-        return cursor.getString(columnIndex)
-    }
 
 }

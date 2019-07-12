@@ -34,26 +34,6 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <EditText
-            android:id="@+id/aag_et_search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:autofillHints="@string/aag_et_search"
-            android:background="@drawable/bg_1_search"
-            android:drawableStart="@drawable/ic_search"
-            android:gravity="center"
-            android:hint="@string/aag_et_search"
-            android:inputType="text"
-            android:padding="@dimen/et_padding"
-            android:textColor="@color/dark_grey"
-            android:textSize="@dimen/et_font_size"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="UnusedAttribute" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.helper.AppConstant;
+import com.talktiva.pilot.helper.ImageFilePath;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.rest.FileUploader;
 import com.talktiva.pilot.rest.FileUploaderCallback;
@@ -56,6 +57,7 @@ import retrofit2.Response;
 public class AddressProofActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
+
     private static final int REQUEST_IMAGE_GALLERY = 1;
     private static final int REQUEST_IMAGE_CAMERA = 2;
 
@@ -66,6 +68,8 @@ public class AddressProofActivity extends AppCompatActivity {
     ImageView ivInfo;
     @BindView(R.id.apa_tv)
     TextView textView;
+    @BindView(R.id.apa_iv_cancel)
+    ImageView ivCancel;
     @BindView(R.id.apa_tv_error)
     TextView tvError;
     @BindView(R.id.apa_tv_upload)
@@ -87,6 +91,7 @@ public class AddressProofActivity extends AppCompatActivity {
 
     private Dialog internetDialog, dialogPermission;
     private ProgressDialog dialog;
+    private String from;
     private Integer id;
     private File file;
     private Uri uri;
@@ -99,7 +104,7 @@ public class AddressProofActivity extends AppCompatActivity {
         setContentView(R.layout.activity_address_proof);
         ButterKnife.bind(this);
 
-        String from = getIntent().getStringExtra(AppConstant.FROM);
+        from = getIntent().getStringExtra(AppConstant.FROM);
         id = getIntent().getIntExtra(AppConstant.ID, 0);
 
         textView.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -123,9 +128,11 @@ public class AddressProofActivity extends AppCompatActivity {
         if (from.equals(AppConstant.SIGNUP)) {
             tvOr.setVisibility(View.VISIBLE);
             tvSkip.setVisibility(View.VISIBLE);
+            ivCancel.setVisibility(View.VISIBLE);
         } else {
             tvOr.setVisibility(View.GONE);
             tvSkip.setVisibility(View.GONE);
+            ivCancel.setVisibility(View.VISIBLE);
         }
 
         tvOr.setOnClickListener(v -> {
@@ -133,7 +140,14 @@ public class AddressProofActivity extends AppCompatActivity {
             finish();
         });
 
-        ivFolder.setOnClickListener(v -> startActivityForResult(Utility.INSTANCE.getPickImageChooserForGallery(AddressProofActivity.this), REQUEST_IMAGE_GALLERY));
+        ivFolder.setOnClickListener(v -> {
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("image/*");
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_IMAGE_GALLERY);
+                }
+//        startActivityForResult(Utility.INSTANCE.getPickImageChooserForGallery(AddressProofActivity.this), REQUEST_IMAGE_GALLERY)
+        );
 
         ivCamera.setOnClickListener(v -> {
             Intent pictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -148,7 +162,9 @@ public class AddressProofActivity extends AppCompatActivity {
         });
 
         ivHelp.setOnClickListener(v -> {
-            internetDialog = Utility.INSTANCE.showAlert(AddressProofActivity.this, R.color.colorPrimary, R.string.dd_info_img, true, View.GONE, null, null, View.GONE, null, null);
+            internetDialog = Utility.INSTANCE.showAlert(AddressProofActivity.this, R.color.colorPrimary, R.string.dd_info_img, v1 -> {
+                Utility.INSTANCE.dismissDialog(internetDialog);
+            });
             internetDialog.show();
         });
 
@@ -165,6 +181,8 @@ public class AddressProofActivity extends AppCompatActivity {
                 }
             }
         });
+
+        ivCancel.setOnClickListener(v -> onBackPressed());
 
         checkAndRequestPermission();
     }
@@ -222,19 +240,20 @@ public class AddressProofActivity extends AppCompatActivity {
                 case REQUEST_IMAGE_GALLERY:
                     if (data != null) {
                         uri = data.getData();
-                        file = new File(Utility.INSTANCE.getRealPathFromURI(Objects.requireNonNull(uri)));
-                        tvError.setText(file.getName());
-                        tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
-                        tvError.setVisibility(View.VISIBLE);
+                        String path = ImageFilePath.getPath(AddressProofActivity.this, uri);
+                        file = new File(path);
+//                        tvError.setText(file.getName());
+//                        tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
+//                        tvError.setVisibility(View.VISIBLE);
                     }
                     break;
                 case REQUEST_IMAGE_CAMERA:
                     try {
                         File f = new File(Utility.INSTANCE.getImageFilePath());
                         file = new Compressor(AddressProofActivity.this).compressToFile(f, f.getName());
-                        tvError.setText(file.getName());
-                        tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
-                        tvError.setVisibility(View.VISIBLE);
+//                        tvError.setText(file.getName());
+//                        tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
+//                        tvError.setVisibility(View.VISIBLE);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -310,5 +329,17 @@ public class AddressProofActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if (from.equals(AppConstant.SIGNUP)) {
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+            Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+            finish();
+            startActivity(new Intent(AddressProofActivity.this, WelcomeActivity.class));
+        } else {
+            super.onBackPressed();
+        }
     }
 }

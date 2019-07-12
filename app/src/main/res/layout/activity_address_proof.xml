@@ -40,6 +40,22 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="PxUsage" />
 
+        <ImageView
+            android:id="@+id/apa_iv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:contentDescription="@string/rv_iv_cancel"
+            android:focusable="true"
+            android:foreground="?android:selectableItemBackground"
+            android:padding="@dimen/et_padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_cancel_theme"
+            tools:ignore="UnusedAttribute" />
+
         <TextView
             android:id="@+id/apa_tv"
             android:layout_width="0dp"

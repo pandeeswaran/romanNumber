@@ -41,7 +41,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -107,7 +109,7 @@ public class PendingFragment extends Fragment {
 
                         @SuppressLint("UseSparseArrays") HashMap<Integer, List<Event>> groupByEvents = new HashMap<>();
                         for (Event event : resultEvents.getEvents()) {
-                            Date curDate = Calendar.getInstance().getTime();
+                            Date curDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime();
                             int day;
                             if (curDate.getDate() == Objects.requireNonNull(event.getEventDate()).getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
                                 day = 0;

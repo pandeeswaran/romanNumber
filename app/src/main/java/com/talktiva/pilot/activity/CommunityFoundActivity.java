@@ -65,7 +65,7 @@ public class CommunityFoundActivity extends AppCompatActivity {
     private Dialog internetDialog;
     private String invitationCode;
     private Community community;
-    private String from;
+    private String from, apartment, street;
 
     private BroadcastReceiver r = new BroadcastReceiver() {
         @Override
@@ -91,6 +91,8 @@ public class CommunityFoundActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         community = (Community) Objects.requireNonNull(bundle).getSerializable(AppConstant.COMMUNITY);
+        apartment = bundle.getString(AppConstant.APRTMENT);
+        street = bundle.getString(AppConstant.STREET);
         from = bundle.getString(AppConstant.FROM);
 
         if (Objects.requireNonNull(from).equalsIgnoreCase(AppConstant.INVITATION)) {
@@ -112,6 +114,8 @@ public class CommunityFoundActivity extends AppCompatActivity {
             bundle1.putString(AppConstant.FROM, from);
             bundle1.putString(AppConstant.INVITATION_CODE, invitationCode);
             bundle1.putSerializable(AppConstant.COMMUNITY, community);
+            bundle1.putString(AppConstant.APRTMENT, apartment);
+            bundle1.putString(AppConstant.STREET, street);
             intent.putExtras(bundle);
             startActivity(intent);
         });

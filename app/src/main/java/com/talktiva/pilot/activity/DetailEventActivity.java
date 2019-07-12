@@ -473,7 +473,7 @@ public class DetailEventActivity extends AppCompatActivity {
                     tvDate.setText(new SimpleDateFormat("MMM", Locale.US).format(event.getEventDate()).concat("\n").concat(new SimpleDateFormat("dd", Locale.US).format(event.getEventDate())));
                     tvTitle.setText(event.getTitle());
                     tvFullDate.setText(dateFormat.format(event.getEventDate()));
-                    tvAdd.setText(Objects.requireNonNull(event.getCreatorFirstName()).concat(" ").concat(Objects.requireNonNull(event.getCreatorLasttName())).concat(" | ").concat(Objects.requireNonNull(event.getLocation())));
+                    tvAdd.setText(Objects.requireNonNull(event.getCreatorFullName()).concat(" | ").concat(Objects.requireNonNull(event.getLocation())));
                     tvCount.setText(String.valueOf(event.getLikeCount()));
 
                     ivMore.setOnClickListener(v -> openContextMenu(v));
@@ -555,7 +555,7 @@ public class DetailEventActivity extends AppCompatActivity {
             String reminderUriString = "content://com.android.calendar/reminders";
             getContentResolver().insert(Uri.parse(reminderUriString), reminders);
 
-            internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, R.string.event_success, false, View.VISIBLE, R.string.dd_ok, v -> internetDialog.dismiss(), View.GONE, null, null);
+            internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, R.string.event_success, false, View.VISIBLE, R.string.dd_btn_continue, v -> internetDialog.dismiss(), View.GONE, null, null);
             internetDialog.show();
             return true;
         } else {
