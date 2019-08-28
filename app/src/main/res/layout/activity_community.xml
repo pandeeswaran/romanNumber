@@ -16,11 +16,10 @@
         android:clickable="true"
         android:contentDescription="@string/app_name"
         android:focusable="true"
-        android:foreground="?android:selectableItemBackground"
         android:padding="@dimen/et_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_info"
+        app:srcCompat="@drawable/ic_info_grey"
         tools:ignore="UnusedAttribute" />
 
     <ImageView
@@ -32,7 +31,6 @@
         android:clickable="true"
         android:contentDescription="@string/back"
         android:focusable="true"
-        android:foreground="?android:selectableItemBackground"
         android:padding="@dimen/et_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -41,66 +39,150 @@
 
     <ImageView
         android:id="@+id/ca_iv"
-        android:layout_width="500px"
-        android:layout_height="104px"
-        android:layout_marginTop="72dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/logo_margin"
+        android:layout_marginTop="@dimen/logo_top"
+        android:layout_marginEnd="@dimen/logo_margin"
+        android:adjustViewBounds="true"
         android:contentDescription="@string/app_name"
         android:src="@drawable/talktiva_logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="PxUsage" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/ca_tv_zip"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="24dp"
+        android:text="@string/ca_tv_zip"
+        android:textColor="@color/font"
+        android:textSize="@dimen/tv_font"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ca_iv" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/ca_til_zip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="24dp"
+        app:hintEnabled="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ca_tv_zip">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ca_et_zip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="true"
+            android:hint="@string/ca_et_zip"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:maxLength="5"
+            android:maxLines="1"
+            android:textColor="@color/colorPrimary"
+            android:textColorHint="@color/grey"
+            android:textSize="@dimen/tv_font" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/ca_tv_zip_error"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:textColor="@color/red"
+        android:textSize="@dimen/error_font_size"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ca_til_zip" />
+
+    <AutoCompleteTextView
+        android:id="@+id/ca_atc_community"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:enabled="false"
+        android:hint="@string/ca_et_community"
+        android:imeOptions="actionNext"
+        android:inputType="textCapWords"
+        android:maxLines="1"
+        android:textColor="@color/colorPrimary"
+        android:textColorHint="@color/grey"
+        android:textSize="@dimen/tv_font"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ca_tv_zip_error" />
+
+    <TextView
+        android:id="@+id/ca_tv_community_error"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:textColor="@color/red"
+        android:textSize="@dimen/error_font_size"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ca_atc_community" />
 
     <TextView
         android:id="@+id/ca_tv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="32dp"
-        android:textColor="@color/font"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ca_iv" />
-
-    <TextView
-        android:id="@+id/ca_tv_error"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:textColor="@color/red"
-        android:visibility="gone"
+        android:layout_marginEnd="24dp"
+        android:text="@string/ca_tv_direct"
+        android:textColor="@color/font"
+        android:textSize="@dimen/tv_font"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ca_tv" />
+        app:layout_constraintTop_toBottomOf="@id/ca_tv_community_error" />
 
     <EditText
         android:id="@+id/ca_et_street"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="24dp"
         android:autofillHints="@string/ca_et_street"
+        android:enabled="false"
         android:hint="@string/ca_et_street"
-        android:inputType="text"
+        android:imeOptions="actionNext"
+        android:inputType="textCapWords"
+        android:maxLines="1"
         android:textColor="@color/colorPrimary"
         android:textColorHint="@color/grey"
+        android:textSize="@dimen/tv_font"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ca_tv_error"
+        app:layout_constraintTop_toBottomOf="@id/ca_tv"
         tools:ignore="UnusedAttribute" />
 
     <TextView
         android:id="@+id/ca_tv_street_error"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="24dp"
         android:text="@string/ca_et_street_error"
         android:textColor="@color/red"
+        android:textSize="@dimen/error_font_size"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -110,65 +192,41 @@
         android:id="@+id/ca_et_apart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="24dp"
         android:autofillHints="@string/ca_et_apart"
+        android:enabled="false"
         android:hint="@string/ca_et_apart"
-        android:inputType="text"
+        android:imeOptions="actionDone"
+        android:inputType="textCapSentences"
+        android:maxLines="1"
         android:textColor="@color/colorPrimary"
         android:textColorHint="@color/grey"
+        android:textSize="@dimen/tv_font"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ca_tv_street_error"
         tools:ignore="UnusedAttribute" />
 
-    <EditText
-        android:id="@+id/ca_et_zip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:autofillHints="@string/ca_et_zip"
-        android:hint="@string/ca_et_zip"
-        android:inputType="number"
-        android:textColor="@color/colorPrimary"
-        android:textColorHint="@color/grey"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ca_et_apart"
-        tools:ignore="UnusedAttribute" />
-
-    <TextView
-        android:id="@+id/ca_tv_zip_error"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:text="@string/ca_et_zip_error"
-        android:textColor="@color/red"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ca_et_zip" />
 
     <Button
-        android:id="@+id/ca_btn_fyc"
+        android:id="@+id/ca_btn_next"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:background="@drawable/bg_theme"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bg_theme_1"
+        android:enabled="false"
         android:padding="@dimen/et_padding"
-        android:text="@string/ca_btn_fyc"
+        android:text="@string/ca_btn_next"
         android:textAllCaps="false"
-        android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@color/white"
+        android:textSize="@dimen/btn_font"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ca_tv_zip_error" />
+        app:layout_constraintTop_toBottomOf="@id/ca_et_apart" />
 
     <TextView
         android:id="@+id/ca_tv_footer"
@@ -177,7 +235,7 @@
         android:layout_marginBottom="8dp"
         android:text="@string/ha_footer"
         android:textColor="@color/font"
-        android:textSize="12sp"
+        android:textSize="@dimen/footer_font"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

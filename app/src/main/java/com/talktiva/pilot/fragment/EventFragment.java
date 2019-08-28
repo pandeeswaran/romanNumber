@@ -30,6 +30,7 @@ import com.talktiva.pilot.activity.DashBoardActivity;
 import com.talktiva.pilot.fragment.event.PendingFragment;
 import com.talktiva.pilot.fragment.event.UpcomingFragment;
 import com.talktiva.pilot.fragment.event.YourFragment;
+import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.CustomTypefaceSpan;
 import com.talktiva.pilot.helper.Utility;
 
@@ -54,10 +55,10 @@ public class EventFragment extends Fragment {
     private BroadcastReceiver r0 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (Objects.requireNonNull(tabLayout.getTabAt(0)).isSelected()) {
+            if (Objects.requireNonNull(tabLayout.getTabAt(1)).isSelected()) {
                 LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).sendBroadcast(new Intent("Refresh0"));
             } else {
-                Objects.requireNonNull(tabLayout.getTabAt(0)).select();
+                Objects.requireNonNull(tabLayout.getTabAt(1)).select();
                 LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).sendBroadcast(new Intent("Refresh0"));
             }
         }
@@ -66,10 +67,10 @@ public class EventFragment extends Fragment {
     private BroadcastReceiver r1 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (Objects.requireNonNull(tabLayout.getTabAt(1)).isSelected()) {
+            if (Objects.requireNonNull(tabLayout.getTabAt(0)).isSelected()) {
                 LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).sendBroadcast(new Intent("Refresh1"));
             } else {
-                Objects.requireNonNull(tabLayout.getTabAt(1)).select();
+                Objects.requireNonNull(tabLayout.getTabAt(0)).select();
                 LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).sendBroadcast(new Intent("Refresh1"));
             }
         }
@@ -122,8 +123,8 @@ public class EventFragment extends Fragment {
 
         Utility.INSTANCE.setTitleText(toolbar, R.id.ef_toolbar_tv_title, R.string.db_bnm_title_event);
 
-        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_pending)), 0);
-        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_upcoming)), 1);
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_upcoming)), 0);
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_pending)), 1);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.ef_tab_yours)), 2);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -131,10 +132,10 @@ public class EventFragment extends Fragment {
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
                     case 0:
-                        loadFragment(new PendingFragment());
+                        loadFragment(new UpcomingFragment());
                         break;
                     case 1:
-                        loadFragment(new UpcomingFragment());
+                        loadFragment(new PendingFragment());
                         break;
                     case 2:
                         loadFragment(new YourFragment());
@@ -190,7 +191,7 @@ public class EventFragment extends Fragment {
         if (item.getItemId() == R.id.ef_menu_create) {
             Intent intent = new Intent(getActivity(), CreateEventActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putString(getResources().getString(R.string.from), getResources().getString(R.string.from_new));
+            bundle.putString(AppConstant.FROM, AppConstant.NEW);
             intent.putExtras(bundle);
             Objects.requireNonNull(getActivity()).startActivity(intent);
             return true;

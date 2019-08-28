@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
@@ -22,6 +23,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -30,6 +40,9 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
@@ -43,7 +56,10 @@ import com.talktiva.pilot.rest.ApiInterface;
 import com.talktiva.pilot.results.ResultError;
 import com.talktiva.pilot.results.ResultLogin;
 
+import org.json.JSONException;
+
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -104,6 +120,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private int GOOGLE_SIGN_IN = 101;
 
+    private CallbackManager callbackManager;
+
     private BroadcastReceiver r = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -133,11 +151,34 @@ public class LoginActivity extends AppCompatActivity {
         btnSignIn.setTypeface(Utility.INSTANCE.getFontRegular());
         tvForgot.setTypeface(Utility.INSTANCE.getFontRegular());
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        mGoogleSignInClient = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+                .build());
+
+        FacebookSdk.sdkInitialize(Talktiva.Companion.getInstance());
+        AppEventsLogger.activateApp(Objects.requireNonNull(Talktiva.Companion.getInstance()));
+        callbackManager = CallbackManager.Factory.create();
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        updateFacebookUI(loginResult.getAccessToken());
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        LoginManager.getInstance().logOut();
+                        // App code
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        LoginManager.getInstance().logOut();
+                        // App code
+                    }
+                });
 
         ivBack.setOnClickListener(v -> onBackPressed());
 
@@ -172,37 +213,50 @@ public class LoginActivity extends AppCompatActivity {
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
         });
+
+        btnFacebook.setOnClickListener(v -> LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email")));
+
+        tvFooter.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(AppConstant.PRIVACY_POLICY));
+            startActivity(i);
+        });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        updateUI(account);
-    }
-
-    @Override
-    protected void onDestroy() {
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        if (GoogleSignIn.getLastSignedInAccount(this) == null) {
+            if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
+                updateFacebookUI(AccessToken.getCurrentAccessToken());
+            }
+        } else {
+            updateGoogleUI(GoogleSignIn.getLastSignedInAccount(this));
         }
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
-        super.onDestroy();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        receiver = new NetworkChangeReceiver();
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r, new IntentFilter("BlankEtPass"));
+    }
+
+    @Override
+    protected void onPause() {
         try {
             unregisterReceiver(receiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        receiver = new NetworkChangeReceiver();
-        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r, new IntentFilter("BlankEtPass"));
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
+        super.onDestroy();
     }
 
     @OnTextChanged(R.id.la_et_email)
@@ -223,9 +277,6 @@ public class LoginActivity extends AppCompatActivity {
         String s = sequence.toString().trim();
         if (sequence.length() == 0) {
             tvPass.setVisibility(View.GONE);
-//        } else if (!isPassValidate(s)) {
-//            tvPass.setVisibility(View.VISIBLE);
-//            tvPass.setText(R.string.la_tv_pass_error);
         } else {
             tvPass.setVisibility(View.GONE);
         }
@@ -235,10 +286,10 @@ public class LoginActivity extends AppCompatActivity {
         return Patterns.EMAIL_ADDRESS.matcher(s).matches();
     }
 
-    private boolean isPassValidate(String s) {
-        Pattern pattern = Pattern.compile("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
-        return pattern.matcher(s).matches();
-    }
+//    private boolean isPassValidate(String s) {
+//        Pattern pattern = Pattern.compile("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+//        return pattern.matcher(s).matches();
+//    }
 
     private void login() {
         progressDialog.show();
@@ -254,6 +305,7 @@ public class LoginActivity extends AppCompatActivity {
                     Utility.INSTANCE.setPreference(AppConstant.PREF_EXPIRE, Objects.requireNonNull(String.valueOf(response.body().getExpiresIn())));
                     Utility.INSTANCE.setPreference(AppConstant.PREF_T_TYPE, response.body().getTokenType());
                     Utility.INSTANCE.setPreference(AppConstant.PREF_USER, String.valueOf(response.body().getUserId()));
+                    Utility.INSTANCE.setPreference(AppConstant.PREF_PASS_FLAG, String.valueOf(response.body().getTemporaryPassword()));
                     getUserDetails();
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
@@ -271,19 +323,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<ResultLogin> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(LoginActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
 
-    private void socialLogin(String email, String pass) {
+    private void socialLogin(String email, String pass, String loginType) {
         progressDialog.show();
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResultLogin> call = apiInterface.getSocialLogin(AppConstant.CT_LOGIN, AppConstant.GRANT_TYPE, email, pass, AppConstant.GOOGLE);
+        Call<ResultLogin> call = apiInterface.getSocialLogin(AppConstant.CT_LOGIN, AppConstant.GRANT_TYPE, email, pass, loginType);
         call.enqueue(new Callback<ResultLogin>() {
             @Override
             public void onResponse(@NonNull Call<ResultLogin> call, @NonNull Response<ResultLogin> response) {
@@ -293,14 +341,16 @@ public class LoginActivity extends AppCompatActivity {
                     Utility.INSTANCE.setPreference(AppConstant.PREF_EXPIRE, Objects.requireNonNull(String.valueOf(response.body().getExpiresIn())));
                     Utility.INSTANCE.setPreference(AppConstant.PREF_T_TYPE, response.body().getTokenType());
                     Utility.INSTANCE.setPreference(AppConstant.PREF_USER, String.valueOf(response.body().getUserId()));
+                    Utility.INSTANCE.setPreference(AppConstant.PREF_PASS_FLAG, String.valueOf(response.body().getTemporaryPassword()));
                     getUserDetails();
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     try {
                         ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
                         }.getType());
-                        internetDialog = Utility.INSTANCE.showAlert(LoginActivity.this, resultError.getMessage(), true, View.VISIBLE, R.string.dd_try, v -> {
+                        internetDialog = Utility.INSTANCE.showAlert(LoginActivity.this, resultError.getMessage(), true, View.VISIBLE, R.string.dd_ok, v -> {
                             Utility.INSTANCE.dismissDialog(internetDialog);
+                            logoutFromFacebook();
                             logoutFromGoogle();
                         }, View.GONE, null, null);
                         internetDialog.show();
@@ -313,33 +363,30 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<ResultLogin> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(LoginActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GOOGLE_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 // Signed in successfully, show authenticated UI.
-                updateUI(account);
+                updateGoogleUI(account);
             } catch (ApiException e) {
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.
                 Log.w(Talktiva.Companion.getTAG(), "signInResult:failed code=" + e.getStatusCode());
-                updateUI(null);
+                updateGoogleUI(null);
             }
         }
     }
 
-    private void updateUI(GoogleSignInAccount account) {
+    private void updateGoogleUI(GoogleSignInAccount account) {
         if (account != null) {
             Log.d(Talktiva.Companion.getTAG(), "DisplayName: ".concat(Objects.requireNonNull(account.getDisplayName())));
             Log.d(Talktiva.Companion.getTAG(), "Email: ".concat(Objects.requireNonNull(account.getEmail())));
@@ -347,7 +394,7 @@ public class LoginActivity extends AppCompatActivity {
             Log.d(Talktiva.Companion.getTAG(), "GivenName: ".concat(Objects.requireNonNull(account.getGivenName())));
             Log.d(Talktiva.Companion.getTAG(), "Id: ".concat(Objects.requireNonNull(account.getId())));
             Log.d(Talktiva.Companion.getTAG(), "IdToken: ".concat(Objects.requireNonNull(account.getIdToken())));
-            socialLogin(account.getEmail(), account.getIdToken());
+            socialLogin(account.getEmail(), account.getIdToken(), AppConstant.GOOGLE);
         }
     }
 
@@ -355,6 +402,12 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, task -> {
                 });
+    }
+
+    private void logoutFromFacebook() {
+        if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
+            LoginManager.getInstance().logOut();
+        }
     }
 
     private void getUserDetails() {
@@ -366,8 +419,13 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, new Gson().toJson(response.body(), User.class));
-                    startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
+                    if (Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_PASS_FLAG)).trim().equalsIgnoreCase("true")) {
+                        startActivity(new Intent(LoginActivity.this, ChangePasswordActivity.class));
+                    } else {
+                        startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
+                    }
                     finish();
+                    LocalBroadcastManager.getInstance(LoginActivity.this).sendBroadcast(new Intent("CloseWelcome"));
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     try {
@@ -384,11 +442,22 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(LoginActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
+    }
+
+    private void updateFacebookUI(AccessToken accessToken) {
+        GraphRequest graphRequest = GraphRequest.newMeRequest(accessToken, (object, response) -> {
+            try {
+                String email = object.getString("email");
+                socialLogin(email, accessToken.getToken(), AppConstant.FACEBOOK);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id, name, email, gender, birthday");
+        graphRequest.setParameters(parameters);
+        graphRequest.executeAsync();
     }
 }

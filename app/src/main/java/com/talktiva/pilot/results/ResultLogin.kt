@@ -34,6 +34,9 @@ class ResultLogin {
     @SerializedName("lastName")
     var lastName: String? = null
 
+    @SerializedName("temporaryPassword")
+    var temporaryPassword: Boolean? = null
+
     @SerializedName("jti")
     var jti: String? = null
 }

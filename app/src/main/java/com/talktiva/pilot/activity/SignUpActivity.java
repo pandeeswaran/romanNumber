@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -22,6 +23,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -44,7 +54,10 @@ import com.talktiva.pilot.rest.ApiInterface;
 import com.talktiva.pilot.results.ResultError;
 import com.talktiva.pilot.results.ResultLogin;
 
+import org.json.JSONException;
+
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -111,8 +124,9 @@ public class SignUpActivity extends AppCompatActivity {
     private String invitationCode, apartment, street;
     private Community community;
 
-    private int GOOGLE_SIGN_IN = 101;
+    private CallbackManager callbackManager;
 
+    private int GOOGLE_SIGN_IN = 101;
     private int regType = 0;
 
     @Override
@@ -125,23 +139,37 @@ public class SignUpActivity extends AppCompatActivity {
 
         progressDialog = Utility.INSTANCE.showProgress(SignUpActivity.this);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        mGoogleSignInClient = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+                .build());
 
         Bundle bundle = getIntent().getExtras();
-        community = (Community) Objects.requireNonNull(bundle).getSerializable(AppConstant.COMMUNITY);
-        apartment = bundle.getString(AppConstant.APRTMENT);
-        street = bundle.getString(AppConstant.STREET);
-        String str1 = getResources().getString(R.string.sua_tv_1);
-        String str2 = "<font color='#8CA5FF'>".concat(Objects.requireNonNull(Objects.requireNonNull(community).getCommunityName())).concat("</font>");
-        String str3 = getResources().getString(R.string.sua_tv_2);
-        textView.setText(Html.fromHtml(str1.concat(" ").concat(str2).concat(" ").concat(str3)));
-
         if (Objects.requireNonNull(Objects.requireNonNull(bundle).getString(AppConstant.FROM)).equalsIgnoreCase(AppConstant.INVITATION)) {
             invitationCode = bundle.getString(AppConstant.INVITATION_CODE);
+            if (invitationCode.substring(0, 3).equalsIgnoreCase("FAM")) {
+                community = (Community) Objects.requireNonNull(bundle).getSerializable(AppConstant.COMMUNITY);
+                String str1 = getResources().getString(R.string.sua_tv_1);
+                String str2 = "<font color='#8CA5FF'>".concat(Objects.requireNonNull(Objects.requireNonNull(community).getCommunityName())).concat("</font>");
+                String str3 = getResources().getString(R.string.sua_tv_2);
+                textView.setText(Html.fromHtml(str1.concat(" ").concat(str2).concat(" ").concat(str3)));
+            } else {
+                community = (Community) Objects.requireNonNull(bundle).getSerializable(AppConstant.COMMUNITY);
+                apartment = bundle.getString(AppConstant.APRTMENT);
+                street = bundle.getString(AppConstant.STREET);
+                String str1 = getResources().getString(R.string.sua_tv_1);
+                String str2 = "<font color='#8CA5FF'>".concat(Objects.requireNonNull(Objects.requireNonNull(community).getCommunityName())).concat("</font>");
+                String str3 = getResources().getString(R.string.sua_tv_2);
+                textView.setText(Html.fromHtml(str1.concat(" ").concat(str2).concat(" ").concat(str3)));
+            }
+        } else {
+            community = (Community) Objects.requireNonNull(bundle).getSerializable(AppConstant.COMMUNITY);
+            apartment = bundle.getString(AppConstant.APRTMENT);
+            street = bundle.getString(AppConstant.STREET);
+            String str1 = getResources().getString(R.string.sua_tv_1);
+            String str2 = "<font color='#8CA5FF'>".concat(Objects.requireNonNull(Objects.requireNonNull(community).getCommunityName())).concat("</font>");
+            String str3 = getResources().getString(R.string.sua_tv_2);
+            textView.setText(Html.fromHtml(str1.concat(" ").concat(str2).concat(" ").concat(str3)));
         }
 
         textView.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -160,13 +188,39 @@ public class SignUpActivity extends AppCompatActivity {
 
         ivBack.setOnClickListener(v -> onBackPressed());
 
+        FacebookSdk.sdkInitialize(Talktiva.Companion.getInstance());
+        AppEventsLogger.activateApp(Objects.requireNonNull(Talktiva.Companion.getInstance()));
+        callbackManager = CallbackManager.Factory.create();
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        updateFacebookUI(loginResult.getAccessToken());
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        LoginManager.getInstance().logOut();
+                        // App code
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                    }
+                });
+
         btnGoogle.setOnClickListener(v -> {
             regType = 1;
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
         });
 
-        btnFacebook.setOnClickListener(v -> regType = 2);
+        btnFacebook.setOnClickListener(v -> {
+            regType = 2;
+            LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+        });
 
         btnSignUp.setOnClickListener(v -> {
             regType = 0;
@@ -187,21 +241,21 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
         ivPassInfo.setOnClickListener(v -> {
-            internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, R.color.colorPrimary, R.string.dd_info_pass, true, View.GONE, null, null, View.GONE, null, null);
+            internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, R.color.colorPrimary, R.string.dd_info_pass, v1 -> Utility.INSTANCE.dismissDialog(internetDialog));
             internetDialog.show();
+        });
+
+        tvFooter.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(AppConstant.PRIVACY_POLICY));
+            startActivity(i);
         });
     }
 
     @OnTextChanged(R.id.sua_et_fname)
     void setEtFullNameOnTextChange(CharSequence sequence) {
         String s = sequence.toString().trim();
-        Pattern pattern = Pattern.compile("[a-zA-Z ]*");
-        if (s.length() == 0) {
-            tvFullName.setVisibility(View.GONE);
-        } else if (!pattern.matcher(s).matches()) {
-            tvFullName.setText(R.string.sua_tv_fname_val);
-            tvFullName.setVisibility(View.VISIBLE);
-        } else {
+        if (s.length() != 0) {
             tvFullName.setVisibility(View.GONE);
         }
     }
@@ -235,18 +289,19 @@ public class SignUpActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GOOGLE_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 // Signed in successfully, show authenticated UI.
-                updateUI(account);
+                updateGoogleUI(account);
             } catch (ApiException e) {
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.
                 Log.w(Talktiva.Companion.getTAG(), "signInResult:failed code=" + e.getStatusCode());
-                updateUI(null);
+                updateGoogleUI(null);
             }
         }
     }
@@ -254,18 +309,13 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        updateUI(account);
-    }
-
-    @Override
-    protected void onDestroy() {
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        if (GoogleSignIn.getLastSignedInAccount(this) == null) {
+            if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
+                updateFacebookUI(AccessToken.getCurrentAccessToken());
+            }
+        } else {
+            updateGoogleUI(GoogleSignIn.getLastSignedInAccount(this));
         }
-        super.onDestroy();
     }
 
     @Override
@@ -280,7 +330,17 @@ public class SignUpActivity extends AppCompatActivity {
         registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
-    private void updateUI(GoogleSignInAccount account) {
+    @Override
+    protected void onPause() {
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        super.onPause();
+    }
+
+    private void updateGoogleUI(GoogleSignInAccount account) {
         if (account != null) {
             Log.d(Talktiva.Companion.getTAG(), "DisplayName: ".concat(Objects.requireNonNull(account.getDisplayName())));
             Log.d(Talktiva.Companion.getTAG(), "Email: ".concat(Objects.requireNonNull(account.getEmail())));
@@ -292,17 +352,43 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
+    private void updateFacebookUI(AccessToken accessToken) {
+        GraphRequest graphRequest = GraphRequest.newMeRequest(accessToken, (object, response) -> {
+            try {
+                String id = object.getString("id");
+                String name = object.getString("name");
+                String email = object.getString("email");
+                getSocialRegister(name, email, accessToken.getToken(), id);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id, name, email, gender, birthday");
+        graphRequest.setParameters(parameters);
+        graphRequest.executeAsync();
+    }
+
     private void getNormalRegister() {
         progressDialog.show();
 
         RequestSignUp requestSignUp = new RequestSignUp();
-        requestSignUp.setAppartmentUnit(apartment);
         requestSignUp.setCommunityId(community.getLocationId());
         requestSignUp.setDeviceType(AppConstant.ANDROID);
         requestSignUp.setEmail(etEmail.getText().toString().trim());
         requestSignUp.setFullName(etFullName.getText().toString().trim());
         if (invitationCode != null && invitationCode.trim().length() != 0) {
             requestSignUp.setInvitationCode(invitationCode);
+            if (invitationCode.substring(0, 3).equalsIgnoreCase("FAM")) {
+                requestSignUp.setStreet(null);
+                requestSignUp.setAppartmentUnit(null);
+            } else {
+                requestSignUp.setStreet(street);
+                requestSignUp.setAppartmentUnit(apartment);
+            }
+        } else {
+            requestSignUp.setStreet(street);
+            requestSignUp.setAppartmentUnit(apartment);
         }
         requestSignUp.setPassword(Objects.requireNonNull(etPass.getText()).toString().trim());
         requestSignUp.setPhone(etPhone.getText().toString().trim());
@@ -317,10 +403,11 @@ public class SignUpActivity extends AppCompatActivity {
                 requestSignUp.setRegistrationType(AppConstant.FACEBOOK);
                 break;
         }
-        requestSignUp.setStreet(street);
+
         requestSignUp.setUdid(Utility.INSTANCE.getDeviceId());
 
-        Log.d(Talktiva.Companion.getTAG(), new Gson().toJson(requestSignUp));
+        String str = new Gson().toJson(requestSignUp);
+        Log.d(Talktiva.Companion.getTAG(), str);
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<User> call = apiInterface.registerUser(AppConstant.CT_JSON, AppConstant.UTF, requestSignUp);
@@ -354,6 +441,13 @@ public class SignUpActivity extends AppCompatActivity {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
                                     }, View.GONE, null, null);
                                     internetDialog.show();
+                                } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.STREET)) {
+                                    internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
+                                        Utility.INSTANCE.dismissDialog(internetDialog);
+                                        logoutFromFacebook();
+                                        logoutFromGoogle();
+                                    }, View.GONE, null, null);
+                                    internetDialog.show();
                                 }
                         }
                     } catch (IOException e) {
@@ -365,10 +459,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(SignUpActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -387,17 +477,36 @@ public class SignUpActivity extends AppCompatActivity {
                     Utility.INSTANCE.setPreference(AppConstant.PREF_EXPIRE, Objects.requireNonNull(String.valueOf(response.body().getExpiresIn())));
                     Utility.INSTANCE.setPreference(AppConstant.PREF_T_TYPE, response.body().getTokenType());
                     Utility.INSTANCE.setPreference(AppConstant.PREF_USER, String.valueOf(response.body().getUserId()));
+                    Utility.INSTANCE.setPreference(AppConstant.PREF_PASS_FLAG, String.valueOf(response.body().getTemporaryPassword()));
 
-                    Intent intent = new Intent(SignUpActivity.this, AddressProofActivity.class);
-                    intent.putExtra(AppConstant.FROM, AppConstant.SIGNUP);
-                    intent.putExtra(AppConstant.ID, Objects.requireNonNull(response.body()).getUserId());
-                    startActivity(intent);
-                    finish();
-                    LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunityFound"));
-                    LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunity"));
-                    LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseFindCommunity"));
+                    if (invitationCode != null) {
+                        if (invitationCode.substring(0, 3).equalsIgnoreCase("FAM")) {
+                            startActivity(new Intent(SignUpActivity.this, DashBoardActivity.class));
+                            finish();
+                        } else {
+                            Intent intent = new Intent(SignUpActivity.this, AddressProofActivity.class);
+                            intent.putExtra(AppConstant.FROM, AppConstant.SIGN_UP);
+                            intent.putExtra(AppConstant.ID, Objects.requireNonNull(response.body()).getUserId());
+                            startActivity(intent);
+                            finish();
+                        }
+                    } else {
+                        Intent intent = new Intent(SignUpActivity.this, AddressProofActivity.class);
+                        intent.putExtra(AppConstant.FROM, AppConstant.SIGN_UP);
+                        intent.putExtra(AppConstant.ID, Objects.requireNonNull(response.body()).getUserId());
+                        startActivity(intent);
+                        finish();
+                    }
                     if (invitationCode != null && invitationCode.trim().length() != 0) {
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunityFound"));
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunity"));
                         LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseInvitation"));
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseWelcome"));
+                    } else {
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunityFound"));
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunity"));
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseFindCommunity"));
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseWelcome"));
                     }
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
@@ -415,10 +524,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<ResultLogin> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(SignUpActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -427,7 +532,6 @@ public class SignUpActivity extends AppCompatActivity {
         progressDialog.show();
 
         RequestSignUp requestSignUp = new RequestSignUp();
-        requestSignUp.setAppartmentUnit(apartment);
         requestSignUp.setCommunityId(community.getLocationId());
         requestSignUp.setDeviceType(AppConstant.ANDROID);
         requestSignUp.setEmail(email);
@@ -435,8 +539,19 @@ public class SignUpActivity extends AppCompatActivity {
         requestSignUp.setIdToken(token);
         if (invitationCode != null && invitationCode.trim().length() != 0) {
             requestSignUp.setInvitationCode(invitationCode);
+            if (invitationCode.substring(0, 3).equalsIgnoreCase("FAM")) {
+                requestSignUp.setStreet(null);
+                requestSignUp.setAppartmentUnit(null);
+            } else {
+                requestSignUp.setStreet(street);
+                requestSignUp.setAppartmentUnit(apartment);
+            }
+        } else {
+            requestSignUp.setStreet(street);
+            requestSignUp.setAppartmentUnit(apartment);
         }
         requestSignUp.setRegistrationId(id);
+
         switch (regType) {
             case 0:
                 requestSignUp.setRegistrationType(AppConstant.APP);
@@ -448,10 +563,10 @@ public class SignUpActivity extends AppCompatActivity {
                 requestSignUp.setRegistrationType(AppConstant.FACEBOOK);
                 break;
         }
-        requestSignUp.setStreet(street);
         requestSignUp.setUdid(Utility.INSTANCE.getDeviceId());
 
-        Log.d(Talktiva.Companion.getTAG(), new Gson().toJson(requestSignUp));
+        String str = new Gson().toJson(requestSignUp);
+        Log.d(Talktiva.Companion.getTAG(), str);
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<User> call = apiInterface.registerUser(AppConstant.CT_JSON, AppConstant.UTF, requestSignUp);
@@ -460,7 +575,14 @@ public class SignUpActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if (response.isSuccessful()) {
                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, new Gson().toJson(response.body(), User.class));
-                    getSocialAutoLogin(email, token);
+                    switch (regType) {
+                        case 1:
+                            getSocialAutoLogin(email, token, AppConstant.GOOGLE);
+                            break;
+                        case 2:
+                            getSocialAutoLogin(email, token, AppConstant.FACEBOOK);
+                            break;
+                    }
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     try {
@@ -471,6 +593,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.F_NAME)) {
                                     internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
+                                        logoutFromFacebook();
                                         logoutFromGoogle();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
@@ -478,6 +601,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.EMAIL)) {
                                     internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
+                                        logoutFromFacebook();
                                         logoutFromGoogle();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
@@ -485,6 +609,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.PASS)) {
                                     internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
+                                        logoutFromFacebook();
                                         logoutFromGoogle();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
@@ -492,6 +617,14 @@ public class SignUpActivity extends AppCompatActivity {
                                 } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.COMMUNITY_ID)) {
                                     internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
+                                        logoutFromFacebook();
+                                        logoutFromGoogle();
+                                    }, View.GONE, null, null);
+                                    internetDialog.show();
+                                } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.STREET)) {
+                                    internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getErrors().get(i).getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
+                                        Utility.INSTANCE.dismissDialog(internetDialog);
+                                        logoutFromFacebook();
                                         logoutFromGoogle();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
@@ -506,17 +639,13 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(SignUpActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
 
-    private void getSocialAutoLogin(String email, String token) {
+    private void getSocialAutoLogin(String email, String token, String loginType) {
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResultLogin> call = apiInterface.getSocialLogin(AppConstant.CT_LOGIN, AppConstant.GRANT_TYPE, email, token, AppConstant.GOOGLE);
+        Call<ResultLogin> call = apiInterface.getSocialLogin(AppConstant.CT_LOGIN, AppConstant.GRANT_TYPE, email, token, loginType);
         call.enqueue(new Callback<ResultLogin>() {
             @Override
             public void onResponse(@NonNull Call<ResultLogin> call, @NonNull Response<ResultLogin> response) {
@@ -528,17 +657,36 @@ public class SignUpActivity extends AppCompatActivity {
                     Utility.INSTANCE.setPreference(AppConstant.PREF_EXPIRE, Objects.requireNonNull(String.valueOf(response.body().getExpiresIn())));
                     Utility.INSTANCE.setPreference(AppConstant.PREF_T_TYPE, response.body().getTokenType());
                     Utility.INSTANCE.setPreference(AppConstant.PREF_USER, String.valueOf(response.body().getUserId()));
+                    Utility.INSTANCE.setPreference(AppConstant.PREF_PASS_FLAG, String.valueOf(response.body().getTemporaryPassword()));
 
-                    Intent intent = new Intent(SignUpActivity.this, AddressProofActivity.class);
-                    intent.putExtra(AppConstant.FROM, AppConstant.SIGNUP);
-                    intent.putExtra(AppConstant.ID, Objects.requireNonNull(response.body()).getUserId());
-                    startActivity(intent);
-                    finish();
-                    LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunityFound"));
-                    LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunity"));
-                    LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseFindCommunity"));
+                    if (invitationCode != null) {
+                        if (invitationCode.substring(0, 3).equalsIgnoreCase("FAM")) {
+                            startActivity(new Intent(SignUpActivity.this, DashBoardActivity.class));
+                            finish();
+                        } else {
+                            Intent intent = new Intent(SignUpActivity.this, AddressProofActivity.class);
+                            intent.putExtra(AppConstant.FROM, AppConstant.SIGN_UP);
+                            intent.putExtra(AppConstant.ID, Objects.requireNonNull(response.body()).getUserId());
+                            startActivity(intent);
+                            finish();
+                        }
+                    } else {
+                        Intent intent = new Intent(SignUpActivity.this, AddressProofActivity.class);
+                        intent.putExtra(AppConstant.FROM, AppConstant.SIGN_UP);
+                        intent.putExtra(AppConstant.ID, Objects.requireNonNull(response.body()).getUserId());
+                        startActivity(intent);
+                        finish();
+                    }
                     if (invitationCode != null && invitationCode.trim().length() != 0) {
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunityFound"));
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunity"));
                         LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseInvitation"));
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseWelcome"));
+                    } else {
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunityFound"));
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseCommunity"));
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseFindCommunity"));
+                        LocalBroadcastManager.getInstance(SignUpActivity.this).sendBroadcast(new Intent("CloseWelcome"));
                     }
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
@@ -547,6 +695,7 @@ public class SignUpActivity extends AppCompatActivity {
                         }.getType());
                         internetDialog = Utility.INSTANCE.showAlert(SignUpActivity.this, resultError.getMessage(), true, View.VISIBLE, R.string.dd_try, v -> {
                             Utility.INSTANCE.dismissDialog(internetDialog);
+                            logoutFromFacebook();
                             logoutFromGoogle();
                         }, View.GONE, null, null);
                         internetDialog.show();
@@ -559,10 +708,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<ResultLogin> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(SignUpActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -571,5 +716,11 @@ public class SignUpActivity extends AppCompatActivity {
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, task -> {
                 });
+    }
+
+    private void logoutFromFacebook() {
+        if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
+            LoginManager.getInstance().logOut();
+        }
     }
 }

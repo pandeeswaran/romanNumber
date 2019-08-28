@@ -85,9 +85,15 @@ object Utility {
         textView.setText(title!!)
     }
 
+    fun setTitleText(toolbar: Toolbar, id: Int?, title: String) {
+        val textView = toolbar.findViewById<TextView>(id!!)
+        textView.typeface = fontRegular
+        textView.text = title
+    }
+
     @SuppressLint("InlinedApi")
     internal fun requestInternet(context: Context) {
-        dialogInternet = showAlert(context, R.string.internet_msg, false, VISIBLE, R.string.dd_setting, View.OnClickListener {
+        dialogInternet = showAlert(context, R.string.dd_msg_internet, false, VISIBLE, R.string.dd_setting, View.OnClickListener {
             dialogInternet!!.dismiss()
             Talktiva.instance!!.startActivity(Intent(Settings.ACTION_DATA_USAGE_SETTINGS))
         }, GONE, null, null)
@@ -126,8 +132,8 @@ object Utility {
             dialog.findViewById<View>(R.id.dialog_negative).setOnClickListener(negativeClickListener)
         }
 
-        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
-        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
@@ -153,8 +159,8 @@ object Utility {
             dialog.findViewById<View>(R.id.dialog_negative).setOnClickListener(negativeClickListener)
         }
 
-        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
-        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
@@ -186,8 +192,8 @@ object Utility {
             dialog.findViewById<View>(R.id.dialog_negative).setOnClickListener(negativeClickListener)
         }
 
-        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
-        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
@@ -209,8 +215,8 @@ object Utility {
 
         dialog.findViewById<ImageView>(R.id.dd_iv_close).setOnClickListener(closeClickListener)
 
-        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
-        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
@@ -235,12 +241,36 @@ object Utility {
 
         dialog.findViewById<ImageView>(R.id.dd_iv_close).setOnClickListener(closeClickListener)
 
-        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
-        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    fun showAlert(context: Context, msg: String?, positiveVisibility: Int?, positiveTitle: Int?, positiveClickListener: View.OnClickListener?, closeClickListener: View.OnClickListener?): Dialog {
+        val dialog = Dialog(context)
+        dialog.setContentView(R.layout.dd_dialog_dash)
+        dialog.setCancelable(false)
 
+        (dialog.findViewById<TextView>(R.id.dd_tv_msg)).typeface = fontBold
+        (dialog.findViewById<TextView>(R.id.dd_tv_msg)).text = msg!!
+
+        dialog.findViewById<Button>(R.id.dd_btn_positive).visibility = positiveVisibility!!
+
+        if (positiveVisibility != GONE) {
+            (dialog.findViewById<Button>(R.id.dd_btn_positive)).typeface = fontRegular
+            (dialog.findViewById<Button>(R.id.dd_btn_positive)).setText(positiveTitle!!)
+            dialog.findViewById<Button>(R.id.dd_btn_positive).setOnClickListener(positiveClickListener)
+        }
+
+        dialog.findViewById<Button>(R.id.dd_btn_negative).visibility = GONE
+
+        dialog.findViewById<ImageView>(R.id.dd_iv_close).setOnClickListener(closeClickListener)
+
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        return dialog
+    }
     //endregion
 
     //region Progress Dialog
@@ -250,7 +280,7 @@ object Utility {
         dialog.setContentView(R.layout.dd_loader)
         dialog.setCancelable(false)
         (dialog.findViewById<View>(R.id.progress) as LottieAnimationView).setAnimation("loader.json")
-        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
@@ -277,8 +307,8 @@ object Utility {
         (dialog.findViewById<View>(R.id.de_btn) as Button).setText(action!!)
         dialog.findViewById<View>(R.id.de_btn).setOnClickListener(clickListener)
 
-        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.MATCH_PARENT)
-        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.MATCH_PARENT)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
@@ -295,8 +325,8 @@ object Utility {
         (dialog.findViewById<View>(R.id.de_btn) as Button).setText(action!!)
         dialog.findViewById<View>(R.id.de_btn).setOnClickListener(clickListener)
 
-        dialog.window.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.MATCH_PARENT)
-        dialog.window.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.MATCH_PARENT)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
     //endregion
@@ -304,6 +334,10 @@ object Utility {
     //region Toast Msg Show
     fun showMsg(id: Int?) {
         Toast.makeText(Talktiva.instance, Talktiva.instance!!.resources!!.getString(id!!), Toast.LENGTH_SHORT).show()
+    }
+
+    fun showMsg(string: String?) {
+        Toast.makeText(Talktiva.instance, string, Toast.LENGTH_SHORT).show()
     }
     //endregion
 

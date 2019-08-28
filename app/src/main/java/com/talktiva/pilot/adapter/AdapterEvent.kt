@@ -31,7 +31,7 @@ class AdapterEvent internal constructor(private val context: Context, private va
     private var internetDialog: Dialog? = null
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): EventViewHolder {
-        return EventViewHolder(LayoutInflater.from(context).inflate(R.layout.item_child, viewGroup, false))
+        return EventViewHolder(LayoutInflater.from(context).inflate(R.layout.item_event, viewGroup, false))
     }
 
     override fun onBindViewHolder(eventViewHolder: EventViewHolder, position: Int) {
@@ -128,10 +128,6 @@ class AdapterEvent internal constructor(private val context: Context, private va
                             }
 
                             override fun onFailure(call: Call<Event>, t: Throwable) {
-                                if (t.message.equals("timeout", ignoreCase = true)) {
-                                    internetDialog = Utility.showError(context, R.string.time_out_msg, R.string.dd_ok, View.OnClickListener { Utility.dismissDialog(internetDialog) })
-                                    internetDialog!!.show()
-                                }
                             }
                         })
                     }

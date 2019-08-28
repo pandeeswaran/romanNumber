@@ -25,15 +25,28 @@ class AdapterInvitee(private val context: Context, private val invitations: List
     }
 
     inner class InviteeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private var tvName = itemView.findViewById<TextView>(R.id.textView)
+        private var tvName = itemView.findViewById<TextView>(R.id.tv_name)
         private var tvAddress = itemView.findViewById<TextView>(R.id.textView2)
         private var view = itemView.findViewById<View>(R.id.dea_view)
+//        private var ivImage = itemView.findViewById<ImageView>(R.id.imageView)
 
         fun bindDataWithViewHolder(invitation: Invitation, i: Int) {
             tvName.typeface = Utility.fontBold
             tvAddress.typeface = Utility.fontRegular
-            tvName.text = invitation.inviteeFirstName.plus(" ").plus(invitation.inviteeLasttName)
-            tvAddress.text = invitation.inviteeAddress
+
+            if (invitation.guestUserEmail != null) {
+                tvName.visibility = View.VISIBLE
+                tvAddress.visibility = View.GONE
+
+                tvName.text = invitation.guestUserEmail
+            } else {
+                tvName.visibility = View.VISIBLE
+                tvAddress.visibility = View.VISIBLE
+
+                tvName.text = invitation.inviteeFullName
+                tvAddress.text = invitation.inviteeAddress
+            }
+
             if (itemCount == i + 1) {
                 view.visibility = View.GONE
             } else {

@@ -16,10 +16,10 @@
         android:layout_marginEnd="8dp"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="?android:selectableItemBackground"
+        android:padding="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_cancel_theme"
+        app:srcCompat="@drawable/ic_cancel_black"
         tools:ignore="ContentDescription,UnusedAttribute" />
 
     <TextView
@@ -45,7 +45,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
-        android:background="@drawable/bg_theme"
+        android:background="@drawable/bg_theme_1"
         android:text="@string/dd_setting"
         android:textAllCaps="false"
         android:textColor="@color/white"

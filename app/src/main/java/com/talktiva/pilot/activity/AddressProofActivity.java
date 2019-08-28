@@ -4,9 +4,12 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Paint;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,11 +30,20 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.ImageFilePath;
+import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.rest.FileUploader;
 import com.talktiva.pilot.rest.FileUploaderCallback;
@@ -88,13 +100,18 @@ public class AddressProofActivity extends AppCompatActivity {
     TextView tvOr;
     @BindView(R.id.apa_tv_skip)
     TextView tvSkip;
+    @BindView(R.id.apa_tv_footer)
+    TextView tvFooter;
 
     private Dialog internetDialog, dialogPermission;
+    private BroadcastReceiver receiver;
     private ProgressDialog dialog;
     private String from;
     private Integer id;
     private File file;
     private Uri uri;
+
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +124,14 @@ public class AddressProofActivity extends AppCompatActivity {
         from = getIntent().getStringExtra(AppConstant.FROM);
         id = getIntent().getIntExtra(AppConstant.ID, 0);
 
+        mGoogleSignInClient = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.server_client_id))
+                .requestEmail()
+                .build());
+
+        FacebookSdk.sdkInitialize(Talktiva.Companion.getInstance());
+        AppEventsLogger.activateApp(Objects.requireNonNull(Talktiva.Companion.getInstance()));
+
         textView.setTypeface(Utility.INSTANCE.getFontRegular());
         tvError.setTypeface(Utility.INSTANCE.getFontRegular());
         tvUpload.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -115,6 +140,7 @@ public class AddressProofActivity extends AppCompatActivity {
         tvOr.setPaintFlags(tvOr.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         tvOr.setTypeface(Utility.INSTANCE.getFontRegular());
         tvSkip.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvFooter.setTypeface(Utility.INSTANCE.getFontRegular());
 
         if (Build.VERSION.SDK_INT >= 24) {
             try {
@@ -125,7 +151,7 @@ public class AddressProofActivity extends AppCompatActivity {
             }
         }
 
-        if (from.equals(AppConstant.SIGNUP)) {
+        if (from.equals(AppConstant.SIGN_UP)) {
             tvOr.setVisibility(View.VISIBLE);
             tvSkip.setVisibility(View.VISIBLE);
             ivCancel.setVisibility(View.VISIBLE);
@@ -136,7 +162,11 @@ public class AddressProofActivity extends AppCompatActivity {
         }
 
         tvOr.setOnClickListener(v -> {
-            startActivity(new Intent(AddressProofActivity.this, DashBoardActivity.class));
+            if (Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_PASS_FLAG)).trim().equalsIgnoreCase("true")) {
+                startActivity(new Intent(AddressProofActivity.this, ChangePasswordActivity.class));
+            } else {
+                startActivity(new Intent(AddressProofActivity.this, DashBoardActivity.class));
+            }
             finish();
         });
 
@@ -146,7 +176,6 @@ public class AddressProofActivity extends AppCompatActivity {
                     intent.setType("image/*");
                     startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_IMAGE_GALLERY);
                 }
-//        startActivityForResult(Utility.INSTANCE.getPickImageChooserForGallery(AddressProofActivity.this), REQUEST_IMAGE_GALLERY)
         );
 
         ivCamera.setOnClickListener(v -> {
@@ -169,20 +198,30 @@ public class AddressProofActivity extends AppCompatActivity {
         });
 
         btnUpload.setOnClickListener(v -> {
-            if (!file.exists()) {
+            if (file != null) {
+                if (!file.exists()) {
+                    tvError.setText(R.string.apa_tv_missing);
+                    tvError.setTextColor(getResources().getColor(R.color.red));
+                    tvError.setVisibility(View.VISIBLE);
+                } else {
+                    if (Utility.INSTANCE.isConnectingToInternet()) {
+                        uploadFile(uri, file);
+                    }
+                }
+            } else {
                 tvError.setText(R.string.apa_tv_missing);
                 tvError.setTextColor(getResources().getColor(R.color.red));
                 tvError.setVisibility(View.VISIBLE);
-            } else {
-                tvError.setText(null);
-                tvError.setVisibility(View.GONE);
-                if (Utility.INSTANCE.isConnectingToInternet()) {
-                    uploadFile(uri, file);
-                }
             }
         });
 
         ivCancel.setOnClickListener(v -> onBackPressed());
+
+        tvFooter.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(AppConstant.PRIVACY_POLICY));
+            startActivity(i);
+        });
 
         checkAndRequestPermission();
     }
@@ -240,20 +279,20 @@ public class AddressProofActivity extends AppCompatActivity {
                 case REQUEST_IMAGE_GALLERY:
                     if (data != null) {
                         uri = data.getData();
-                        String path = ImageFilePath.getPath(AddressProofActivity.this, uri);
+                        String path = ImageFilePath.INSTANCE.getPath(AddressProofActivity.this, uri);
                         file = new File(path);
-//                        tvError.setText(file.getName());
-//                        tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
-//                        tvError.setVisibility(View.VISIBLE);
+                        tvError.setText(file.getName());
+                        tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
+                        tvError.setVisibility(View.VISIBLE);
                     }
                     break;
                 case REQUEST_IMAGE_CAMERA:
                     try {
                         File f = new File(Utility.INSTANCE.getImageFilePath());
                         file = new Compressor(AddressProofActivity.this).compressToFile(f, f.getName());
-//                        tvError.setText(file.getName());
-//                        tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
-//                        tvError.setVisibility(View.VISIBLE);
+                        tvError.setText(file.getName());
+                        tvError.setTextColor(getResources().getColor(R.color.colorPrimary));
+                        tvError.setVisibility(View.VISIBLE);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -282,12 +321,18 @@ public class AddressProofActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     if (dialog.isShowing()) {
                         dialog.dismiss();
+                        tvError.setText(null);
+                        tvError.setVisibility(View.GONE);
                     }
                     try {
                         ResultMessage resultMessage = new Gson().fromJson(Objects.requireNonNull(response.body()).string(), new TypeToken<ResultMessage>() {
                         }.getType());
                         internetDialog = Utility.INSTANCE.showAlert(AddressProofActivity.this, resultMessage.getResponseMessage(), true, View.VISIBLE, R.string.dd_ok, v -> {
-                            startActivity(new Intent(AddressProofActivity.this, DashBoardActivity.class));
+                            if (Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_PASS_FLAG)).trim().equalsIgnoreCase("true")) {
+                                startActivity(new Intent(AddressProofActivity.this, ChangePasswordActivity.class));
+                            } else {
+                                startActivity(new Intent(AddressProofActivity.this, DashBoardActivity.class));
+                            }
                             finish();
                         }, View.GONE, null, null);
                         internetDialog.show();
@@ -314,10 +359,6 @@ public class AddressProofActivity extends AppCompatActivity {
                 if (dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(AddressProofActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
 
             @Override
@@ -329,17 +370,49 @@ public class AddressProofActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (from.equals(AppConstant.SIGNUP)) {
+        if (from.equals(AppConstant.SIGN_UP)) {
             Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
             Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
             Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
             Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
             Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+            Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
             Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+            logoutFromFacebook();
+            logoutFromGoogle();
             finish();
             startActivity(new Intent(AddressProofActivity.this, WelcomeActivity.class));
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        receiver = new NetworkChangeReceiver();
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    @Override
+    protected void onPause() {
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        super.onPause();
+    }
+
+    private void logoutFromGoogle() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, task -> {
+                });
+    }
+
+    private void logoutFromFacebook() {
+        if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
+            LoginManager.getInstance().logOut();
         }
     }
 }

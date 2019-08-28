@@ -8,51 +8,40 @@
     <string name="server_client_id">129685831491-epi9fk1qhfn88quot41q04eien8s8l2f.apps.googleusercontent.com</string>
     <!--endregion-->
 
-    <!--region Detail Event Activity Title-->
-    <string name="dea_title_1">View Upcoming Event</string>
+    <!--region Facebook App Id-->
+    <string name="facebook_app_id">343949462960555</string>
+    <string name="fb_login_protocol_scheme">fb343949462960555</string>
+    <!--endregion-->
+
+    <!--region Detail Event Activity-->
     <string name="dea_title_0">View Pending Event</string>
+    <string name="dea_title_1">View Upcoming Event</string>
     <string name="dea_title_2">View My Event</string>
-    <!--endregion-->
 
-    <!--region Detail Event Activity Menu-->
     <string name="dea_menu_edit">Edit</string>
-    <!--endregion-->
 
-    <!--region Detail Event Activity Tab Title-->
     <string name="dea_tab_accept">Accepted Guests</string>
     <string name="dea_tab_pending">Pending Guests</string>
     <!--endregion-->
 
-    <!--region Detail Event Invitee RecyclerView ImageView Description-->
-    <string name="event_user">User Image</string>
-    <!--endregion-->
-
-    <!--region Create/Edit Event Activity Title-->
+    <!--region Create/Edit Event Activity-->
     <string name="cea_title1">Create Event</string>
     <string name="cea_title2">Edit Event</string>
-    <!--endregion-->
 
-    <!--region Create/Edit Event Activity Menu-->
     <string name="cea_menu_save">Save</string>
-    <!--endregion-->
 
-    <!--region Create/Edit Event EditText Hint-->
     <string name="cea_et_location">Event Location</string>
     <string name="cea_et_name">Event Name</string>
     <string name="cea_et_date">Event Date</string>
-    <!--endregion-->
 
-    <!--region Create/Edit Event TextView-->
     <string name="cea_tv_can_guest">Guest can invite community friends</string>
     <string name="cea_tv_private">Private event</string>
-    <string name="cea_tv_invited">guests added</string>
-    <!--endregion-->
+    <string name="cea_tv_invited">guest(s) added</string>
+    <string name="cea_tv_friend_invited">friend(s) added</string>
 
-    <!--region Create/Edit Event Button Title-->
-    <string name="cea_btn_guest">Add Guests</string>
-    <!--endregion-->
+    <string name="cea_btn_guest">Add Guest(s)</string>
+    <string name="cea_btn_friend">Add Friend(s)</string>
 
-    <!--region Event Validation Messages-->
     <string name="cea_error_date">Please choose future date and time</string>
     <string name="cea_val_name">Kindly enter the event name</string>
     <string name="cea_val_date">Kindly select the event date</string>
@@ -60,15 +49,25 @@
     <string name="cea_val_guest">Kindly add guests</string>
     <!--endregion-->
 
-    <!--region Add Guest Activity Title-->
-    <string name="aag_title">Add Guest to Event</string>
-    <!--endregion-->
+    <!--region Add Guest Activity-->
+    <string name="aag_title_1">Add Guest(s) to Event</string>
+    <string name="aag_title_2">Share Event</string>
 
-    <!--region Add guest Activity EditText/TextView Hint/Text-->
     <string name="aag_et_phone">Enter guest phone numbers here</string>
     <string name="aag_et_email">Enter guest emails here</string>
     <string name="aag_et_search">Search</string>
+
     <string name="aag_tv_add">ADD</string>
+
+    <string name="aag_menu_add">Add</string>
+    <string name="aag_menu_share">Share</string>
+    <!--endregion-->
+
+    <!--region Add Friend Activity-->
+    <string name="aaf_title">Add Friend(s) to Event</string>
+
+    <string name="aaf_tv_email_error_1">Please enter valid email address</string>
+    <string name="aaf_tv_email_error_2">Email address already added</string>
     <!--endregion-->
 
     <!--region Dialog Buttons-->
@@ -79,32 +78,16 @@
     <string name="dd_ok">OK</string>
     <!--endregion-->
 
-    <!--region Intent Parsing Strings-->
-    <string name="from_edit">edit</string>
-    <string name="from_new">new</string>
-    <string name="event">event</string>
-    <string name="from">from</string>
-    <!--endregion-->
+    <!--region Dialog Action/GPS/Network/Alert/Server Messages-->
+    <string name="dd_msg_server">Sorry&#33;&#33;&#33; server is not responding or cannot reached&#44; please try again later&#46;</string>
+    <string name="dd_msg_internet">Your INTERNET seems to be disabled&#44;\ndo you want to enable it&#63;</string>
+    <string name="dd_msg_network">There is no network connection at the moment&#44; try again later&#46;</string>
+    <string name="dd_msg_authentication">You are not authorize user to do this event&#46;</string>
+    <string name="dd_msg_gps">Your GPS seems to be disabled&#44; do you want to enable it&#63;</string>
+    <string name="dd_msg_connection">Oops&#33;&#33;&#33; Connection is slow&#44; please try again&#46;</string>
+    <string name="dd_msg_time_out">Sorry&#33;&#33;&#33; Connection time out&#44; please try again&#46;</string>
+    <string name="dd_msg_no_internet">No Internet Connection</string>
 
-    <!--region GPS/Network/Alert/Server Messages-->
-    <string name="server_msg">Sorry&#33;&#33;&#33; server is not responding or cannot reached&#44; please try again later&#46;</string>
-    <string name="internet_msg">Your INTERNET seems to be disabled&#44;\ndo you want to enable it&#63;</string>
-    <string name="network_msg">There is no network connection at the moment&#44; try again later&#46;</string>
-    <string name="authentication_msg">You are not authorize user to do this event&#46;</string>
-    <string name="gps_msg">Your GPS seems to be disabled&#44; do you want to enable it&#63;</string>
-    <string name="connection_msg">Oops&#33;&#33;&#33; Connection is slow&#44; please try again&#46;</string>
-    <string name="time_out_msg">Sorry&#33;&#33;&#33; Connection time out&#44; please try again&#46;</string>
-    <string name="internet">No Internet Connection</string>
-    <!--endregion-->
-
-    <!--region Dash Board Activity Bottom Navigation Menu Title-->
-    <string name="db_bnm_title_notifications">Notifications</string>
-    <string name="db_bnm_title_event">Events</string>
-    <string name="db_bnm_title_home">Home</string>
-    <string name="db_bnm_title_chats">Chats</string>
-    <!--endregion-->
-
-    <!--region Dialog Action Messages-->
     <string name="dd_permission_msg">Required permissions are not granted&#44; ask again&#63;</string>
     <string name="dd_decline_msg">Are you sure you want to decline this event&#63;</string>
     <string name="dd_cancel_msg">Are you sure you want to cancel this event&#63;</string>
@@ -120,21 +103,27 @@
     <string name="dd_btn_add_click">Click here to action</string>
     <string name="dd_info_add_verified">Your address proof verification is still pending on our end. Your concern has been acknowledged. We will notify you via email as soon as your address proof is verified.\n\nSorry for the inconvenience!</string>
     <string name="dd_info_img">Accepted formats: PDF/JPEG/PNG\nDocuments such as Utility bill, Local library card</string>
+    <string name="dd_notification_success">Notification settings updated successfully</string>
+    <!--endregion-->
+
+    <!--region Dash Board Activity Bottom Navigation Menu Title-->
+    <string name="db_bnm_title_notifications">Notifications</string>
+    <string name="db_bnm_title_event">Events</string>
+    <string name="db_bnm_title_home">Home</string>
+    <string name="db_bnm_title_chats">Chats</string>
+    <string name="db_bnm_title_feedback">Feedback</string>
+    <string name="db_bnm_title_profile">Profile</string>
     <!--endregion-->
 
     <!--region Event Fragment Tab Title-->
     <string name="ef_tab_upcoming">Upcoming</string>
     <string name="ef_tab_pending">Pending</string>
     <string name="ef_tab_yours">Yours</string>
-    <!--endregion-->
 
-    <!--region Event Fragment TextView-->
-    <string name="empty_ue_msg">No upcoming events found</string>
-    <string name="empty_pe_msg">No pending events found</string>
-    <string name="empty_ye_msg">No events created</string>
-    <!--endregion-->
+    <string name="ef_empty_ue_msg">No upcoming events found</string>
+    <string name="ef_empty_pe_msg">No pending events found</string>
+    <string name="ef_empty_ye_msg">No events created</string>
 
-    <!--region Event Fragment Menu-->
     <string name="ef_menu_create">Create</string>
     <!--endregion-->
 
@@ -158,10 +147,11 @@
     <!--region Event Response Messages-->
     <string name="event_success_msg">Event created successfully</string>
     <string name="event_update_msg">Event updated successfully</string>
-    <string name="event_cancel_msg">Event canceled successfully</string>
+    <string name="event_cancel_msg">Event cancelled successfully</string>
     <string name="event_guest_added">Guest added successfully</string>
     <string name="event_guest_exist">Guest already selected</string>
     <string name="event_success">This event has been added to your calender.</string>
+    <string name="event_update">This event has been updated to your calender.</string>
     <!--endregion-->
 
     <!--region Context Menu Title-->
@@ -170,32 +160,37 @@
 
     <!--region Home Activity Footer-->
     <string name="ha_footer">&#42; Privacy policies &#124; talktiva&#8482;</string>
-    <!--endregion-->
 
-    <!--region Home Activity Button Text-->
     <string name="ha_btn_login">Log In</string>
     <string name="ha_btn_create">Create Account</string>
-    <!--endregion-->
 
     <string name="ha_tv_content_1">The Private social network for your community 1</string>
     <string name="ha_tv_content_2">The Private social network for your community 2</string>
     <string name="ha_tv_content_3">The Private social network for your community 3</string>
     <string name="ha_tv_content_4">The Private social network for your community 4</string>
     <string name="ha_tv_content_5">The Private social network for your community 5</string>
+    <!--endregion-->
 
     <!--region Login Activity Button/Hint/Error Text-->
     <string name="la_btn_fb">Sign-in with Facebook</string>
     <string name="la_btn_google">Sign-in with Google</string>
+
     <string name="la_tv_welcome">Welcome Back&#33;</string>
+
     <string name="la_ll_tv_or">OR USE YOUR OWN EMAIL</string>
+
     <string name="la_et_email">Email</string>
     <string name="la_et_pass">Password</string>
+
     <string name="la_tv_forgot">Forgot Password&#63;</string>
+
     <string name="la_btn_sign_in">Sign-In</string>
+
     <string name="la_tv_email_empty">Please enter email</string>
     <string name="la_tv_email_error">Please enter valid email</string>
     <string name="la_tv_pass_empty">Please enter password</string>
     <string name="la_tv_pass_error">Please enter valid password</string>
+
     <string name="la_til_helper_pass">Password should be 8 characters or more&#46;\nIt can be any combination of letters&#44; numbers and symbols&#46;\neg.Abcd@123</string>
     <!--endregion-->
 
@@ -203,26 +198,30 @@
     <string name="fa_et_email">Email</string>
     <string name="fa_et_empty">Please enter email</string>
     <string name="fa_et_error">Please enter valid email</string>
+
     <string name="fa_tv_forgot">Forgot your password&#63;</string>
     <string name="fa_tv">Please enter your registered email address&#44; and we will send you a link to reset your password&#46;</string>
+
     <string name="fa_btn_reset">Reset Password</string>
     <!--endregion-->
 
     <!--region Find Community Activity Button/Text-->
     <string name="fca_tv">Hi there&#33;\nLet us get started&#46;&#46;&#46;</string>
     <string name="fca_tv_invitation">Have an invitation code&#63;</string>
+
     <string name="fca_btn_fyc">Find your community</string>
     <!--endregion-->
 
     <!--region Community Activity Button/Text-->
     <string name="ca_tv_direct">Please enter your home address</string>
-    <string name="ca_tv_invitation">Please confirm your home address</string>
-    <string name="ca_et_street">Street Name (Required)</string>
-    <string name="ca_et_apart">Apartment/Unit (Optional)</string>
+    <string name="ca_tv_zip">Please enter your zip code</string>
     <string name="ca_et_zip">Zip Code (Required)</string>
-    <string name="ca_btn_fyc">Find your community</string>
-    <string name="ca_et_street_error">Please enter street name</string>
-    <string name="ca_et_zip_error">Please enter zip code</string>
+    <string name="ca_et_community">Enter community name here</string>
+
+    <string name="ca_et_apart">Apartment/Unit (Optional)</string>
+    <string name="ca_et_street">Street Name (Required)</string>
+    <string name="ca_btn_next">Next</string>
+    <string name="ca_et_street_error">Please enter valid street name</string>
     <!--endregion-->
 
     <!--region Invitation Activity Text-->
@@ -267,17 +266,154 @@
     <string name="apa_btn_upload">Upload</string>
     <!--endregion-->
 
-    <string name="sample_add">10 Taylor Ct&#44; Ridgefield CT 06877</string>
+    <!--region Home Fragment-->
+    <string name="hf_menu_community">Community</string>
+    <!--endregion-->
 
+    <!--region For Back Press-->
     <string name="back">Back</string>
     <string name="exit">Please click BACK again to exit</string>
-    <string name="title_activity_forgot">ForgotActivity</string>
-    <string name="title_activity_find_community">FindCommunityActivity</string>
-    <string name="title_activity_invitation">InvitationActivity</string>
-    <string name="title_activity_forgot_result">ForgotResultActivity</string>
-    <string name="title_activity_community">CommunityActivity</string>
-    <string name="title_activity_community_found">CommunityFoundActivity</string>
-    <string name="title_activity_signup">SignupActivity</string>
-    <string name="title_activity_address_proof">AddressProofActivity</string>
+    <!--endregion-->
 
+    <!--region Profile Activity-->
+    <string name="pa_tv_eh_title">Event Hosted</string>
+    <string name="pa_tv_ea_title">Event Attended</string>
+    <string name="pa_tv_post">Post</string>
+    <string name="pa_tv_notification">Notification</string>
+    <string name="pa_tv_family">My Family Member</string>
+    <string name="pa_tv_feedback">Send Feedback</string>
+    <string name="pa_tv_setting">Settings</string>
+    <string name="pa_tv_about">About Us</string>
+    <string name="pa_btn_logout">Logout</string>
+    <string name="pa_btn_lc">Leave Community</string>
+    <string name="pa_btn_da">Delete Account</string>
+    <!--endregion-->
+
+    <!--region Notification Settings-->
+    <string name="na_title">Notification Settings</string>
+    <string name="na_sw_pause">Pause All</string>
+    <string name="na_tv_events">Events</string>
+    <string name="na_sw_invited">Invited</string>
+    <string name="na_sw_ad">Accept or Decline</string>
+    <string name="na_sw_sl">Share or Like</string>
+    <string name="na_sw_canceled">Canceled</string>
+    <string name="na_tv_post">Post</string>
+    <string name="na_sw_like">Like</string>
+    <string name="na_sw_comment">Comment</string>
+    <string name="na_sw_ra">Report Abuse</string>
+    <string name="na_tv_chats">Chats</string>
+    <string name="na_sw_dc">Direct Chats</string>
+    <string name="na_tv_dcs">Direct Chats Sound</string>
+    <string name="na_sw_gc">Group Chats</string>
+    <string name="na_tv_gcs">Group Chats Sound</string>
+    <string name="na_tv_community">My Community</string>
+    <string name="na_sw_people">New People Joined Community</string>
+    <string name="na_sw_mc">Management Chat</string>
+    <string name="na_sw_notice">Notice</string>
+    <string name="na_btn_ran">Reset All Notification</string>
+    <string name="title_activity_my_family_member">MyFamilyMemberActivity</string>
+    <!--endregion-->
+
+    <!--region My Family Members Activity-->
+    <string name="mfa_title">My Family Members</string>
+    <string name="mfa_menu_add_title">Add Family Members</string>
+
+    <string name="mfa_btn_approve">Approve</string>
+    <string name="mfa_btn_re_invite">Re-Invite</string>
+    <string name="mfa_btn_invite">Invite</string>
+
+    <string name="mfa_tv">No family members added</string>
+    <!--endregion-->
+
+    <!--region Edit Profile Activity-->
+    <string name="epa_title">Edit Profile</string>
+
+    <string name="epa_et_fn">Full Name (Required)</string>
+    <string name="epa_et_email">Email (Required if registered using email)</string>
+    <string name="epa_et_phone">Phone Number (Option) xxx-xxx-xxxx</string>
+    <string name="epa_et_dob">Birthday (Required)</string>
+    <string name="epa_et_rs">Resident Since (Required)</string>
+
+    <string name="epa_tv_des">Please Note : If you change your name on talktiva, you can\'t change it again for 60 days.</string>
+
+    <string name="epa_sw_dob">Show my birthday</string>
+
+    <string name="epa_tv_photo">Edit Profile Picture</string>
+
+    <string name="epa_tv_fn_error">Please enter full name</string>
+    <string name="epa_tv_fn_val">Please enter valid full name</string>
+    <string name="epa_tv_dob_error">Please select birthday</string>
+    <string name="epa_tv_rs_error">Please select resident since</string>
+    <!--endregion-->
+
+    <string name="title_activity_add_family_member">AddFamilyMemberActivity</string>
+
+    <!--region Add Family Member-->
+    <string name="afm_title_1">Add Family Member</string>
+    <string name="afm_title_2">Edit Family Member</string>
+    <string name="afm_text">*To invite family members to this community, email or phone is required</string>
+
+    <string name="afm_et_fn">Full Name (Required)</string>
+    <string name="afm_et_email">Email (Required)</string>
+    <string name="afm_et_phone">Phone Number (Option) xxx-xxx-xxxx</string>
+    <string name="afm_et_dob">Birthday (Required)</string>
+
+    <string name="afm_sw_dob">Show my birthday</string>
+
+    <string name="afm_tv_fn_error">Please enter full name</string>
+    <string name="afm_tv_fn_val">Please enter valid full name</string>
+
+    <string name="afm_tv_email_error">Please enter email</string>
+    <string name="afm_tv_email_val">Please enter valid email</string>
+
+    <string name="afm_tv_dob_error">Please select birthday</string>
+    <!--endregion-->
+
+    <!--region Settings-->
+    <string name="sa_title">Settings</string>
+
+    <string name="sa_calendar_sync">Calender Sync for Events</string>
+    <string name="sa_residents_view">Residents View by House Number</string>
+    <!--endregion-->
+
+    <!--region Detail Event Invitee RecyclerView ImageView Description-->
+    <string name="event_user">User Image</string>
+    <!--endregion-->
+
+    <!--region About Us Activity-->
+    <string name="aa_title">About Us</string>
+
+    <string name="aa_tv_version">Version</string>
+    <string name="aa_tv_privacy">Privacy</string>
+    <string name="aa_tv_terms">Terms of use</string>
+    <string name="aa_tv_ack">Acknowledgement</string>
+    <!--endregion-->
+
+    <!--region Feedback Activity-->
+    <string name="fba_title">Feedback</string>
+    <string name="fba_et">Please enter your feedback here</string>
+    <string name="fba_tv">Please enter feedback</string>
+    <!--endregion-->
+
+    <!--region Change Password Activity-->
+    <string name="acp_tv">Create New Password</string>
+
+    <string name="acp_et_current">Current Password</string>
+    <string name="acp_et_new_pass">New Password</string>
+    <string name="acp_et_confirm_pass">Confirm Password</string>
+
+    <string name="acp_btn_continue">Continue</string>
+
+    <string name="acp_tv_cur_error">Please enter current password</string>
+    <string name="acp_tv_new_error">Please enter new password</string>
+    <string name="acp_tv_confirm_error">Please enter confirm password</string>
+
+    <string name="acp_tv_pass_val">Please enter valid password</string>
+    <string name="acp_tv_pass_confirm">Password does not matched</string>
+    <!--endregion-->
+
+    <string name="divider">&#124;</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

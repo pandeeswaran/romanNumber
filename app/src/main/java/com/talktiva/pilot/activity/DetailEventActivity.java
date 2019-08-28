@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +36,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.fragment.invitee.InviteeFragment;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.CustomTypefaceSpan;
@@ -149,7 +152,7 @@ public class DetailEventActivity extends AppCompatActivity {
         tvOther.setTypeface(Utility.INSTANCE.getFontRegular());
 
         Bundle bundle = getIntent().getExtras();
-        from = bundle != null ? bundle.getInt(getResources().getString(R.string.from)) : 0;
+        from = bundle != null ? bundle.getInt(AppConstant.FROM) : 0;
 
         switch (from) {
             case 0:
@@ -163,13 +166,107 @@ public class DetailEventActivity extends AppCompatActivity {
                 break;
         }
 
-        Event event = (Event) (bundle != null ? bundle.getSerializable(getResources().getString(R.string.event)) : null);
+        event = (Event) (bundle != null ? bundle.getSerializable(AppConstant.EVENTT) : null);
         eventId = Objects.requireNonNull(Objects.requireNonNull(event).getEventId());
         if (Utility.INSTANCE.isConnectingToInternet()) {
             getEventById(eventId);
         }
 
         registerForContextMenu(ivMore);
+
+        ivShare.setOnClickListener(v -> {
+            switch (from) {
+                case 0:
+                    Intent intentNew1 = new Intent(DetailEventActivity.this, AddGuestActivity.class);
+                    Bundle bundleNew1 = new Bundle();
+                    bundleNew1.putString(AppConstant.FROM, AppConstant.DETAIL);
+                    bundleNew1.putString(AppConstant.FRAGMENT, AppConstant.PENDING_DETAIL);
+                    bundleNew1.putInt(AppConstant.ID, event.getEventId());
+                    List<String> stringList1 = new ArrayList<>();
+                    if (event.getInvitations() != null) {
+                        if (event.getInvitations().size() != 0) {
+                            for (int i = 0; i < event.getInvitations().size(); i++) {
+                                if (event.getInvitations().get(i).getInviteeId() != null) {
+                                    stringList1.add(String.valueOf(event.getInvitations().get(i).getInviteeId()));
+                                }
+                            }
+                            if (stringList1.size() == 1) {
+                                bundleNew1.putString(AppConstant.INVITATION, stringList1.get(0));
+                            } else {
+                                String str = TextUtils.join(",", stringList1);
+                                bundleNew1.putString(AppConstant.INVITATION, str);
+                            }
+                        } else {
+                            bundleNew1.putString(AppConstant.INVITATION, null);
+                        }
+                    } else {
+                        bundleNew1.putString(AppConstant.INVITATION, null);
+                    }
+                    intentNew1.putExtras(bundleNew1);
+                    startActivity(intentNew1);
+                    break;
+
+                case 1:
+                    Intent intentNew2 = new Intent(DetailEventActivity.this, AddGuestActivity.class);
+                    Bundle bundleNew2 = new Bundle();
+                    bundleNew2.putString(AppConstant.FROM, AppConstant.DETAIL);
+                    bundleNew2.putString(AppConstant.FRAGMENT, AppConstant.UPCOMMING_DETAIL);
+                    bundleNew2.putInt(AppConstant.ID, event.getEventId());
+                    List<String> stringList2 = new ArrayList<>();
+                    if (event.getInvitations() != null) {
+                        if (event.getInvitations().size() != 0) {
+                            for (int i = 0; i < event.getInvitations().size(); i++) {
+                                if (event.getInvitations().get(i).getInviteeId() != null) {
+                                    stringList2.add(String.valueOf(event.getInvitations().get(i).getInviteeId()));
+                                }
+                            }
+                            if (stringList2.size() == 1) {
+                                bundleNew2.putString(AppConstant.INVITATION, stringList2.get(0));
+                            } else {
+                                String str = TextUtils.join(",", stringList2);
+                                bundleNew2.putString(AppConstant.INVITATION, str);
+                            }
+                        } else {
+                            bundleNew2.putString(AppConstant.INVITATION, null);
+                        }
+                    } else {
+                        bundleNew2.putString(AppConstant.INVITATION, null);
+                    }
+                    intentNew2.putExtras(bundleNew2);
+                    startActivity(intentNew2);
+                    break;
+
+                case 2:
+                    Intent intentNew3 = new Intent(DetailEventActivity.this, AddGuestActivity.class);
+                    Bundle bundleNew3 = new Bundle();
+                    bundleNew3.putString(AppConstant.FROM, AppConstant.DETAIL);
+                    bundleNew3.putString(AppConstant.FRAGMENT, AppConstant.YOURS_DETAIL);
+                    bundleNew3.putInt(AppConstant.ID, event.getEventId());
+                    List<String> stringList3 = new ArrayList<>();
+                    if (event.getInvitations() != null) {
+                        if (event.getInvitations().size() != 0) {
+                            for (int i = 0; i < event.getInvitations().size(); i++) {
+                                if (event.getInvitations().get(i).getInviteeId() != null) {
+                                    stringList3.add(String.valueOf(event.getInvitations().get(i).getInviteeId()));
+                                }
+                            }
+                            if (stringList3.size() == 1) {
+                                bundleNew3.putString(AppConstant.INVITATION, stringList3.get(0));
+                            } else {
+                                String str = TextUtils.join(",", stringList3);
+                                bundleNew3.putString(AppConstant.INVITATION, str);
+                            }
+                        } else {
+                            bundleNew3.putString(AppConstant.INVITATION, null);
+                        }
+                    } else {
+                        bundleNew3.putString(AppConstant.INVITATION, null);
+                    }
+                    intentNew3.putExtras(bundleNew3);
+                    startActivity(intentNew3);
+                    break;
+            }
+        });
     }
 
     @Override
@@ -199,13 +296,18 @@ public class DetailEventActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         LocalBroadcastManager.getInstance(DetailEventActivity.this).unregisterReceiver(r);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
         try {
             unregisterReceiver(receiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
+        super.onPause();
     }
 
     @Override
@@ -218,8 +320,8 @@ public class DetailEventActivity extends AppCompatActivity {
             case R.id.dea_menu_edit:
                 Intent intent = new Intent(DetailEventActivity.this, CreateEventActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString(getResources().getString(R.string.from), getResources().getString(R.string.from_edit));
-                bundle.putSerializable(getResources().getString(R.string.event), event);
+                bundle.putString(AppConstant.FROM, AppConstant.EDIT);
+                bundle.putSerializable(AppConstant.EVENTT, event);
                 intent.putExtras(bundle);
                 startActivity(intent);
                 return true;
@@ -263,10 +365,6 @@ public class DetailEventActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -308,10 +406,6 @@ public class DetailEventActivity extends AppCompatActivity {
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(cancelDialog);
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -503,10 +597,6 @@ public class DetailEventActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -527,6 +617,9 @@ public class DetailEventActivity extends AppCompatActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getTitle().toString().equalsIgnoreCase(getResources().getString(R.string.atc))) {
+            long start, end;
+            start = end = Objects.requireNonNull(event.getEventDate()).getTime();
+
             Cursor cursor = getContentResolver().query(CalendarContract.Calendars.CONTENT_URI, null, null, null, null);
             long calenderId = 0;
 
@@ -534,29 +627,87 @@ public class DetailEventActivity extends AppCompatActivity {
                 calenderId = cursor.getLong(cursor.getColumnIndex(CalendarContract.Calendars._ID));
             }
 
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(CalendarContract.Events.CALENDAR_ID, calenderId);
-            contentValues.put(CalendarContract.Events.TITLE, event.getTitle());
-            contentValues.put(CalendarContract.Events.EVENT_LOCATION, event.getLocation());
-            contentValues.put(CalendarContract.Events.ALL_DAY, false);
-            contentValues.put(CalendarContract.Events.STATUS, true);
-            contentValues.put(CalendarContract.Events.HAS_ALARM, true);
-            contentValues.put(CalendarContract.Events.DTSTART, (Objects.requireNonNull(event.getEventDate()).getTime() + 60 * 60 * 1000));
-            contentValues.put(CalendarContract.Events.DTEND, event.getEventDate().getTime() + 60 * 60 * 1000);
-            contentValues.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().toString());
+//            String[] proj = new String[]{CalendarContract.Instances._ID, CalendarContract.Instances.BEGIN, CalendarContract.Instances.END, CalendarContract.Instances.EVENT_ID};
+//            Cursor c = CalendarContract.Instances.query(getContentResolver(), proj, begin, end, event.getTitle());
+//            if (c.getCount() > 0) {
+//                ContentValues events = new ContentValues();
+//                events.put(CalendarContract.Events.TITLE, event.getTitle());
+//                events.put(CalendarContract.Events.EVENT_LOCATION, event.getLocation());
+//                events.put(CalendarContract.Events.DTSTART, begin);
+//                events.put(CalendarContract.Events.DTEND, end);
+//                events.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().toString());
+//
+//                c.moveToFirst();
+//
+//                long tempEventId = c.getLong(c.getColumnIndex(CalendarContract.Instances._ID));
+//                Uri updateUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, tempEventId);
+//                int rowEvent = getContentResolver().update(updateUri, events, null, null);
+//                Log.d(Talktiva.Companion.getTAG(), "onContextItemSelected: ".concat(String.valueOf(rowEvent)));
+//
+//                ContentValues reminders = new ContentValues();
+//                reminders.put(CalendarContract.Reminders.MINUTES, getResources().getInteger(R.integer.event_alert_time));
+//
+//                long tempReminderId = c.getLong(c.getColumnIndex(CalendarContract.Instances.EVENT_ID));
+//                Uri reminderUri = ContentUris.withAppendedId(CalendarContract.Reminders.CONTENT_URI, tempReminderId);
+//                int rowReminder = getContentResolver().update(reminderUri, reminders, null, null);
+//                Log.d(Talktiva.Companion.getTAG(), "onContextItemSelected: ".concat(String.valueOf(rowReminder)));
+//
+//                internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, R.string.event_update, false, View.VISIBLE, R.string.dd_btn_continue, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+//                internetDialog.show();
+//            } else {
+//                ContentValues events = new ContentValues();
+//                events.put(CalendarContract.Events.CALENDAR_ID, calenderId);
+//                events.put(CalendarContract.Events.TITLE, event.getTitle());
+//                events.put(CalendarContract.Events.EVENT_LOCATION, event.getLocation());
+//                events.put(CalendarContract.Events.ALL_DAY, false);
+//                events.put(CalendarContract.Events.STATUS, true);
+//                events.put(CalendarContract.Events.HAS_ALARM, true);
+//                events.put(CalendarContract.Events.DTSTART, begin);
+//                events.put(CalendarContract.Events.DTEND, end);
+//                events.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().toString());
+//
+//                Uri eventUri = getContentResolver().insert(CalendarContract.Events.CONTENT_URI, events);
+//                Log.d(Talktiva.Companion.getTAG(), "onContextItemSelected: ".concat(Objects.requireNonNull(eventUri).toString()));
+//                long eventID = ContentUris.parseId(eventUri);
+//
+//                ContentValues reminders = new ContentValues();
+//                reminders.put(CalendarContract.Reminders.EVENT_ID, eventID);
+//                reminders.put(CalendarContract.Reminders.METHOD, true);
+//                reminders.put(CalendarContract.Reminders.MINUTES, getResources().getInteger(R.integer.event_alert_time));
+//
+//                Uri reminderUri = getContentResolver().insert(CalendarContract.Reminders.CONTENT_URI, reminders);
+//                Log.d(Talktiva.Companion.getTAG(), "onContextItemSelected: ".concat(Objects.requireNonNull(reminderUri).toString()));
+//
+//                internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, R.string.event_success, false, View.VISIBLE, R.string.dd_btn_continue, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+//                internetDialog.show();
+//            }
 
-            Uri eventUri = getContentResolver().insert(CalendarContract.Events.CONTENT_URI, contentValues);
+            ContentValues events = new ContentValues();
+            events.put(CalendarContract.Events.CALENDAR_ID, calenderId);
+            events.put(CalendarContract.Events.TITLE, event.getTitle());
+            events.put(CalendarContract.Events.EVENT_LOCATION, event.getLocation());
+            events.put(CalendarContract.Events.ALL_DAY, false);
+            events.put(CalendarContract.Events.STATUS, true);
+            events.put(CalendarContract.Events.HAS_ALARM, true);
+            events.put(CalendarContract.Events.DTSTART, start);
+            events.put(CalendarContract.Events.DTEND, end);
+            events.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().toString());
+
+            Uri eventUri = getContentResolver().insert(CalendarContract.Events.CONTENT_URI, events);
+            Log.d(Talktiva.Companion.getTAG(), "onContextItemSelected: ".concat(Objects.requireNonNull(eventUri).toString()));
             long eventID = ContentUris.parseId(eventUri);
 
             ContentValues reminders = new ContentValues();
             reminders.put(CalendarContract.Reminders.EVENT_ID, eventID);
             reminders.put(CalendarContract.Reminders.METHOD, true);
             reminders.put(CalendarContract.Reminders.MINUTES, getResources().getInteger(R.integer.event_alert_time));
-            String reminderUriString = "content://com.android.calendar/reminders";
-            getContentResolver().insert(Uri.parse(reminderUriString), reminders);
 
-            internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, R.string.event_success, false, View.VISIBLE, R.string.dd_btn_continue, v -> internetDialog.dismiss(), View.GONE, null, null);
+            Uri reminderUri = getContentResolver().insert(CalendarContract.Reminders.CONTENT_URI, reminders);
+            Log.d(Talktiva.Companion.getTAG(), "onContextItemSelected: ".concat(Objects.requireNonNull(reminderUri).toString()));
+
+            internetDialog = Utility.INSTANCE.showAlert(DetailEventActivity.this, R.string.event_success, false, View.VISIBLE, R.string.dd_btn_continue, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
             internetDialog.show();
+
             return true;
         } else {
             return false;
@@ -590,10 +741,6 @@ public class DetailEventActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(DetailEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }

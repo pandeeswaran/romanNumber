@@ -33,6 +33,7 @@ import com.github.vivchar.viewpagerindicator.ViewPagerIndicator;
 import com.squareup.picasso.Picasso;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.Talktiva;
+import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Slider;
@@ -47,32 +48,24 @@ import butterknife.OnPageChange;
 
 public class WelcomeActivity extends AppCompatActivity {
 
-    @BindView(R.id.ha_vp)
-    ViewPager viewPager;
-
-    @BindView(R.id.ha_footer)
-    TextView footer;
-
-    @BindView(R.id.ha_btn_login)
-    Button btnLogin;
-
-    @BindView(R.id.ha_btn_create)
-    Button btnCreate;
-
-    @BindView(R.id.ha_vpi)
-    ViewPagerIndicator pagerIndicator;
-
-    @BindView(R.id.ha_tv_content)
-    TextView tvContent;
-
     private static final int PERMISSION_REQUEST_CODE = 123;
-
     private final String[] appPermissions = {
             Manifest.permission.INTERNET,
             Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE};
-
+    @BindView(R.id.ha_vp)
+    ViewPager viewPager;
+    @BindView(R.id.ha_footer)
+    TextView tvFooter;
+    @BindView(R.id.ha_btn_login)
+    Button btnLogin;
+    @BindView(R.id.ha_btn_create)
+    Button btnCreate;
+    @BindView(R.id.ha_vpi)
+    ViewPagerIndicator pagerIndicator;
+    @BindView(R.id.ha_tv_content)
+    TextView tvContent;
     private Boolean doubleBackToExitPressedOnce = false;
     private MyPagerAdapter pagerAdapter;
     private BroadcastReceiver receiver;
@@ -82,14 +75,6 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private Integer delay = 4000;
     private Integer page = 0;
-
-    private BroadcastReceiver r = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            finish();
-        }
-    };
-
     Runnable runnable = new Runnable() {
         public void run() {
             if (pagerAdapter.getCount() == page) {
@@ -99,6 +84,12 @@ public class WelcomeActivity extends AppCompatActivity {
             }
             viewPager.setCurrentItem(page, true);
             handler.postDelayed(this, delay);
+        }
+    };
+    private BroadcastReceiver r = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            finish();
         }
     };
 
@@ -116,10 +107,10 @@ public class WelcomeActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         handler = new Handler();
 
-        btnCreate.setTypeface(Utility.INSTANCE.getFontRegular());
         tvContent.setTypeface(Utility.INSTANCE.getFontRegular());
+        btnCreate.setTypeface(Utility.INSTANCE.getFontRegular());
         btnLogin.setTypeface(Utility.INSTANCE.getFontRegular());
-        footer.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvFooter.setTypeface(Utility.INSTANCE.getFontRegular());
 
         sliders = new ArrayList<>();
         sliders.add(new Slider(R.string.ha_tv_content_1, "https://images.pexels.com/photos/2300595/pexels-photo-2300595.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"));
@@ -133,6 +124,12 @@ public class WelcomeActivity extends AppCompatActivity {
         pagerIndicator.setupWithViewPager(viewPager);
         viewPager.setOffscreenPageLimit(5);
         tvContent.setText(Objects.requireNonNull(sliders.get(0).getText()));
+
+        tvFooter.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(AppConstant.PRIVACY_POLICY));
+            startActivity(i);
+        });
 
         checkAndRequestPermission();
 
@@ -189,16 +186,16 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         handler.removeCallbacks(runnable);
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
         try {
             unregisterReceiver(receiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
         LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
         super.onDestroy();
     }
@@ -206,15 +203,21 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
         receiver = new NetworkChangeReceiver();
         registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         handler.postDelayed(runnable, delay);
         LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r, new IntentFilter("CloseWelcome"));
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+        this.doubleBackToExitPressedOnce = true;
+        Utility.INSTANCE.showMsg(R.string.exit);
+        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }
 
     private class MyPagerAdapter extends PagerAdapter {
@@ -252,17 +255,4 @@ public class WelcomeActivity extends AppCompatActivity {
             return view == object;
         }
     }
-
-    @Override
-    public void onBackPressed() {
-        if (doubleBackToExitPressedOnce) {
-            super.onBackPressed();
-            return;
-        }
-        this.doubleBackToExitPressedOnce = true;
-        Utility.INSTANCE.showMsg(R.string.exit);
-        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
-    }
-
-
 }

@@ -25,18 +25,28 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.fragment.EmptyFragment;
 import com.talktiva.pilot.fragment.EventFragment;
+import com.talktiva.pilot.fragment.FeedbackFragment;
+import com.talktiva.pilot.fragment.HomeFragment;
+import com.talktiva.pilot.fragment.NotificationFragment;
+import com.talktiva.pilot.fragment.ProfileFragment;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
@@ -44,6 +54,7 @@ import com.talktiva.pilot.model.Count;
 import com.talktiva.pilot.model.User;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
+import com.talktiva.pilot.results.ResultAllUser;
 import com.talktiva.pilot.results.ResultError;
 import com.talktiva.pilot.results.ResultMessage;
 
@@ -52,9 +63,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -68,7 +78,8 @@ public class DashBoardActivity extends AppCompatActivity {
 
     private final String[] appPermissions = {
             Manifest.permission.WRITE_CALENDAR,
-            Manifest.permission.READ_CALENDAR};
+            Manifest.permission.READ_CALENDAR,
+            Manifest.permission.VIBRATE};
 
     @BindView(R.id.db_bnv)
     BottomNavigationView bottomNavigationView;
@@ -76,6 +87,7 @@ public class DashBoardActivity extends AppCompatActivity {
     private Dialog dialogPermission, dialogClose, internetDialog, progressDialog;
     private GoogleSignInClient mGoogleSignInClient;
     private BroadcastReceiver receiver;
+    private String token;
 
     public static void showBadge(Context context, BottomNavigationView bottomNavigationView, int itemId, String value) {
         removeBadge(bottomNavigationView, itemId);
@@ -99,11 +111,17 @@ public class DashBoardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dash_board);
         ButterKnife.bind(this);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        mGoogleSignInClient = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
-                .build();
+                .build());
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        FacebookSdk.sdkInitialize(Talktiva.Companion.getInstance());
+        AppEventsLogger.activateApp(Objects.requireNonNull(Talktiva.Companion.getInstance()));
+
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        token = FirebaseInstanceId.getInstance().getToken();
+        sendFcmToken(token);
 
         progressDialog = Utility.INSTANCE.showProgress(DashBoardActivity.this);
 
@@ -163,25 +181,8 @@ public class DashBoardActivity extends AppCompatActivity {
     //endregion
 
     @Override
-    protected void onDestroy() {
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        super.onDestroy();
-    }
-
-    @Override
     public void onBackPressed() {
         dialogClose = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_exit_msg, true, View.VISIBLE, R.string.dd_yes, v -> {
-            Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
-            Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
-            Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
-            Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
-            Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-            Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
-            logoutFromGoogle();
             dialogClose.dismiss();
             finishAffinity();
         }, View.VISIBLE, R.string.dd_no, v -> dialogClose.dismiss());
@@ -191,13 +192,6 @@ public class DashBoardActivity extends AppCompatActivity {
     private void loadFragment(Fragment fragment, String tag) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.db_fl_container, fragment, tag);
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        transaction.commitAllowingStateLoss();
-    }
-
-    private void removeFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.remove(fragment);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         transaction.commitAllowingStateLoss();
     }
@@ -225,57 +219,49 @@ public class DashBoardActivity extends AppCompatActivity {
 
         bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getItemId()) {
-                case R.id.db_bnm_home:
-                    EmptyFragment homeFragment = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_home));
-                    if (homeFragment != null && homeFragment.isVisible()) {
-                        return true;
-                    } else {
-                        loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_home), getResources().getString(R.string.db_bnm_title_home));
-                        return true;
-                    }
+//                case R.id.db_bnm_home:
+//                    HomeFragment homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag(HomeFragment.TAG);
+//                    if (homeFragment != null && homeFragment.isVisible()) {
+//                        return true;
+//                    } else {
+//                        loadFragment(new HomeFragment(), HomeFragment.TAG);
+//                        return true;
+//                    }
+//
+//                case R.id.db_bnm_chats:
+//                    EmptyFragment chatsFragment = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_chats));
+//                    if (chatsFragment != null && chatsFragment.isVisible()) {
+//                        return true;
+//                    } else {
+//                        loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_chats), getResources().getString(R.string.db_bnm_title_chats));
+//                        return true;
+//                    }
 
-                case R.id.db_bnm_chats:
-                    EmptyFragment chatsFragment = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_chats));
-                    if (chatsFragment != null && chatsFragment.isVisible()) {
-                        return true;
-                    } else {
-                        loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_chats), getResources().getString(R.string.db_bnm_title_chats));
-                        return true;
-                    }
-
-                case R.id.db_bnm_add:
-                    EmptyFragment fragmentHome = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_home));
-                    if (fragmentHome != null && fragmentHome.isVisible()) {
-                        removeFragment(fragmentHome);
-                        return true;
-                    }
-
-                    EmptyFragment fragmentChats = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_chats));
-                    if (fragmentChats != null && fragmentChats.isVisible()) {
-                        removeFragment(fragmentChats);
-                        return true;
-                    }
-
-                    EmptyFragment fragmentNotification = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_notifications));
-                    if (fragmentNotification != null && fragmentNotification.isVisible()) {
-                        removeFragment(fragmentNotification);
-                        return true;
-                    }
-
-                    EventFragment fragmentEvent = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
-                    if (fragmentEvent != null && fragmentEvent.isVisible()) {
-                        removeFragment(fragmentEvent);
-                        return true;
-                    }
-
-                case R.id.db_bnm_notification:
-                    EmptyFragment notificationFragment = (EmptyFragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_notifications));
-                    if (notificationFragment != null && notificationFragment.isVisible()) {
-                        return true;
-                    } else {
-                        loadFragment(EmptyFragment.newInstance(R.string.db_bnm_title_notifications), getResources().getString(R.string.db_bnm_title_notifications));
-                        return true;
-                    }
+//                case R.id.db_bnm_add:
+//                    if (getSupportFragmentManager().findFragmentByTag(HomeFragment.TAG) != null && Objects.requireNonNull(getSupportFragmentManager().findFragmentByTag(HomeFragment.TAG)).isVisible()) {
+//                        removeFragment(getSupportFragmentManager().findFragmentByTag(HomeFragment.TAG));
+//                        return true;
+//                    } else if (getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_chats)) != null && Objects.requireNonNull(getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_chats))).isVisible()) {
+//                        removeFragment(getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.db_bnm_title_chats)));
+//                        return true;
+//                    } else if (getSupportFragmentManager().findFragmentByTag(NotificationFragment.TAG) != null && Objects.requireNonNull(getSupportFragmentManager().findFragmentByTag(NotificationFragment.TAG)).isVisible()) {
+//                        removeFragment(getSupportFragmentManager().findFragmentByTag(NotificationFragment.TAG));
+//                        return true;
+//                    } else if (getSupportFragmentManager().findFragmentByTag(EventFragment.TAG) != null && Objects.requireNonNull(getSupportFragmentManager().findFragmentByTag(EventFragment.TAG)).isVisible()) {
+//                        removeFragment(getSupportFragmentManager().findFragmentByTag(EventFragment.TAG));
+//                        return true;
+//                    } else {
+//                        return false;
+//                    }
+//
+//                case R.id.db_bnm_notification:
+//                    NotificationFragment notificationFragment = (NotificationFragment) getSupportFragmentManager().findFragmentByTag(NotificationFragment.TAG);
+//                    if (notificationFragment != null && notificationFragment.isVisible()) {
+//                        return true;
+//                    } else {
+//                        loadFragment(new NotificationFragment(), NotificationFragment.TAG);
+//                        return true;
+//                    }
 
                 case R.id.db_bnm_event:
                     EventFragment myFragment = (EventFragment) getSupportFragmentManager().findFragmentByTag(EventFragment.TAG);
@@ -285,26 +271,49 @@ public class DashBoardActivity extends AppCompatActivity {
                         loadFragment(new EventFragment(), EventFragment.TAG);
                         return true;
                     }
+
+                case R.id.db_bnm_feedback:
+                    FeedbackFragment fbFeedback = (FeedbackFragment) getSupportFragmentManager().findFragmentByTag(FeedbackFragment.TAG);
+                    if (fbFeedback != null && fbFeedback.isVisible()) {
+                        return true;
+                    } else {
+                        loadFragment(new FeedbackFragment(), FeedbackFragment.TAG);
+                        return true;
+                    }
+
+                case R.id.db_bnm_profile:
+                    ProfileFragment proFeedback = (ProfileFragment) getSupportFragmentManager().findFragmentByTag(ProfileFragment.TAG);
+                    if (proFeedback != null && proFeedback.isVisible()) {
+                        return true;
+                    } else {
+                        loadFragment(new ProfileFragment(), ProfileFragment.TAG);
+                        return true;
+                    }
             }
             return false;
         });
 
-        bottomNavigationView.setSelectedItemId(R.id.db_bnm_home);
+        bottomNavigationView.setSelectedItemId(R.id.db_bnm_event);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
         receiver = new NetworkChangeReceiver();
         registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         if (Utility.INSTANCE.isConnectingToInternet()) {
             setPendingEventCount();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        super.onPause();
     }
 
     private void setPendingEventCount() {
@@ -322,8 +331,12 @@ public class DashBoardActivity extends AppCompatActivity {
                     }
 
                     User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
-                    Date curDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime();
+                    Date curDate = Calendar.getInstance().getTime();
                     Date regDate = user.getCreatedOn();
+
+                    long diff = curDate.getTime() - regDate.getTime();
+                    long days = TimeUnit.MILLISECONDS.toDays(diff);
+                    int dayDiff = (int) days;
 
                     if (!response.body().getEmailVerified()) {
                         if (internetDialog != null) {
@@ -338,7 +351,9 @@ public class DashBoardActivity extends AppCompatActivity {
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                    logoutFromFacebook();
                                     logoutFromGoogle();
                                     finish();
                                     startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
@@ -356,41 +371,20 @@ public class DashBoardActivity extends AppCompatActivity {
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                                 Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                logoutFromFacebook();
                                 logoutFromGoogle();
                                 finish();
                                 startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
                             });
                             internetDialog.show();
                         }
-                    } else if ((Objects.requireNonNull(regDate).getDate() + 5) >= curDate.getDate() && regDate.getMonth() == curDate.getMonth() && regDate.getYear() == curDate.getYear()) {
+                    } else if (dayDiff <= 50) {
                         return;
-                    } else {
-                        if (!response.body().getAddressProofUploaded()) {
-                            if (internetDialog != null) {
-                                if (internetDialog.isShowing()) {
-                                    internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_add, View.VISIBLE, R.string.dd_btn_add_click, v -> {
-                                        Utility.INSTANCE.dismissDialog(internetDialog);
-                                        Intent intent = new Intent(DashBoardActivity.this, AddressProofActivity.class);
-                                        intent.putExtra(AppConstant.FROM, AppConstant.DASHBOARD);
-                                        intent.putExtra(AppConstant.ID, user.getUserId());
-                                        startActivity(intent);
-                                        finish();
-                                    }, v -> {
-                                        Utility.INSTANCE.dismissDialog(internetDialog);
-                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
-                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
-                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
-                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
-                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-                                        Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
-                                        logoutFromGoogle();
-                                        finish();
-                                        startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
-                                    });
-                                    internetDialog.show();
-                                }
-                            } else {
+                    } else if (!response.body().getAddressProofUploaded()) {
+                        if (internetDialog != null) {
+                            if (!internetDialog.isShowing()) {
                                 internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_add, View.VISIBLE, R.string.dd_btn_add_click, v -> {
                                     Utility.INSTANCE.dismissDialog(internetDialog);
                                     Intent intent = new Intent(DashBoardActivity.this, AddressProofActivity.class);
@@ -405,31 +399,42 @@ public class DashBoardActivity extends AppCompatActivity {
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                    logoutFromFacebook();
                                     logoutFromGoogle();
                                     finish();
                                     startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
                                 });
                                 internetDialog.show();
                             }
-                        } else if (!response.body().getAddressVerified()) {
-                            if (internetDialog != null) {
-                                if (internetDialog.isShowing()) {
-                                    internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.color.font, R.string.dd_info_add_verified, v -> {
-                                        Utility.INSTANCE.dismissDialog(internetDialog);
-                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
-                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
-                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
-                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
-                                        Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-                                        Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
-                                        logoutFromGoogle();
-                                        finish();
-                                        startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
-                                    });
-                                    internetDialog.show();
-                                }
-                            } else {
+                        } else {
+                            internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.string.dd_info_add, View.VISIBLE, R.string.dd_btn_add_click, v -> {
+                                Utility.INSTANCE.dismissDialog(internetDialog);
+                                Intent intent = new Intent(DashBoardActivity.this, AddressProofActivity.class);
+                                intent.putExtra(AppConstant.FROM, AppConstant.DASHBOARD);
+                                intent.putExtra(AppConstant.ID, user.getUserId());
+                                startActivity(intent);
+                                finish();
+                            }, v -> {
+                                Utility.INSTANCE.dismissDialog(internetDialog);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
+                                Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                logoutFromFacebook();
+                                logoutFromGoogle();
+                                finish();
+                                startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
+                            });
+                            internetDialog.show();
+                        }
+                    } else if (!response.body().getAddressVerified()) {
+                        if (internetDialog != null) {
+                            if (!internetDialog.isShowing()) {
                                 internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.color.font, R.string.dd_info_add_verified, v -> {
                                     Utility.INSTANCE.dismissDialog(internetDialog);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
@@ -437,13 +442,31 @@ public class DashBoardActivity extends AppCompatActivity {
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                    logoutFromFacebook();
                                     logoutFromGoogle();
                                     finish();
                                     startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
                                 });
                                 internetDialog.show();
                             }
+                        } else {
+                            internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, R.color.font, R.string.dd_info_add_verified, v -> {
+                                Utility.INSTANCE.dismissDialog(internetDialog);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+                                Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
+                                Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+                                logoutFromFacebook();
+                                logoutFromGoogle();
+                                finish();
+                                startActivity(new Intent(DashBoardActivity.this, WelcomeActivity.class));
+                            });
+                            internetDialog.show();
                         }
                     }
                 } else {
@@ -461,10 +484,6 @@ public class DashBoardActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Count> call, @NonNull Throwable t) {
                 Log.e(Talktiva.Companion.getTAG(), "onFailure: ".concat(t.getMessage()));
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(DashBoardActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -473,6 +492,12 @@ public class DashBoardActivity extends AppCompatActivity {
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, task -> {
                 });
+    }
+
+    private void logoutFromFacebook() {
+        if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
+            LoginManager.getInstance().logOut();
+        }
     }
 
     private void resendEmail() {
@@ -492,16 +517,40 @@ public class DashBoardActivity extends AppCompatActivity {
                         LocalBroadcastManager.getInstance(DashBoardActivity.this).sendBroadcast(new Intent("CloseWelcome"));
                     }, View.GONE, null, null);
                     internetDialog.show();
+                } else {
+                    Utility.INSTANCE.dismissDialog(progressDialog);
+                    try {
+                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
+                        }.getType());
+                        internetDialog = Utility.INSTANCE.showAlert(DashBoardActivity.this, resultError.getMessage(), true, View.VISIBLE, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+                        internetDialog.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResultMessage> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(DashBoardActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
+            }
+        });
+    }
+
+    private void sendFcmToken(String token) {
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
+        Call<ResultAllUser> call = apiInterface.sendToken(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))), token);
+        call.enqueue(new Callback<ResultAllUser>() {
+            @Override
+            public void onResponse(@NonNull Call<ResultAllUser> call, @NonNull Response<ResultAllUser> response) {
+                if (response.isSuccessful()) {
+
                 }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResultAllUser> call, @NonNull Throwable t) {
+
             }
         });
     }

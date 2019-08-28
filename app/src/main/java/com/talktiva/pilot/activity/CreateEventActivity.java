@@ -5,12 +5,14 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,13 +30,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.CustomTypefaceSpan;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Address;
 import com.talktiva.pilot.model.Event;
-import com.talktiva.pilot.model.Invitation;
 import com.talktiva.pilot.model.User;
 import com.talktiva.pilot.request.RequestEvent;
 import com.talktiva.pilot.rest.ApiClient;
@@ -44,12 +46,11 @@ import com.talktiva.pilot.results.ResultError;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -95,24 +96,75 @@ public class CreateEventActivity extends AppCompatActivity {
     @BindView(R.id.cea_sw_cg)
     Switch swCanGuest;
 
-    @BindView(R.id.cea_tv_invitee)
-    TextView tvInvitee;
-
     @BindView(R.id.cea_tv_count_fig)
     TextView tvCountFig;
 
     @BindView(R.id.cea_tv_count)
     TextView tvCount;
 
+    @BindView(R.id.cea_tv_invitee)
+    TextView tvInvitee;
+
+    @BindView(R.id.cea_tv_count_fig_friend)
+    TextView tvCountFigFriend;
+
+    @BindView(R.id.cea_tv_count_friend)
+    TextView tvCountFriend;
+
+    @BindView(R.id.cea_tv_friend)
+    TextView tvFriend;
+
     private DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
     private Dialog progressDialog, internetDialog, errorDialog;
     private Calendar currentDate, newDate;
-    private List<Invitation> invitations;
+    private List<String> emails, invitees;
     private BroadcastReceiver receiver;
-    private Invitation invitation;
     private Event curEvent;
-    private int count = 0;
+
+    private int countInvitee = 0, countMail = 0;
     private String from;
+
+    private BroadcastReceiver r1 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            invitees = new ArrayList<>();
+
+            String string = intent.getStringExtra(AppConstant.INVITATION);
+            if (string != null) {
+                if (string.contains(",")) {
+                    invitees = Arrays.asList(string.split(","));
+                } else {
+                    invitees.add(string);
+                }
+                countInvitee = invitees.size();
+                tvCountFig.setText(String.valueOf(countInvitee));
+            } else {
+                countInvitee = 0;
+                tvCountFig.setText(String.valueOf(countInvitee));
+            }
+        }
+    };
+
+    private BroadcastReceiver r2 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            emails = new ArrayList<>();
+
+            String string = intent.getStringExtra(AppConstant.EMAIL);
+            if (string != null) {
+                if (string.contains(",")) {
+                    emails = Arrays.asList(string.split(","));
+                } else {
+                    emails.add(string);
+                }
+                countMail = emails.size();
+                tvCountFigFriend.setText(String.valueOf(countMail));
+            } else {
+                countMail = 0;
+                tvCountFigFriend.setText(String.valueOf(countMail));
+            }
+        }
+    };
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -121,6 +173,9 @@ public class CreateEventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_event);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+
+        emails = new ArrayList<>();
+        invitees = new ArrayList<>();
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -140,14 +195,18 @@ public class CreateEventActivity extends AppCompatActivity {
         tvName.setTypeface(Utility.INSTANCE.getFontRegular());
         tvDate.setTypeface(Utility.INSTANCE.getFontRegular());
         tvLocation.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvCountFigFriend.setTypeface(Utility.INSTANCE.getFontBold());
+        tvCountFriend.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvFriend.setTypeface(Utility.INSTANCE.getFontRegular());
 
         Bundle bundle = getIntent().getExtras();
-        from = bundle != null ? bundle.getString(getResources().getString(R.string.from)) : null;
+        from = bundle != null ? bundle.getString(AppConstant.FROM) : null;
 
         switch (Objects.requireNonNull(from)) {
             case "new":
                 Utility.INSTANCE.setTitleText(toolbar, R.id.cea_toolbar_tv_title, R.string.cea_title1);
-                tvCountFig.setText(String.valueOf(count));
+                tvCountFig.setText(String.valueOf(countInvitee));
+                tvCountFigFriend.setText(String.valueOf(countMail));
                 User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
                 Address address = user.getAddress();
                 etLocation.setText(Objects.requireNonNull(Objects.requireNonNull(address).getStreet()).concat(", ").concat(Objects.requireNonNull(address.getCity())).concat(", ").concat(Objects.requireNonNull(address.getState())).concat(" ").concat(Objects.requireNonNull(address.getZip())));
@@ -155,7 +214,7 @@ public class CreateEventActivity extends AppCompatActivity {
 
             case "edit":
                 Utility.INSTANCE.setTitleText(toolbar, R.id.cea_toolbar_tv_title, R.string.cea_title2);
-                curEvent = (Event) bundle.getSerializable(getResources().getString(R.string.event));
+                curEvent = (Event) bundle.getSerializable(AppConstant.EVENTT);
                 getEventDetails(Objects.requireNonNull(curEvent));
                 break;
         }
@@ -164,26 +223,26 @@ public class CreateEventActivity extends AppCompatActivity {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 switch (from) {
                     case "new":
-                        currentDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+                        currentDate = Calendar.getInstance();
                         break;
                     case "edit":
-                        currentDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+                        currentDate = Calendar.getInstance();
                         currentDate.setTimeInMillis(Objects.requireNonNull(curEvent.getEventDate()).getTime());
                         break;
                 }
 
                 DatePickerDialog datePickerDialog = new DatePickerDialog(CreateEventActivity.this, (view, year, month, dayOfMonth) -> {
-                    newDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+                    newDate = Calendar.getInstance();
                     newDate.set(year, month, dayOfMonth);
 
                     TimePickerDialog timePickerDialog = new TimePickerDialog(CreateEventActivity.this, (view1, hourOfDay, minute) -> {
                         newDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         newDate.set(Calendar.MINUTE, minute);
 
-                        Date dt1 = new Date(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DAY_OF_MONTH), newDate.get(Calendar.HOUR_OF_DAY), newDate.get(Calendar.MINUTE));
+                        Date dt1 = new Date(newDate.getTime().getYear(), newDate.getTime().getMonth(), newDate.getTime().getDate(), newDate.getTime().getHours(), newDate.getTime().getMinutes());
 
-                        Calendar c = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
-                        Date dt2 = new Date(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
+                        Calendar c = Calendar.getInstance();
+                        Date dt2 = new Date(c.getTime().getYear(), c.getTime().getMonth(), c.getTime().getDate(), c.getTime().getHours(), c.getTime().getMinutes());
 
                         if (dt1.getTime() > dt2.getTime()) {
                             etDate.setText(dateFormat.format(dt1));
@@ -192,10 +251,10 @@ public class CreateEventActivity extends AppCompatActivity {
                             errorDialog.show();
                         }
                     }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false);
-                    timePickerDialog.updateTime(Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime().getHours(), Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime().getMinutes());
+                    timePickerDialog.updateTime(Calendar.getInstance().getTime().getHours(), Calendar.getInstance().getTime().getMinutes());
                     timePickerDialog.show();
                 }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH));
-                datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTimeInMillis());
+                datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
                 datePickerDialog.show();
                 return true;
             } else {
@@ -275,49 +334,82 @@ public class CreateEventActivity extends AppCompatActivity {
 
     @OnClick(R.id.cea_tv_invitee)
     void setTvInviteeOnClick() {
-        switch (from) {
-            case "new":
-//                if (invitations == null) {
-//                    invitations = getInvitations();
-//                    count = invitations.size();
-//                    tvCountFig.setText(String.valueOf(count));
-//                } else {
-//                    errorDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.event_guest_added, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
-//                    errorDialog.show();
-//                }
-                break;
-            case "edit":
-//                if (invitations != null) {
-//                    if (invitations.size() != 0) {
-//                        errorDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.event_guest_exist, false, View.VISIBLE, R.string.dd_ok, v -> errorDialog.dismiss(), View.GONE, null, null);
-//                        errorDialog.show();
-//                    } else {
-//                        invitations = getInvitations();
-//                        count = invitations.size();
-//                        tvCountFig.setText(String.valueOf(count));
-//                    }
-//                }
-                break;
+        Intent intent = new Intent(CreateEventActivity.this, AddGuestActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(AppConstant.FROM, AppConstant.CREATE);
+        if (invitees != null) {
+            if (invitees.size() != 0) {
+                if (invitees.size() == 1) {
+                    bundle.putString(AppConstant.INVITATION, invitees.get(0));
+                } else {
+                    String invitee = TextUtils.join(",", invitees);
+                    bundle.putString(AppConstant.INVITATION, invitee);
+                }
+            } else {
+                bundle.putString(AppConstant.INVITATION, null);
+            }
+        } else {
+            bundle.putString(AppConstant.INVITATION, null);
         }
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.cea_tv_friend)
+    void setTvFriendOnClick() {
+        Intent intent = new Intent(CreateEventActivity.this, AddFriendsActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(AppConstant.FROM, AppConstant.CREATE);
+        if (emails != null) {
+            if (emails.size() != 0) {
+                if (emails.size() == 1) {
+                    bundle.putString(AppConstant.EMAIL, emails.get(0));
+                } else {
+                    String email = TextUtils.join(",", emails);
+                    bundle.putString(AppConstant.EMAIL, email);
+                }
+            } else {
+                bundle.putString(AppConstant.EMAIL, null);
+            }
+        } else {
+            bundle.putString(AppConstant.EMAIL, null);
+        }
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     private void getEventDetails(Event event) {
         etName.setText(event.getTitle());
-        newDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+        newDate = Calendar.getInstance();
         newDate.setTimeInMillis(Objects.requireNonNull(event.getEventDate()).getTime());
         etDate.setText(dateFormat.format(event.getEventDate()));
         etLocation.setText(event.getLocation());
         swPrivate.setChecked(Objects.requireNonNull(event.isPrivate()));
         swCanGuest.setChecked(Objects.requireNonNull(event.getCanInviteGuests()));
-        invitations = new ArrayList<>();
-        for (int i = 0; i < Objects.requireNonNull(event.getInvitations()).size(); i++) {
-            invitation = new Invitation();
-            invitation.setInviteeId(event.getInvitations().get(i).getInviteeId());
-            invitation.setInvitationId(event.getInvitations().get(i).getInvitationId());
-            invitations.add(invitation);
+
+        if (event.getGuestEmails() != null) {
+            if (event.getGuestEmails().contains(",")) {
+                emails = Arrays.asList(event.getGuestEmails().split(","));
+            } else {
+                emails.add(event.getGuestEmails());
+            }
+            countMail = emails.size();
+            tvCountFigFriend.setText(String.valueOf(countMail));
+        } else {
+            tvCountFigFriend.setText(String.valueOf(countMail));
         }
-        count = invitations.size();
-        tvCountFig.setText(String.valueOf(count));
+
+        if (event.getInviteeIds() != null) {
+            if (event.getInviteeIds().contains(",")) {
+                invitees = Arrays.asList(event.getInviteeIds().split(","));
+            } else {
+                invitees.add(event.getInviteeIds());
+            }
+            countInvitee = invitees.size();
+            tvCountFig.setText(String.valueOf(countInvitee));
+        } else {
+            tvCountFig.setText(String.valueOf(countInvitee));
+        }
     }
 
     private void createEvent() {
@@ -334,14 +426,34 @@ public class CreateEventActivity extends AppCompatActivity {
 
         event.setEventDate(newDate.getTime().getTime() / 1000);
 
-        if (invitations != null) {
-            if (invitations.size() != 0) {
-                event.setInvitations(invitations);
+        if (invitees != null) {
+            if (invitees.size() != 0) {
+                if (invitees.size() == 1) {
+                    event.setInviteeIds(invitees.get(0));
+                } else {
+                    String string = TextUtils.join(",", invitees);
+                    event.setInviteeIds(string);
+                }
             } else {
-                event.setInvitations(null);
+                event.setInviteeIds(null);
             }
         } else {
-            event.setInvitations(null);
+            event.setInviteeIds(null);
+        }
+
+        if (emails != null) {
+            if (emails.size() != 0) {
+                if (emails.size() == 1) {
+                    event.setGuestEmails(emails.get(0));
+                } else {
+                    String string = TextUtils.join(",", emails);
+                    event.setGuestEmails(string);
+                }
+            } else {
+                event.setGuestEmails(null);
+            }
+        } else {
+            event.setGuestEmails(null);
         }
 
         event.setLocation(etLocation.getText().toString().trim());
@@ -372,8 +484,19 @@ public class CreateEventActivity extends AppCompatActivity {
                     try {
                         ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
                         }.getType());
-                        internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
-                        internetDialog.show();
+                        if (resultError.getErrorDescription() != null) {
+                            internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+                            internetDialog.show();
+                        } else {
+                            if (resultError.getErrors().size() != 0) {
+                                for (int i = 0; i < resultError.getErrors().size(); i++) {
+                                    if (resultError.getErrors().get(i).getField().equalsIgnoreCase("eventDate")) {
+                                        internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, resultError.getErrors().get(i).getMessage(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+                                        internetDialog.show();
+                                    }
+                                }
+                            }
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -383,10 +506,6 @@ public class CreateEventActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(CreateEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -399,21 +518,41 @@ public class CreateEventActivity extends AppCompatActivity {
         event.setEventId(id);
 
         if (swCanGuest.isChecked()) {
-            event.setCanInviteGuests(false);
+            event.setCanInviteGuests(true);
         } else {
             event.setCanInviteGuests(false);
         }
 
         event.setEventDate(newDate.getTime().getTime() / 1000);
 
-        if (invitations != null) {
-            if (invitations.size() != 0) {
-                event.setInvitations(invitations);
+        if (invitees != null) {
+            if (invitees.size() != 0) {
+                if (invitees.size() == 1) {
+                    event.setInviteeIds(invitees.get(0));
+                } else {
+                    String string = TextUtils.join(",", invitees);
+                    event.setInviteeIds(string);
+                }
             } else {
-                event.setInvitations(null);
+                event.setInviteeIds(null);
             }
         } else {
-            event.setInvitations(null);
+            event.setInviteeIds(null);
+        }
+
+        if (emails != null) {
+            if (emails.size() != 0) {
+                if (emails.size() == 1) {
+                    event.setGuestEmails(emails.get(0));
+                } else {
+                    String string = TextUtils.join(",", emails);
+                    event.setGuestEmails(string);
+                }
+            } else {
+                event.setGuestEmails(null);
+            }
+        } else {
+            event.setGuestEmails(null);
         }
 
         event.setLocation(etLocation.getText().toString().trim());
@@ -445,8 +584,19 @@ public class CreateEventActivity extends AppCompatActivity {
                     try {
                         ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
                         }.getType());
-                        internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
-                        internetDialog.show();
+                        if (resultError.getErrorDescription() != null) {
+                            internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+                            internetDialog.show();
+                        } else {
+                            if (resultError.getErrors().size() != 0) {
+                                for (int i = 0; i < resultError.getErrors().size(); i++) {
+                                    if (resultError.getErrors().get(i).getField().equalsIgnoreCase("eventDate")) {
+                                        internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, resultError.getErrors().get(i).getMessage(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+                                        internetDialog.show();
+                                    }
+                                }
+                            }
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -456,31 +606,8 @@ public class CreateEventActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(CreateEventActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
-    }
-
-    private List<Invitation> getInvitations() {
-        List<Invitation> invitations = new ArrayList<>();
-        //region First Invitation
-        invitation = new Invitation();
-        invitation.setInvitationId(null);
-        invitation.setInviteeId(6);
-        invitations.add(invitation);
-        //endregion
-
-        //region Second Invitation
-        invitation = new Invitation();
-        invitation.setInvitationId(null);
-        invitation.setInviteeId(8);
-        invitations.add(invitation);
-        //endregion
-
-        return invitations;
     }
 
     @Override
@@ -488,33 +615,55 @@ public class CreateEventActivity extends AppCompatActivity {
         switch (from) {
             case "new":
                 if (etName.getText().toString().trim().length() != 0 || etDate.getText().toString().trim().length() != 0 || etLocation.getText().toString().trim().length() != 0) {
-                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> super.onBackPressed(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else {
-                    finish();
+                    super.onBackPressed();
                 }
                 break;
             case "edit":
+                List<String> oldInvitees = new ArrayList<>();
+                List<String> oldEmails = new ArrayList<>();
+
+                if (curEvent.getInviteeIds() != null) {
+                    if (curEvent.getInviteeIds().contains(",")) {
+                        oldInvitees.addAll(Arrays.asList(curEvent.getInviteeIds().split(",")));
+                    } else {
+                        oldInvitees.add(curEvent.getInviteeIds());
+                    }
+                }
+
+                if (curEvent.getGuestEmails() != null) {
+                    if (curEvent.getGuestEmails().contains(",")) {
+                        oldEmails.addAll(Arrays.asList(curEvent.getInviteeIds().split(",")));
+                    } else {
+                        oldEmails.add(curEvent.getInviteeIds());
+                    }
+                }
+
                 if (!etName.getText().toString().trim().equalsIgnoreCase(curEvent.getTitle())) {
-                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> super.onBackPressed(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (!etDate.getText().toString().trim().equalsIgnoreCase(dateFormat.format(curEvent.getEventDate()))) {
-                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> super.onBackPressed(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (!etLocation.getText().toString().trim().equalsIgnoreCase(curEvent.getLocation())) {
-                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> super.onBackPressed(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (swPrivate.isChecked() != Objects.requireNonNull(curEvent.isPrivate())) {
-                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> super.onBackPressed(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else if (swCanGuest.isChecked() != Objects.requireNonNull(curEvent.getCanInviteGuests())) {
-                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> super.onBackPressed(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
-                } else if (invitations.size() != Objects.requireNonNull(curEvent.getInvitations()).size()) {
-                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> finish(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                } else if (invitees.size() != oldInvitees.size()) {
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> super.onBackPressed(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+                    internetDialog.show();
+                } else if (emails.size() != oldEmails.size()) {
+                    internetDialog = Utility.INSTANCE.showAlert(CreateEventActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> super.onBackPressed(), View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                     internetDialog.show();
                 } else {
-                    finish();
+                    super.onBackPressed();
                 }
                 break;
         }
@@ -525,15 +674,24 @@ public class CreateEventActivity extends AppCompatActivity {
         super.onResume();
         receiver = new NetworkChangeReceiver();
         registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r1, new IntentFilter("UpdateCountInvitee"));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r2, new IntentFilter("UpdateCountMail"));
     }
 
     @Override
     protected void onDestroy() {
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r1);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r2);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
         try {
             unregisterReceiver(receiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        super.onDestroy();
+        super.onPause();
     }
 }

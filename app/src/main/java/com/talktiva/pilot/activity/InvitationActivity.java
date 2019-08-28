@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -105,6 +106,12 @@ public class InvitationActivity extends AppCompatActivity {
                 }
             }
         });
+
+        tvFooter.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(AppConstant.PRIVACY_POLICY));
+            startActivity(i);
+        });
     }
 
     @OnTextChanged(value = R.id.ia_et, callback = OnTextChanged.Callback.TEXT_CHANGED)
@@ -115,17 +122,6 @@ public class InvitationActivity extends AppCompatActivity {
         } else {
             tvValidation.setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
-        super.onDestroy();
     }
 
     @Override
@@ -141,6 +137,22 @@ public class InvitationActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r, new IntentFilter("CloseInvitation"));
     }
 
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        try {
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
+    }
+
     private void checkCode() {
         progressDialog.show();
         tvError.setText("");
@@ -153,11 +165,21 @@ public class InvitationActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<Community> call, @NonNull Response<Community> response) {
                 if (response.isSuccessful()) {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    Intent intent = new Intent(InvitationActivity.this, CommunityActivity.class);
-                    intent.putExtra(AppConstant.FROM, AppConstant.INVITATION);
-                    intent.putExtra(AppConstant.INVITATION_CODE, editText.getText().toString().trim());
-                    intent.putExtra(AppConstant.ZIPCODE, Objects.requireNonNull(response.body()).getZip());
-                    startActivity(intent);
+                    if (editText.getText().toString().substring(0, 3).equalsIgnoreCase("FAM")) {
+                        Intent intent = new Intent(InvitationActivity.this, SignUpActivity.class);
+                        Bundle bundle1 = new Bundle();
+                        bundle1.putString(AppConstant.FROM, AppConstant.INVITATION);
+                        bundle1.putString(AppConstant.INVITATION_CODE, editText.getText().toString().trim());
+                        bundle1.putSerializable(AppConstant.COMMUNITY, response.body());
+                        intent.putExtras(bundle1);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(InvitationActivity.this, CommunityActivity.class);
+                        intent.putExtra(AppConstant.FROM, AppConstant.INVITATION);
+                        intent.putExtra(AppConstant.INVITATION_CODE, editText.getText().toString().trim());
+                        intent.putExtra(AppConstant.COMMUNITY, response.body());
+                        startActivity(intent);
+                    }
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     try {
@@ -174,10 +196,6 @@ public class InvitationActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Community> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(InvitationActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }

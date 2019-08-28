@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -30,6 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.Talktiva;
+import com.talktiva.pilot.activity.AddGuestActivity;
 import com.talktiva.pilot.activity.DetailEventActivity;
 import com.talktiva.pilot.adapter.AdapterGroupBy;
 import com.talktiva.pilot.helper.AppConstant;
@@ -48,9 +50,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -117,15 +119,16 @@ public class UpcomingFragment extends Fragment {
 
                         @SuppressLint("UseSparseArrays") HashMap<Integer, List<Event>> groupByEvents = new HashMap<>();
                         for (Event event : resultEvents.getEvents()) {
-                            Date curDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime();
                             int day;
-                            if (curDate.getDate() == Objects.requireNonNull(event.getEventDate()).getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
+
+                            if (TimeUnit.MILLISECONDS.toDays(event.getEventDate().getTime() - Calendar.getInstance().getTime().getTime()) == 0) {
                                 day = 0;
-                            } else if ((curDate.getDate() + 1) == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
+                            } else if (TimeUnit.MILLISECONDS.toDays(event.getEventDate().getTime() - Calendar.getInstance().getTime().getTime()) == 1) {
                                 day = 1;
                             } else {
                                 day = 2;
                             }
+
                             if (groupByEvents.containsKey(day)) {
                                 Objects.requireNonNull(groupByEvents.get(day)).add(event);
                             } else {
@@ -155,12 +158,39 @@ public class UpcomingFragment extends Fragment {
                                 case R.id.yf_rv_cl:
                                     Intent intent = new Intent(Talktiva.Companion.getInstance(), DetailEventActivity.class);
                                     Bundle bundle = new Bundle();
-                                    bundle.putInt(getResources().getString(R.string.from), from);
-                                    bundle.putSerializable(getResources().getString(R.string.event), event);
+                                    bundle.putInt(AppConstant.FROM, from);
+                                    bundle.putSerializable(AppConstant.EVENTT, event);
                                     intent.putExtras(bundle);
                                     startActivity(intent);
                                     break;
                                 case R.id.yf_rv_iv_share:
+                                    Intent intentNew = new Intent(getActivity(), AddGuestActivity.class);
+                                    Bundle bundleNew = new Bundle();
+                                    bundleNew.putString(AppConstant.FROM, AppConstant.SHARE);
+                                    bundleNew.putString(AppConstant.FRAGMENT, AppConstant.UPCOMMING);
+                                    bundleNew.putInt(AppConstant.ID, event.getEventId());
+                                    List<String> stringList = new ArrayList<>();
+                                    if (event.getInvitations() != null) {
+                                        if (event.getInvitations().size() != 0) {
+                                            for (int i = 0; i < event.getInvitations().size(); i++) {
+                                                if (event.getInvitations().get(i).getInviteeId() != null) {
+                                                    stringList.add(String.valueOf(event.getInvitations().get(i).getInviteeId()));
+                                                }
+                                            }
+                                            if (stringList.size() == 1) {
+                                                bundleNew.putString(AppConstant.INVITATION, stringList.get(0));
+                                            } else {
+                                                String str = TextUtils.join(",", stringList);
+                                                bundleNew.putString(AppConstant.INVITATION, str);
+                                            }
+                                        } else {
+                                            bundleNew.putString(AppConstant.INVITATION, null);
+                                        }
+                                    } else {
+                                        bundleNew.putString(AppConstant.INVITATION, null);
+                                    }
+                                    intentNew.putExtras(bundleNew);
+                                    startActivity(intentNew);
                                     break;
                                 case R.id.yf_rv_iv_more:
                                     curEvent = event;
@@ -189,10 +219,6 @@ public class UpcomingFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(Objects.requireNonNull(getActivity()), R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -218,18 +244,10 @@ public class UpcomingFragment extends Fragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getTitle().toString().equalsIgnoreCase(getResources().getString(R.string.atc))) {
+            long start, end;
+            start = end = Objects.requireNonNull(curEvent.getEventDate()).getTime();
 
-            long begin, end;
-            begin = end = Objects.requireNonNull(curEvent.getEventDate()).getTime() + 60 * 60 * 1000;
-
-//            String[] proj = new String[]{CalendarContract.Instances._ID, CalendarContract.Instances.BEGIN, CalendarContract.Instances.END, CalendarContract.Instances.EVENT_ID};
-
-//            Cursor c = CalendarContract.Instances.query(getActivity().getContentResolver(), proj, begin, end, curEvent.getTitle());
-//            if (c.getCount() > 0) {
-
-//            }
-
-            Cursor cursor = getActivity().getContentResolver().query(CalendarContract.Calendars.CONTENT_URI, null, null, null, null);
+            Cursor cursor = Objects.requireNonNull(getActivity()).getContentResolver().query(CalendarContract.Calendars.CONTENT_URI, null, null, null, null);
             long calenderId = 0;
 
             if (Objects.requireNonNull(cursor).moveToFirst()) {
@@ -243,7 +261,7 @@ public class UpcomingFragment extends Fragment {
             contentValues.put(CalendarContract.Events.ALL_DAY, false);
             contentValues.put(CalendarContract.Events.STATUS, true);
             contentValues.put(CalendarContract.Events.HAS_ALARM, true);
-            contentValues.put(CalendarContract.Events.DTSTART, begin);
+            contentValues.put(CalendarContract.Events.DTSTART, start);
             contentValues.put(CalendarContract.Events.DTEND, end);
             contentValues.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().toString());
 

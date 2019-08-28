@@ -22,6 +22,9 @@ class ResultAllUser : Serializable {
     @SerializedName("size")
     var size: Int? = null
 
+    @SerializedName("userCount")
+    var userCount: Int? = null
+
     @SerializedName("currentPage")
     var currentPage: Int? = null
 

@@ -10,8 +10,19 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (Utility.getPreference(AppConstant.PREF_A_TOKEN) != null) startActivity(Intent(this@SplashActivity, DashBoardActivity::class.java))
-        else startActivity(Intent(this@SplashActivity, WelcomeActivity::class.java))
+        if (Utility.getPreference(AppConstant.PREF_A_TOKEN) != null) {
+            if (Utility.getPreference(AppConstant.PREF_PASS_FLAG) != null) {
+                if (Utility.getPreference(AppConstant.PREF_PASS_FLAG).equals("true", true)) {
+                    startActivity(Intent(this@SplashActivity, ChangePasswordActivity::class.java))
+                } else {
+                    startActivity(Intent(this@SplashActivity, DashBoardActivity::class.java))
+                }
+            } else {
+                startActivity(Intent(this@SplashActivity, DashBoardActivity::class.java))
+            }
+        } else {
+            startActivity(Intent(this@SplashActivity, WelcomeActivity::class.java))
+        }
         finish()
     }
 }

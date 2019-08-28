@@ -1,9 +1,8 @@
 package com.talktiva.pilot.model
 
 import com.google.gson.annotations.SerializedName
-
 import java.io.Serializable
-import java.util.Date
+import java.util.*
 
 class Invitation : Serializable {
 
@@ -33,6 +32,9 @@ class Invitation : Serializable {
 
     @SerializedName("inviteeLasttName")
     var inviteeLasttName: String? = null
+
+    @SerializedName("inviteeFullName")
+    var inviteeFullName: String? = null
 
     @SerializedName("inviteeAddress")
     var inviteeAddress: String? = null

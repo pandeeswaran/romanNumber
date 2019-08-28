@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -25,7 +26,6 @@ import com.talktiva.pilot.R;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
-import com.talktiva.pilot.model.User;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
 import com.talktiva.pilot.results.ResultError;
@@ -109,6 +109,12 @@ public class ForgotActivity extends AppCompatActivity {
                 }
             }
         });
+
+        tvFooter.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(AppConstant.PRIVACY_POLICY));
+            startActivity(i);
+        });
     }
 
     @OnTextChanged(R.id.fa_et_email)
@@ -133,25 +139,20 @@ public class ForgotActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        super.onDestroy();
+    protected void onResume() {
+        super.onResume();
+        receiver = new NetworkChangeReceiver();
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onPause() {
         try {
             unregisterReceiver(receiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        receiver = new NetworkChangeReceiver();
-        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        super.onPause();
     }
 
     private void reset() {
@@ -181,15 +182,13 @@ public class ForgotActivity extends AppCompatActivity {
                         }.getType());
                         if (response.code() == 412) {
                             if (resultError.getMessage().contains("google")) {
-                                internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, resultError.getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
-                                    Utility.INSTANCE.dismissDialog(internetDialog);
-                                }, View.GONE, null, null);
+                                internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, resultError.getMessage(), false, View.VISIBLE, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
                                 internetDialog.show();
                             } else {
-                                internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, resultError.getMessage(), false, View.VISIBLE, R.string.dd_btn_resend, v -> {
+                                internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, resultError.getMessage(), View.VISIBLE, R.string.dd_btn_resend, v -> {
                                     Utility.INSTANCE.dismissDialog(internetDialog);
                                     resendEmail();
-                                }, View.GONE, null, null);
+                                }, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                                 internetDialog.show();
                             }
                         } else {
@@ -205,10 +204,6 @@ public class ForgotActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<ResultMessage> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(ForgotActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -216,15 +211,14 @@ public class ForgotActivity extends AppCompatActivity {
     private void resendEmail() {
         progressDialog.show();
 
-        User user = new Gson().fromJson(Utility.INSTANCE.getData(AppConstant.FILE_USER), User.class);
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<ResultMessage> call = apiInterface.resendEmail(user.getEmail());
+        Call<ResultMessage> call = apiInterface.resendEmail(etEmail.getText().toString().trim());
         call.enqueue(new Callback<ResultMessage>() {
             @Override
             public void onResponse(@NonNull Call<ResultMessage> call, @NonNull Response<ResultMessage> response) {
                 if (response.isSuccessful()) {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, R.string.dd_info_email_resend, false, View.VISIBLE, R.string.dd_btn_continue, v -> {
+                    internetDialog = Utility.INSTANCE.showAlert(ForgotActivity.this, R.string.dd_info_email_resend, false, View.VISIBLE, R.string.dd_ok, v -> {
                         Utility.INSTANCE.dismissDialog(internetDialog);
                         finish();
                         Intent intent = new Intent("BlankEtPass");
@@ -238,10 +232,6 @@ public class ForgotActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<ResultMessage> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(ForgotActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }

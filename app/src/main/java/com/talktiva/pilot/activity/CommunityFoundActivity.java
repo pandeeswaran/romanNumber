@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -62,7 +64,6 @@ public class CommunityFoundActivity extends AppCompatActivity {
     TextView tvFooter;
 
     private BroadcastReceiver receiver;
-    private Dialog internetDialog;
     private String invitationCode;
     private Community community;
     private String from, apartment, street;
@@ -116,33 +117,39 @@ public class CommunityFoundActivity extends AppCompatActivity {
             bundle1.putSerializable(AppConstant.COMMUNITY, community);
             bundle1.putString(AppConstant.APRTMENT, apartment);
             bundle1.putString(AppConstant.STREET, street);
-            intent.putExtras(bundle);
+            intent.putExtras(bundle1);
             startActivity(intent);
         });
-    }
 
-    @Override
-    protected void onDestroy() {
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
-        super.onDestroy();
+        tvFooter.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(AppConstant.PRIVACY_POLICY));
+            startActivity(i);
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        receiver = new NetworkChangeReceiver();
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r, new IntentFilter("CloseCommunityFound"));
+    }
+
+    @Override
+    protected void onPause() {
         try {
             unregisterReceiver(receiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        receiver = new NetworkChangeReceiver();
-        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r, new IntentFilter("CloseCommunityFound"));
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
+        super.onDestroy();
     }
 
     private void residents() {
@@ -160,10 +167,6 @@ public class CommunityFoundActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Count> call, @NonNull Throwable t) {
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(CommunityFoundActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }
@@ -183,10 +186,6 @@ public class CommunityFoundActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Count> call, @NonNull Throwable t) {
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(CommunityFoundActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }

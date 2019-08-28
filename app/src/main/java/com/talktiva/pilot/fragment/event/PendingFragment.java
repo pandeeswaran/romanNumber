@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.Talktiva;
+import com.talktiva.pilot.activity.AddGuestActivity;
 import com.talktiva.pilot.activity.DetailEventActivity;
 import com.talktiva.pilot.adapter.AdapterGroupBy;
 import com.talktiva.pilot.helper.AppConstant;
@@ -38,12 +40,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -107,17 +107,19 @@ public class PendingFragment extends Fragment {
                         layoutManager.setOrientation(RecyclerView.VERTICAL);
                         recyclerView.setLayoutManager(layoutManager);
 
+
                         @SuppressLint("UseSparseArrays") HashMap<Integer, List<Event>> groupByEvents = new HashMap<>();
                         for (Event event : resultEvents.getEvents()) {
-                            Date curDate = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).getTime();
                             int day;
-                            if (curDate.getDate() == Objects.requireNonNull(event.getEventDate()).getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
+
+                            if (TimeUnit.MILLISECONDS.toDays(event.getEventDate().getTime() - Calendar.getInstance().getTime().getTime()) == 0) {
                                 day = 0;
-                            } else if ((curDate.getDate() + 1) == event.getEventDate().getDate() && curDate.getMonth() == event.getEventDate().getMonth() && curDate.getYear() == event.getEventDate().getYear()) {
+                            } else if (TimeUnit.MILLISECONDS.toDays(event.getEventDate().getTime() - Calendar.getInstance().getTime().getTime()) == 1) {
                                 day = 1;
                             } else {
                                 day = 2;
                             }
+
                             if (groupByEvents.containsKey(day)) {
                                 Objects.requireNonNull(groupByEvents.get(day)).add(event);
                             } else {
@@ -146,12 +148,39 @@ public class PendingFragment extends Fragment {
                                 case R.id.yf_rv_cl:
                                     Intent intent = new Intent(getActivity(), DetailEventActivity.class);
                                     Bundle bundle = new Bundle();
-                                    bundle.putInt(getResources().getString(R.string.from), from);
-                                    bundle.putSerializable(getResources().getString(R.string.event), event);
+                                    bundle.putInt(AppConstant.FROM, from);
+                                    bundle.putSerializable(AppConstant.EVENTT, event);
                                     intent.putExtras(bundle);
                                     startActivity(intent);
                                     break;
                                 case R.id.yf_rv_iv_share:
+                                    Intent intentNew = new Intent(getActivity(), AddGuestActivity.class);
+                                    Bundle bundleNew = new Bundle();
+                                    bundleNew.putString(AppConstant.FROM, AppConstant.SHARE);
+                                    bundleNew.putString(AppConstant.FRAGMENT, AppConstant.PENDING);
+                                    bundleNew.putInt(AppConstant.ID, event.getEventId());
+                                    List<String> stringList = new ArrayList<>();
+                                    if (event.getInvitations() != null) {
+                                        if (event.getInvitations().size() != 0) {
+                                            for (int i = 0; i < event.getInvitations().size(); i++) {
+                                                if (event.getInvitations().get(i).getInviteeId() != null) {
+                                                    stringList.add(String.valueOf(event.getInvitations().get(i).getInviteeId()));
+                                                }
+                                            }
+                                            if (stringList.size() == 1) {
+                                                bundleNew.putString(AppConstant.INVITATION, stringList.get(0));
+                                            } else {
+                                                String str = TextUtils.join(",", stringList);
+                                                bundleNew.putString(AppConstant.INVITATION, str);
+                                            }
+                                        } else {
+                                            bundleNew.putString(AppConstant.INVITATION, null);
+                                        }
+                                    } else {
+                                        bundleNew.putString(AppConstant.INVITATION, null);
+                                    }
+                                    intentNew.putExtras(bundleNew);
+                                    startActivity(intentNew);
                                     break;
                             }
                         });
@@ -176,10 +205,6 @@ public class PendingFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<ResultEvents> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(Objects.requireNonNull(getActivity()), R.string.time_out_msg, R.string.dd_ok, v -> internetDialog.dismiss());
-                    internetDialog.show();
-                }
             }
         });
     }

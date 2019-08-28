@@ -26,13 +26,31 @@ object AppConstant {
     const val PASS = "password"
     const val STATUS = "status"
     const val CODE = "code"
+    const val ZIP = "zip"
     const val FROM = "from"
+    const val FAMILY = "family"
+    const val EVENTT = "event"
     const val DIRECT = "direct"
+    const val FRAGMENT = "fragment"
     const val COMMUNITY_ID = "communityId"
     const val INVITATION = "invitation"
     const val INVITATION_CODE = "invitationCode"
-    const val ZIPCODE = "zipCode"
+    const val CREATE = "create"
+    const val SHARE = "share"
+    const val DETAIL = "detail"
+    const val EDIT = "edit"
+    const val NEW = "new"
+    const val USER = "user"
+    const val URL = "url"
+    const val TOKEN = "fcmToken"
 
+    const val PENDING = "pending"
+    const val UPCOMMING = "upcomming"
+    const val YOURS = "yours"
+
+    const val PENDING_DETAIL = "pending_detail"
+    const val UPCOMMING_DETAIL = "upcomming_detail"
+    const val YOURS_DETAIL = "yours_detail"
 
     const val STREET = "street"
     const val APRTMENT = "apartment"
@@ -41,46 +59,69 @@ object AppConstant {
     const val FILE = "file"
     const val GT = "grant_type"
     const val USERNAME = "username"
-    const val SIGNUP = "signUp"
+    const val SIGN_UP = "signUp"
     const val DASHBOARD = "dashBoard"
     const val POP = "popUp"
     const val PROVIDER = "provider"
     const val ANDROID = "ANDROID"
     //endregion
 
-    const val BASE_URL = "http://54.80.108.189:9092/"
+    const val BASE_URL = "http://54.80.108.189:9092"
+    const val BASE_EVENT = "/ms-event/api/v1/events"
+    const val BASE_USER = "/ms-event/api/v1/users"
+    const val BASE_NOTIFICATION = "/ms-event/api/v1/notifications"
+    const val BASE_FAMILY = BASE_USER.plus("/familyMember")
 
-    const val EVENT = "ms-event/api/v1/events"
-    const val EVENT_P = "ms-event/api/v1/events/pending"
-    const val EVENT_U = "ms-event/api/v1/events/upcoming"
-    const val EVENT_BY_ID = "ms-event/api/v1/events/{id}"
-    const val EVENT_CANCEL = "ms-event/api/v1/events/{id}/cancel"
-    const val ACCEPT_DECLINE = "ms-event/api/v1/events/{id}/acceptOrDecline/{status}"
-    const val LIKE_EVENT = "ms-event/api/v1/events/{id}/like"
-    const val P_EVENT_COUNT = "ms-event/api/v1/events/pending/count"
-    const val FORGOT_PASS = "ms-event/api/v1/users/resetPassword/{email}"
-    const val CHECK_COMMUNITY = "ms-event/api/v1/users/communities"
-    const val CHECK_INVITATION = "ms-event/api/v1/users/invitationCode/{code}/valid"
-    const val RESIDENT_COUNT = "ms-event/api/v1/users/community/{communityId}/count"
-    const val EVENTS_COUNT = "ms-event/api/v1/events/upcoming/community/{communityId}/count"
-    const val REGISTER = "ms-event/api/v1/users/register"
-    const val ADD_DOC_UPLOAD = "ms-event/api/v1/users/{id}/addressProof"
-    const val SOCIAL_LOGIN = "ms-event/api/v1/users/login/{provider}"
-    const val MY_DATA = "ms-event/api/v1/users/me"
-    const val RESEND_EMAIL = "ms-event/api/v1/users/resendVerificationEmail/{email}"
+    const val EVENT_P = BASE_EVENT.plus("/pending")
+    const val EVENT_U = BASE_EVENT.plus("/upcoming")
+    const val EVENT_BY_ID = BASE_EVENT.plus("/{id}")
+    const val EVENT_CANCEL = BASE_EVENT.plus("/{id}/cancel")
+    const val ACCEPT_DECLINE = BASE_EVENT.plus("/{id}/acceptOrDecline/{status}")
+    const val LIKE_EVENT = BASE_EVENT.plus("/{id}/like")
+    const val P_EVENT_COUNT = BASE_EVENT.plus("/pending/count")
+    const val EVENTS_COUNT = BASE_EVENT.plus("/upcoming/community/{communityId}/count")
+    const val SHARE_EVENT = BASE_EVENT.plus("/{id}/invite")
 
-    const val LOGIN = "uaa/oauth/token"
+    const val FORGOT_PASS = BASE_USER.plus("/resetPassword/{email}")
+    const val CHECK_COMMUNITY = BASE_USER.plus("/communities/{zip}")
+    const val CHECK_INVITATION = BASE_USER.plus("/invitationCode/{code}/valid")
+    const val RESIDENT_COUNT = BASE_USER.plus("/community/{communityId}/count")
+    const val REGISTER = BASE_USER.plus("/register")
+    const val ADD_DOC_UPLOAD = BASE_USER.plus("/{id}/addressProof")
+    const val SOCIAL_LOGIN = BASE_USER.plus("/login/{provider}")
+    const val MY_DATA = BASE_USER.plus("/me")
+    const val ALL_USER = BASE_USER.plus("?size=50")
+    const val RESEND_EMAIL = BASE_USER.plus("/resendVerificationEmail/{email}")
+    const val UPDATE_PROFILE = BASE_USER.plus("/profile")
+    const val FEEDBACK = BASE_USER.plus("/feedback")
+    const val UPLOAD_AVTAR = BASE_USER.plus("/avatar")
+    const val CHANGE_PSW = BASE_USER.plus("/changePassword")
+    const val DEL_FAMILY = BASE_FAMILY.plus("/{id}")
+    const val APPROVE_FAMILY = BASE_FAMILY.plus("/{id}/approve")
+    const val INVITE_FAMLIY = BASE_FAMILY.plus("/{id}/invite")
+    const val REINVITE_FAMILY = BASE_FAMILY.plus("/{id}/reinvite")
+    const val NOTI_SETTING = BASE_USER.plus("/notificationSettings")
+    const val FCM_TOKEN = BASE_USER.plus("/addfcmToken/{fcmToken}")
 
-    //    public static final String ALL_USERS = "api/v1/users";
+    const val READ_NOTIFICATION = BASE_NOTIFICATION.plus("/{id}/read")
+
+    const val LOGIN = "/uaa/oauth/token"
 
     const val LOGIN_TOKEN = "Basic dGFsa3RpdmFBcHA6dGFsa0BUaXZhITE="
-    const val DESCRIPTION = "Document is using for address proof verification"
+
+    const val PP_TITLE = "Privacy Policy"
+    const val PRIVACY_POLICY = "https://talktiva.com/privacy.html"
+    const val TC_TITLE = "Terms and Conditions"
+    const val TERMS_CONDITION = "https://talktiva.com/terms.html"
+    const val ACK_TITLE = "Acknowledgements"
+    const val ACK = "https://talktiva.com/acknowledgements.html"
 
     const val PREF_R_TOKEN = "refresh_token"
     const val PREF_A_TOKEN = "access_token"
     const val PREF_T_TYPE = "token_type"
     const val PREF_EXPIRE = "expires_in"
     const val PREF_USER = "userId"
+    const val PREF_PASS_FLAG = "passwordFlag"
 
     const val FILE_USER = "currentUser.json"
 }

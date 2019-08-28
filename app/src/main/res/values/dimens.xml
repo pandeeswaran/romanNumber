@@ -1,5 +1,5 @@
 <resources>
-    <dimen name="bg_corner">6dp</dimen>
+    <dimen name="bg_corner">8dp</dimen>
     <dimen name="et_corner">4dp</dimen>
 
     <dimen name="et_padding">10dp</dimen>
@@ -13,4 +13,16 @@
 
     <integer name="event_alert_time">60</integer>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="footer_font">12sp</dimen>
+
+    <dimen name="btn_font">16sp</dimen>
+
+    <dimen name="tv_font">16sp</dimen>
+
+    <dimen name="tv_title_font">20sp</dimen>
+
+    <dimen name="logo_top">72dp</dimen>
+    <dimen name="logo_margin">104dp</dimen>
+
 </resources>

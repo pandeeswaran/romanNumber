@@ -8,7 +8,8 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.gson.JsonElement;
+import com.talktiva.pilot.helper.AppConstant;
+import com.talktiva.pilot.helper.Utility;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -34,12 +35,46 @@ public class FileUploader {
 
     private FileUploaderCallback fileUploaderCallback;
 
+    public FileUploader() {
+        apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
+    }
+
     public void setOnUploadListener(FileUploaderCallback fileUploaderCallback) {
         this.fileUploaderCallback = fileUploaderCallback;
     }
 
-    public FileUploader() {
-        apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
+    public void uploadFile(Context context, Uri uri, File file, String fileKey, Integer id) {
+        MyRequestBody requestBody = new MyRequestBody(context, uri, file);
+        MultipartBody.Part part = MultipartBody.Part.createFormData(fileKey, file.getName(), requestBody);
+        Call<ResponseBody> call = apiInterface.uploadImage(id, part);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                fileUploaderCallback.onResponse(call, response);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                fileUploaderCallback.onFailure(call, t);
+            }
+        });
+    }
+
+    public void uploadAvatar(Context context, Uri uri, File file, String fileKey) {
+        MyRequestBody requestBody = new MyRequestBody(context, uri, file);
+        MultipartBody.Part part = MultipartBody.Part.createFormData(fileKey, file.getName(), requestBody);
+        Call<ResponseBody> call = apiInterface.uploadAvatar(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))), part);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                fileUploaderCallback.onResponse(call, response);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                fileUploaderCallback.onFailure(call, t);
+            }
+        });
     }
 
     private class MyRequestBody extends RequestBody {
@@ -80,23 +115,6 @@ public class FileUploader {
                 }
             }
         }
-    }
-
-    public void uploadFile(Context context, Uri uri, File file, String fileKey, Integer id) {
-        MyRequestBody requestBody = new MyRequestBody(context, uri, file);
-        MultipartBody.Part part = MultipartBody.Part.createFormData(fileKey, file.getName(),requestBody);
-        Call<ResponseBody> call = apiInterface.uploadImage(id, part);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseBody> call,@NonNull  Response<ResponseBody> response) {
-                fileUploaderCallback.onResponse(call, response);
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ResponseBody> call,@NonNull  Throwable t) {
-                fileUploaderCallback.onFailure(call, t);
-            }
-        });
     }
 
     private class ProgressUpdater implements Runnable {

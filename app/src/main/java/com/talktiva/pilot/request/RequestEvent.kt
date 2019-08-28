@@ -16,6 +16,12 @@ class RequestEvent : Serializable {
     @SerializedName("eventDate")
     var eventDate: Long? = null
 
+    @SerializedName("guestEmails")
+    var guestEmails: String? = null
+
+    @SerializedName("inviteeIds")
+    var inviteeIds: String? = null
+
     @SerializedName("invitations")
     var invitations: List<Invitation>? = null
 

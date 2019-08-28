@@ -43,6 +43,7 @@ class AdapterGroupBy(private val context: Context, private val groupByEvents: Li
                 0 -> textView.text = Talktiva.instance?.getString(R.string.rv_header_today)
                 1 -> textView.text = Talktiva.instance?.getString(R.string.rv_header_tomorrow)
                 2 -> textView.text = Talktiva.instance?.getString(R.string.rv_header_later)
+
             }
 
             val layoutManager = LinearLayoutManager(Talktiva.instance)

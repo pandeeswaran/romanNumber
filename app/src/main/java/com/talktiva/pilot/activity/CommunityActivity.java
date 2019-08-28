@@ -6,10 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,22 +21,22 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.google.android.material.textfield.TextInputEditText;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.Talktiva;
+import com.talktiva.pilot.adapter.AdapterCommunity;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Community;
-import com.talktiva.pilot.request.RequestCommunity;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
-import com.talktiva.pilot.results.ResultError;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,11 +53,23 @@ public class CommunityActivity extends AppCompatActivity {
     @BindView(R.id.ca_iv_back)
     ImageView ivBack;
 
+    @BindView(R.id.ca_tv_zip)
+    TextView tvZip;
+
+    @BindView(R.id.ca_et_zip)
+    TextInputEditText etZip;
+
+    @BindView(R.id.ca_tv_zip_error)
+    TextView tvZipError;
+
+    @BindView(R.id.ca_atc_community)
+    AutoCompleteTextView atvCommunity;
+
+    @BindView(R.id.ca_tv_community_error)
+    TextView tvCommunityError;
+
     @BindView(R.id.ca_tv)
     TextView textView;
-
-    @BindView(R.id.ca_tv_error)
-    TextView tvError;
 
     @BindView(R.id.ca_et_street)
     EditText etStreet;
@@ -66,27 +80,41 @@ public class CommunityActivity extends AppCompatActivity {
     @BindView(R.id.ca_et_apart)
     EditText etApartment;
 
-    @BindView(R.id.ca_et_zip)
-    EditText etZip;
-
-    @BindView(R.id.ca_tv_zip_error)
-    TextView tvZipError;
-
-    @BindView(R.id.ca_btn_fyc)
-    Button btnFYC;
+    @BindView(R.id.ca_btn_next)
+    Button btnNext;
 
     @BindView(R.id.ca_tv_footer)
     TextView tvFooter;
 
-    private Dialog progressDialog, internetDialog;
+    private Dialog progressDialog;
     private BroadcastReceiver receiver;
+
     private String invitationCode;
     private String from;
 
-    private BroadcastReceiver r = new BroadcastReceiver() {
+    private List<Community> communityList;
+    private Community community;
+
+    private BroadcastReceiver r1 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             finish();
+        }
+    };
+
+    private BroadcastReceiver r2 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            tvCommunityError.setText("No such community found for entered zip code");
+            tvCommunityError.setVisibility(View.VISIBLE);
+        }
+    };
+
+    private BroadcastReceiver r3 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            tvCommunityError.setVisibility(View.GONE);
+            tvCommunityError.setText(null);
         }
     };
 
@@ -98,133 +126,190 @@ public class CommunityActivity extends AppCompatActivity {
         setContentView(R.layout.activity_community);
         ButterKnife.bind(this);
 
-        from = getIntent().getStringExtra(AppConstant.FROM);
-
-        if (from.equalsIgnoreCase(AppConstant.DIRECT)) {
-            textView.setText(R.string.ca_tv_direct);
-        } else {
-            textView.setText(R.string.ca_tv_invitation);
-            invitationCode = getIntent().getStringExtra(AppConstant.INVITATION_CODE);
-            etZip.setText(getIntent().getStringExtra(AppConstant.ZIPCODE));
-        }
-
         progressDialog = Utility.INSTANCE.showProgress(CommunityActivity.this);
 
+        from = getIntent().getStringExtra(AppConstant.FROM);
+
+        if (from.equalsIgnoreCase(AppConstant.INVITATION)) {
+            invitationCode = getIntent().getStringExtra(AppConstant.INVITATION_CODE);
+            community = (Community) getIntent().getSerializableExtra(AppConstant.COMMUNITY);
+            etZip.setText(community.getZip());
+            atvCommunity.setText(community.getCommunityName());
+            etZip.setEnabled(false);
+        }
+
+        tvZip.setTypeface(Utility.INSTANCE.getFontRegular());
+        etZip.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvZipError.setTypeface(Utility.INSTANCE.getFontRegular());
+        atvCommunity.setTypeface(Utility.INSTANCE.getFontRegular());
+        tvCommunityError.setTypeface(Utility.INSTANCE.getFontRegular());
         textView.setTypeface(Utility.INSTANCE.getFontRegular());
-        tvError.setTypeface(Utility.INSTANCE.getFontRegular());
         etStreet.setTypeface(Utility.INSTANCE.getFontRegular());
         tvStreetError.setTypeface(Utility.INSTANCE.getFontRegular());
         etApartment.setTypeface(Utility.INSTANCE.getFontRegular());
-        etZip.setTypeface(Utility.INSTANCE.getFontRegular());
-        tvZipError.setTypeface(Utility.INSTANCE.getFontRegular());
-        btnFYC.setTypeface(Utility.INSTANCE.getFontRegular());
+        btnNext.setTypeface(Utility.INSTANCE.getFontRegular());
         tvFooter.setTypeface(Utility.INSTANCE.getFontRegular());
 
         ivBack.setOnClickListener(v -> onBackPressed());
 
-        btnFYC.setOnClickListener(v -> {
-            if (etStreet.getText().toString().length() == 0) {
-                tvStreetError.setVisibility(View.VISIBLE);
-            } else if (etZip.getText().toString().length() == 0) {
-                tvZipError.setVisibility(View.VISIBLE);
-            } else {
-                if (Utility.INSTANCE.isConnectingToInternet()) {
-                    checkCommunity();
-                }
-            }
+        btnNext.setOnClickListener(v -> {
+            Intent intent = new Intent(CommunityActivity.this, CommunityFoundActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString(AppConstant.FROM, from);
+            bundle.putString(AppConstant.INVITATION_CODE, invitationCode);
+            bundle.putSerializable(AppConstant.COMMUNITY, community);
+            bundle.putString(AppConstant.STREET, etStreet.getText().toString().trim());
+            bundle.putString(AppConstant.APRTMENT, etApartment.getText().toString().trim());
+            intent.putExtras(bundle);
+            startActivity(intent);
         });
-    }
 
-    @OnTextChanged(value = R.id.ca_et_street, callback = OnTextChanged.Callback.TEXT_CHANGED)
-    void setEtStreetOnTextChange(CharSequence sequence) {
-        String s = sequence.toString().trim();
-        if (s.length() == 0) {
-            tvStreetError.setVisibility(View.VISIBLE);
-        } else {
-            tvStreetError.setVisibility(View.GONE);
-        }
+        tvFooter.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(AppConstant.PRIVACY_POLICY));
+            startActivity(i);
+        });
     }
 
     @OnTextChanged(value = R.id.ca_et_zip, callback = OnTextChanged.Callback.TEXT_CHANGED)
     void setEtZipOnTextChange(CharSequence sequence) {
         String s = sequence.toString().trim();
+        Pattern pattern = Pattern.compile("^[0-9]{5}(?:-[0-9]{4})?$");
         if (s.length() == 0) {
-            tvZipError.setVisibility(View.VISIBLE);
-        } else {
             tvZipError.setVisibility(View.GONE);
+            atvCommunity.setText(null);
+            atvCommunity.setEnabled(false);
+        } else if (!pattern.matcher(s).matches()) {
+            tvZipError.setVisibility(View.VISIBLE);
+            tvZipError.setText("Please enter valid zip code");
+            atvCommunity.setText(null);
+            atvCommunity.setEnabled(false);
+        } else {
+            if (s.length() == 5) {
+                tvZipError.setVisibility(View.GONE);
+                checkCommunity(s);
+            } else {
+                tvZipError.setVisibility(View.GONE);
+                atvCommunity.setText(null);
+                atvCommunity.setEnabled(false);
+            }
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+    @OnTextChanged(value = R.id.ca_atc_community, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    void setAtvCommunityOnTextChange(CharSequence sequence) {
+        String s = sequence.toString().trim();
+        if (from.equalsIgnoreCase(AppConstant.INVITATION)) {
+            etStreet.setEnabled(true);
+            etApartment.setEnabled(true);
+        } else {
+            if (communityList != null) {
+                if (communityList.size() != 0) {
+                    for (int i = 0; i < communityList.size(); i++) {
+                        if (Objects.requireNonNull(communityList.get(i).getCommunityName()).equalsIgnoreCase(s)) {
+                            etStreet.setEnabled(true);
+                            etApartment.setEnabled(true);
+                            break;
+                        } else {
+                            etStreet.setEnabled(false);
+                            etApartment.setEnabled(false);
+                            etStreet.setText(null);
+                            etApartment.setText(null);
+                        }
+                    }
+                }
+            }
         }
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
-        super.onDestroy();
+    }
+
+    @OnTextChanged(value = R.id.ca_et_street, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    void setEtStreetOnTextChange(CharSequence sequence) {
+        String s = sequence.toString().trim().toLowerCase();
+        if (s.length() == 0) {
+            tvStreetError.setVisibility(View.GONE);
+            btnNext.setEnabled(false);
+        } else {
+            if (community != null) {
+                List<String> strings = Arrays.asList(community.getStreet().split(","));
+                for (int i = 0; i < strings.size(); i++) {
+                    if (s.contains(strings.get(i).trim().toLowerCase())) {
+                        tvStreetError.setVisibility(View.GONE);
+                        btnNext.setEnabled(true);
+                        break;
+                    } else {
+                        tvStreetError.setVisibility(View.VISIBLE);
+                        btnNext.setEnabled(false);
+                    }
+                }
+            }
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        receiver = new NetworkChangeReceiver();
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r1, new IntentFilter("CloseCommunity"));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r2, new IntentFilter("SetError"));
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r3, new IntentFilter("ClearError"));
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r1);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r2);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r3);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
         try {
             unregisterReceiver(receiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        receiver = new NetworkChangeReceiver();
-        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r, new IntentFilter("CloseCommunity"));
+        super.onPause();
     }
 
-    private void checkCommunity() {
+    private void checkCommunity(String zip) {
         progressDialog.show();
-        tvError.setText(null);
-        tvError.setVisibility(View.GONE);
-
-        RequestCommunity requestCommunity = new RequestCommunity();
-        requestCommunity.setStreet(etStreet.getText().toString().trim());
-        requestCommunity.setAppartmentUnit(etApartment.getText().toString().trim());
-        requestCommunity.setZip(etZip.getText().toString().trim());
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
-        Call<List<Community>> call = apiInterface.getCommunity(AppConstant.CT_JSON, AppConstant.UTF, requestCommunity);
+        Call<List<Community>> call = apiInterface.getCommunity(AppConstant.CT_JSON, AppConstant.UTF, zip);
         call.enqueue(new Callback<List<Community>>() {
             @Override
             public void onResponse(@NonNull Call<List<Community>> call, @NonNull Response<List<Community>> response) {
                 if (response.isSuccessful()) {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    Intent intent = new Intent(CommunityActivity.this, CommunityFoundActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString(AppConstant.FROM, from);
-                    bundle.putString(AppConstant.INVITATION_CODE, invitationCode);
-                    bundle.putSerializable(AppConstant.COMMUNITY, Objects.requireNonNull(response.body()).get(0));
-                    bundle.putString(AppConstant.APRTMENT, etApartment.getText().toString().trim());
-                    bundle.putString(AppConstant.STREET, etStreet.getText().toString().trim());
-                    intent.putExtras(bundle);
-                    startActivity(intent);
+                    communityList = new ArrayList<>(Objects.requireNonNull(response.body()));
+                    if (communityList.size() > 0) {
+                        if (from.equalsIgnoreCase(AppConstant.INVITATION)) {
+                            atvCommunity.setEnabled(false);
+                        } else {
+                            atvCommunity.setEnabled(true);
+                        }
+                        tvZipError.setVisibility(View.GONE);
+                        atvCommunity.setAdapter(new AdapterCommunity(CommunityActivity.this, R.layout.item_community, communityList));
+                        atvCommunity.setThreshold(3);
+                        atvCommunity.setOnItemClickListener((parent, view, position, id) -> {
+                            community = (Community) parent.getItemAtPosition(position);
+                            atvCommunity.setText(community.getCommunityName());
+                        });
+                    } else {
+                        tvZipError.setVisibility(View.VISIBLE);
+                        tvZipError.setText("No community found for entered zip code");
+                        atvCommunity.setEnabled(false);
+                    }
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    try {
-                        ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
-                        }.getType());
-                        tvError.setText(resultError.getMessage());
-                        tvError.setVisibility(View.VISIBLE);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<List<Community>> call, @NonNull Throwable t) {
                 Utility.INSTANCE.dismissDialog(progressDialog);
-                if (t.getMessage().equalsIgnoreCase("timeout")) {
-                    internetDialog = Utility.INSTANCE.showError(CommunityActivity.this, R.string.time_out_msg, R.string.dd_ok, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                    internetDialog.show();
-                }
             }
         });
     }

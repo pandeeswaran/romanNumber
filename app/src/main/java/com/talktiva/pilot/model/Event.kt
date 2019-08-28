@@ -48,6 +48,12 @@ class Event : Serializable {
     @SerializedName("likeCount")
     var likeCount: Int? = null
 
+    @SerializedName("inviteeIds")
+    var inviteeIds: String? = null
+
+    @SerializedName("guestEmails")
+    var guestEmails: String? = null
+
     @SerializedName("hasLiked")
     var isHasLiked: Boolean? = null
 
