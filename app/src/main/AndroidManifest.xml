@@ -32,8 +32,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        tools:ignore="GoogleAppIndexingWarning"
-        tools:targetApi="m">
+        tools:ignore="UnusedAttribute">
 
         <provider
             android:name="androidx.core.content.FileProvider"

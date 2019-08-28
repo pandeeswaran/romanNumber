@@ -15,19 +15,19 @@
       },
       "oauth_client": [
         {
+          "client_id": "129685831491-docs7nck8l400oa3mqa0i90iqajugg0r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.talktiva.pilot",
+            "certificate_hash": "cb3244e69ca9a28e6ff02ca8344c75cfda2cbb44"
+          }
+        },
+        {
           "client_id": "129685831491-27jq3l633n8dpor04ko3pt5oe4trcc87.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.talktiva.pilot",
             "certificate_hash": "3e9f0695dbc27c1b275e96db937808218bbdad72"
-          }
-        },
-        {
-          "client_id": "129685831491-93lddqotjtpj2pabcnc42snhgfo06eod.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.talktiva.pilot",
-            "certificate_hash": "f52eb18c880bffcc58bd4d79b25f4bb5fd1e7c3d"
           }
         },
         {
