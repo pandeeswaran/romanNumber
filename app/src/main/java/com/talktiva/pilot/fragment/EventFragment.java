@@ -165,7 +165,7 @@ public class EventFragment extends Fragment {
         }
 
         if (Objects.requireNonNull(tabLayout.getTabAt(0)).isSelected()) {
-            loadFragment(new PendingFragment());
+            loadFragment(new UpcomingFragment());
         }
     }
 
