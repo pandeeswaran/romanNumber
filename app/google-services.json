@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "129685831491-ic2dgm3p910jj987s28motc3164ahjhc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.talktiva.pilot",
+            "certificate_hash": "8c995424c337cbd70b771595cf7d9386ba1d29b3"
+          }
+        },
+        {
           "client_id": "129685831491-docs7nck8l400oa3mqa0i90iqajugg0r.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

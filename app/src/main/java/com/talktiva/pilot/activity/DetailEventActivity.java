@@ -427,7 +427,9 @@ public class DetailEventActivity extends AppCompatActivity {
                     for (int j = 0; j < Objects.requireNonNull(event.getInvitations()).size(); j++) {
                         if (Objects.requireNonNull(event.getInvitations().get(j).getStatus()).equalsIgnoreCase("pending")) {
                             pendingInvitations.add(event.getInvitations().get(j));
-                        } else {
+                        }
+
+                        if (Objects.requireNonNull(event.getInvitations().get(j).getStatus()).equalsIgnoreCase("ACCEPTED")) {
                             acceptedInvitations.add(event.getInvitations().get(j));
                         }
                     }
@@ -439,7 +441,6 @@ public class DetailEventActivity extends AppCompatActivity {
                         tabLayout.removeAllTabs();
                         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.dea_tab_accept).concat(" (").concat(String.valueOf(acceptedInvitations.size())).concat(")")), 0);
                         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.dea_tab_pending).concat(" (").concat(String.valueOf(pendingInvitations.size())).concat(")")), 1);
-
                     }
 
                     if (Objects.requireNonNull(event.isPrivate())) {

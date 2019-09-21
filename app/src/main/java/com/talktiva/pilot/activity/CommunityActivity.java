@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -29,11 +31,11 @@ import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Community;
+import com.talktiva.pilot.model.tpav.AddressObject;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -152,17 +154,7 @@ public class CommunityActivity extends AppCompatActivity {
 
         ivBack.setOnClickListener(v -> onBackPressed());
 
-        btnNext.setOnClickListener(v -> {
-            Intent intent = new Intent(CommunityActivity.this, CommunityFoundActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putString(AppConstant.FROM, from);
-            bundle.putString(AppConstant.INVITATION_CODE, invitationCode);
-            bundle.putSerializable(AppConstant.COMMUNITY, community);
-            bundle.putString(AppConstant.STREET, etStreet.getText().toString().trim());
-            bundle.putString(AppConstant.APRTMENT, etApartment.getText().toString().trim());
-            intent.putExtras(bundle);
-            startActivity(intent);
-        });
+        btnNext.setOnClickListener(v -> checkAddress(etStreet.getText().toString(), community));
 
         tvFooter.setOnClickListener(v -> {
             Intent i = new Intent(Intent.ACTION_VIEW);
@@ -222,27 +214,49 @@ public class CommunityActivity extends AppCompatActivity {
         }
     }
 
-    @OnTextChanged(value = R.id.ca_et_street, callback = OnTextChanged.Callback.TEXT_CHANGED)
-    void setEtStreetOnTextChange(CharSequence sequence) {
-        String s = sequence.toString().trim().toLowerCase();
+    @OnTextChanged(value = R.id.ca_et_street, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void setEtStreetOnTextChange(Editable editable) {
+        String s = editable.toString().trim().toLowerCase();
         if (s.length() == 0) {
             tvStreetError.setVisibility(View.GONE);
             btnNext.setEnabled(false);
         } else {
-            if (community != null) {
-                List<String> strings = Arrays.asList(community.getStreet().split(","));
-                for (int i = 0; i < strings.size(); i++) {
-                    if (s.contains(strings.get(i).trim().toLowerCase())) {
-                        tvStreetError.setVisibility(View.GONE);
-                        btnNext.setEnabled(true);
-                        break;
-                    } else {
-                        tvStreetError.setVisibility(View.VISIBLE);
-                        btnNext.setEnabled(false);
+            btnNext.setEnabled(true);
+        }
+    }
+
+    private void checkAddress(String street, Community community) {
+        ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
+        Call<List<AddressObject>> call = apiInterface.checkAddress(AppConstant.AUTH_ID_VAL, AppConstant.AUTH_TOKEN_VAL, AppConstant.MATCH_VAL, street, community.getCity(), community.getState(), community.getZip());
+        call.enqueue(new Callback<List<AddressObject>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<AddressObject>> call, @NonNull Response<List<AddressObject>> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        if (response.body().size() != 0) {
+                            Intent intent = new Intent(CommunityActivity.this, CommunityFoundActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putString(AppConstant.FROM, from);
+                            bundle.putString(AppConstant.INVITATION_CODE, invitationCode);
+                            bundle.putSerializable(AppConstant.COMMUNITY, community);
+                            bundle.putString(AppConstant.STREET, etStreet.getText().toString().trim());
+                            bundle.putString(AppConstant.APRTMENT, etApartment.getText().toString().trim());
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        } else {
+                            tvStreetError.setVisibility(View.VISIBLE);
+                        }
                     }
+                } else {
+                    Log.d(Talktiva.Companion.getTAG(), "onResponse: ".concat(response.message()));
                 }
             }
-        }
+
+            @Override
+            public void onFailure(@NonNull Call<List<AddressObject>> call, @NonNull Throwable t) {
+                Log.d(Talktiva.Companion.getTAG(), "onFailure: ".concat(t.getMessage()));
+            }
+        });
     }
 
     @Override

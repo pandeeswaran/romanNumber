@@ -40,9 +40,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
@@ -61,7 +58,6 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -399,9 +395,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void logoutFromGoogle() {
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener(this, task -> {
-                });
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, task -> {
+                    });
+        }
     }
 
     private void logoutFromFacebook() {
@@ -420,12 +418,16 @@ public class LoginActivity extends AppCompatActivity {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, new Gson().toJson(response.body(), User.class));
                     if (Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_PASS_FLAG)).trim().equalsIgnoreCase("true")) {
-                        startActivity(new Intent(LoginActivity.this, ChangePasswordActivity.class));
+                        Intent intent = new Intent(LoginActivity.this, ChangePasswordActivity.class);
+                        intent.putExtra(AppConstant.FROM, "Login");
+                        intent.putExtra("Password", etPass.getText().toString().trim());
+                        startActivity(intent);
+                        finish();
                     } else {
                         startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
+                        finish();
+                        LocalBroadcastManager.getInstance(LoginActivity.this).sendBroadcast(new Intent("CloseWelcome"));
                     }
-                    finish();
-                    LocalBroadcastManager.getInstance(LoginActivity.this).sendBroadcast(new Intent("CloseWelcome"));
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     try {

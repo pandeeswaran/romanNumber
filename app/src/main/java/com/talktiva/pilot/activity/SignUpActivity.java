@@ -713,9 +713,11 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void logoutFromGoogle() {
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener(this, task -> {
-                });
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, task -> {
+                    });
+        }
     }
 
     private void logoutFromFacebook() {

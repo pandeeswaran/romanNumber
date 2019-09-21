@@ -1,5 +1,7 @@
 package com.talktiva.pilot.helper
 
+import android.service.autofill.FieldClassification
+
 object AppConstant {
 
     //region Headers
@@ -52,7 +54,6 @@ object AppConstant {
     const val UPCOMMING_DETAIL = "upcomming_detail"
     const val YOURS_DETAIL = "yours_detail"
 
-    const val STREET = "street"
     const val APRTMENT = "apartment"
     const val COMMUNITY = "community"
 
@@ -64,9 +65,26 @@ object AppConstant {
     const val POP = "popUp"
     const val PROVIDER = "provider"
     const val ANDROID = "ANDROID"
+
+    const val AUTH_ID = "auth-id"
+    const val AUTH_ID_VAL = "6192e9c8-6910-b507-fcde-9bf80c7fa882"
+
+    const val AUTH_TOKEN = "auth-token"
+    const val AUTH_TOKEN_VAL = "uuJ8WGrkS4JIRXQ40Qpf"
+
+    const val MATCH = "match"
+    const val MATCH_VAL = "strict"
+
+    const val STREET = "street"
+    const val CITY = "city"
+    const val STAT = "state"
+    const val ZIPCODE = "zipcode"
     //endregion
 
-    const val BASE_URL = "http://54.80.108.189:9092"
+    const val BASE_ADDRESS = "https://us-street.api.smartystreets.com/street-address"
+
+    const val BASE_URL = "http://13.59.232.104:9092"
+    //    const val BASE_URL = "http://54.80.108.189:9092"
     const val BASE_EVENT = "/ms-event/api/v1/events"
     const val BASE_USER = "/ms-event/api/v1/users"
     const val BASE_NOTIFICATION = "/ms-event/api/v1/notifications"

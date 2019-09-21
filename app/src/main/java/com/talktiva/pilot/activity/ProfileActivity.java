@@ -72,11 +72,11 @@ public class ProfileActivity extends AppCompatActivity {
     @BindView(R.id.pa_tv_ea_title)
     TextView tvEventAttended;
 
-    @BindView(R.id.pa_tv_post_count)
-    TextView tvPostCount;
-
-    @BindView(R.id.pa_tv_post)
-    TextView tvPost;
+//    @BindView(R.id.pa_tv_post_count)
+//    TextView tvPostCount;
+//
+//    @BindView(R.id.pa_tv_post)
+//    TextView tvPost;
 
     @BindView(R.id.pa_tv_notification)
     TextView tvNotification;
@@ -115,7 +115,7 @@ public class ProfileActivity extends AppCompatActivity {
             tvAddEmail.setText(Objects.requireNonNull(Objects.requireNonNull(user.getAddress()).getStreet()).concat(" ").concat(getResources().getString(R.string.divider)).concat(" ").concat(Objects.requireNonNull(user.getEmail())));
             tvEventHostedCount.setText(String.valueOf(user.getEventHostedCount()));
             tvEventAttendedCount.setText(String.valueOf(user.getEventAttendedCount()));
-            tvPostCount.setText(String.valueOf(user.getPostCount()));
+//            tvPostCount.setText(String.valueOf(user.getPostCount()));
             String str = getResources().getString(R.string.pa_tv_family);
             tvFamily.setText(str.concat(" (").concat(String.valueOf(user.getFamilyMemberCount())).concat(")"));
             RequestCreator rc = Picasso.get().load(user.getUserImage());
@@ -152,8 +152,8 @@ public class ProfileActivity extends AppCompatActivity {
         tvEventHosted.setTypeface(Utility.INSTANCE.getFontRegular());
         tvEventAttendedCount.setTypeface(Utility.INSTANCE.getFontRegular());
         tvEventAttended.setTypeface(Utility.INSTANCE.getFontRegular());
-        tvPostCount.setTypeface(Utility.INSTANCE.getFontRegular());
-        tvPost.setTypeface(Utility.INSTANCE.getFontRegular());
+//        tvPostCount.setTypeface(Utility.INSTANCE.getFontRegular());
+//        tvPost.setTypeface(Utility.INSTANCE.getFontRegular());
         tvNotification.setTypeface(Utility.INSTANCE.getFontRegular());
         tvFamily.setTypeface(Utility.INSTANCE.getFontRegular());
  //       tvFeedback.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -186,8 +186,8 @@ public class ProfileActivity extends AppCompatActivity {
                 logoutFromFacebook();
                 logoutFromGoogle();
                 dialogClose.dismiss();
-                startActivity(new Intent(ProfileActivity.this, WelcomeActivity.class));
                 finish();
+                startActivity(new Intent(ProfileActivity.this, WelcomeActivity.class));
             }, View.VISIBLE, R.string.dd_no, v2 -> dialogClose.dismiss());
             dialogClose.show();
         });
@@ -202,9 +202,11 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void logoutFromGoogle() {
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener(this, task -> {
-                });
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, task -> {
+                    });
+        }
     }
 
     private void logoutFromFacebook() {
@@ -238,7 +240,7 @@ public class ProfileActivity extends AppCompatActivity {
                     tvAddEmail.setText(Objects.requireNonNull(Objects.requireNonNull(user.getAddress()).getStreet()).concat(" ").concat(getResources().getString(R.string.divider)).concat(" ").concat(Objects.requireNonNull(user.getEmail())));
                     tvEventHostedCount.setText(String.valueOf(user.getEventHostedCount()));
                     tvEventAttendedCount.setText(String.valueOf(user.getEventAttendedCount()));
-                    tvPostCount.setText(String.valueOf(user.getPostCount()));
+//                    tvPostCount.setText(String.valueOf(user.getPostCount()));
                     String str = getResources().getString(R.string.pa_tv_family);
                     tvFamily.setText(str.concat(" (").concat(String.valueOf(user.getFamilyMemberCount())).concat(")"));
                     RequestCreator rc = Picasso.get().load(user.getUserImage());

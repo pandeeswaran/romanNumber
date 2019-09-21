@@ -56,45 +56,45 @@ public class NotificationActivity extends AppCompatActivity {
 
     @BindView(R.id.na_sw_cancel)
     Switch swCancel;
-/*
-    @BindView(R.id.na_tv_post)
-    TextView tvPost;
 
-    @BindView(R.id.na_sw_like)
-    Switch swLike;
-
-    @BindView(R.id.na_sw_comment)
-    Switch swComment;
-
-    @BindView(R.id.na_sw_ra)
-    Switch swReportAbuse;
-
-    @BindView(R.id.na_tv_chats)
-    TextView tvChats;
-
-    @BindView(R.id.na_sw_dc)
-    Switch swDirectChats;
-
-    @BindView(R.id.na_tv_dcs)
-    TextView tvDirectChatsSound;
-
-    @BindView(R.id.na_sw_gc)
-    Switch swGroupChats;
-
-    @BindView(R.id.na_tv_gcs)
-    TextView tvGroupChatsSound;
-
-    @BindView(R.id.na_tv_community)
-    TextView tvCommunity;
-
-    @BindView(R.id.na_sw_people)
-    Switch swPeople;
-
-    @BindView(R.id.na_sw_mc)
-    Switch swManagementChat;
-
-    @BindView(R.id.na_sw_notice)
-    Switch swNotice;*/
+//    @BindView(R.id.na_tv_post)
+//    TextView tvPost;
+//
+//    @BindView(R.id.na_sw_like)
+//    Switch swLike;
+//
+//    @BindView(R.id.na_sw_comment)
+//    Switch swComment;
+//
+//    @BindView(R.id.na_sw_ra)
+//    Switch swReportAbuse;
+//
+//    @BindView(R.id.na_tv_chats)
+//    TextView tvChats;
+//
+//    @BindView(R.id.na_sw_dc)
+//    Switch swDirectChats;
+//
+//    @BindView(R.id.na_tv_dcs)
+//    TextView tvDirectChatsSound;
+//
+//    @BindView(R.id.na_sw_gc)
+//    Switch swGroupChats;
+//
+//    @BindView(R.id.na_tv_gcs)
+//    TextView tvGroupChatsSound;
+//
+//    @BindView(R.id.na_tv_community)
+//    TextView tvCommunity;
+//
+//    @BindView(R.id.na_sw_people)
+//    Switch swPeople;
+//
+//    @BindView(R.id.na_sw_mc)
+//    Switch swManagementChat;
+//
+//    @BindView(R.id.na_sw_notice)
+//    Switch swNotice;
 
     @BindView(R.id.na_tv_ran)
     TextView tvRestAllNotification;
@@ -126,21 +126,21 @@ public class NotificationActivity extends AppCompatActivity {
         swShareLike.setTypeface(Utility.INSTANCE.getFontRegular());
         swCancel.setTypeface(Utility.INSTANCE.getFontRegular());
 
-      /*  tvPost.setTypeface(Utility.INSTANCE.getFontBold());
-        swLike.setTypeface(Utility.INSTANCE.getFontRegular());
-        swComment.setTypeface(Utility.INSTANCE.getFontRegular());
-        swReportAbuse.setTypeface(Utility.INSTANCE.getFontRegular());
-
-        tvChats.setTypeface(Utility.INSTANCE.getFontBold());
-        swDirectChats.setTypeface(Utility.INSTANCE.getFontRegular());
-        tvDirectChatsSound.setTypeface(Utility.INSTANCE.getFontRegular());
-        swGroupChats.setTypeface(Utility.INSTANCE.getFontRegular());
-        tvGroupChatsSound.setTypeface(Utility.INSTANCE.getFontRegular());
-
-        tvCommunity.setTypeface(Utility.INSTANCE.getFontBold());
-        swPeople.setTypeface(Utility.INSTANCE.getFontRegular());
-        swManagementChat.setTypeface(Utility.INSTANCE.getFontRegular());
-        swNotice.setTypeface(Utility.INSTANCE.getFontRegular());*/
+//        tvPost.setTypeface(Utility.INSTANCE.getFontBold());
+//        swLike.setTypeface(Utility.INSTANCE.getFontRegular());
+//        swComment.setTypeface(Utility.INSTANCE.getFontRegular());
+//        swReportAbuse.setTypeface(Utility.INSTANCE.getFontRegular());
+//
+//        tvChats.setTypeface(Utility.INSTANCE.getFontBold());
+//        swDirectChats.setTypeface(Utility.INSTANCE.getFontRegular());
+//        tvDirectChatsSound.setTypeface(Utility.INSTANCE.getFontRegular());
+//        swGroupChats.setTypeface(Utility.INSTANCE.getFontRegular());
+//        tvGroupChatsSound.setTypeface(Utility.INSTANCE.getFontRegular());
+//
+//        tvCommunity.setTypeface(Utility.INSTANCE.getFontBold());
+//        swPeople.setTypeface(Utility.INSTANCE.getFontRegular());
+//        swManagementChat.setTypeface(Utility.INSTANCE.getFontRegular());
+//        swNotice.setTypeface(Utility.INSTANCE.getFontRegular());
 
         tvRestAllNotification.setTypeface(Utility.INSTANCE.getFontRegular());
 
@@ -152,21 +152,21 @@ public class NotificationActivity extends AppCompatActivity {
                 swShareLike.setEnabled(false);
                 swCancel.setEnabled(false);
 
-        /*        tvPost.setEnabled(false);
-                swLike.setEnabled(false);
-                swComment.setEnabled(false);
-                swReportAbuse.setEnabled(false);
-
-                tvChats.setEnabled(false);
-                swDirectChats.setEnabled(false);
-                tvDirectChatsSound.setEnabled(false);
-                swGroupChats.setEnabled(false);
-                tvGroupChatsSound.setEnabled(false);
-
-                tvCommunity.setEnabled(false);
-                swPeople.setEnabled(false);
-                swManagementChat.setEnabled(false);
-                swNotice.setEnabled(false);*/
+//                tvPost.setEnabled(false);
+//                swLike.setEnabled(false);
+//                swComment.setEnabled(false);
+//                swReportAbuse.setEnabled(false);
+//
+//                tvChats.setEnabled(false);
+//                swDirectChats.setEnabled(false);
+//                tvDirectChatsSound.setEnabled(false);
+//                swGroupChats.setEnabled(false);
+//                tvGroupChatsSound.setEnabled(false);
+//
+//                tvCommunity.setEnabled(false);
+//                swPeople.setEnabled(false);
+//                swManagementChat.setEnabled(false);
+//                swNotice.setEnabled(false);
             } else {
                 tvEvents.setEnabled(true);
                 swInvited.setEnabled(true);
@@ -174,21 +174,21 @@ public class NotificationActivity extends AppCompatActivity {
                 swShareLike.setEnabled(true);
                 swCancel.setEnabled(true);
 
-                /*tvPost.setEnabled(true);
-                swLike.setEnabled(true);
-                swComment.setEnabled(true);
-                swReportAbuse.setEnabled(true);
-
-                tvChats.setEnabled(true);
-                swDirectChats.setEnabled(true);
-                tvDirectChatsSound.setEnabled(true);
-                swGroupChats.setEnabled(true);
-                tvGroupChatsSound.setEnabled(true);
-
-                tvCommunity.setEnabled(true);
-                swPeople.setEnabled(true);
-                swManagementChat.setEnabled(true);
-                swNotice.setEnabled(true);*/
+//                tvPost.setEnabled(true);
+//                swLike.setEnabled(true);
+//                swComment.setEnabled(true);
+//                swReportAbuse.setEnabled(true);
+//
+//                tvChats.setEnabled(true);
+//                swDirectChats.setEnabled(true);
+//                tvDirectChatsSound.setEnabled(true);
+//                swGroupChats.setEnabled(true);
+//                tvGroupChatsSound.setEnabled(true);
+//
+//                tvCommunity.setEnabled(true);
+//                swPeople.setEnabled(true);
+//                swManagementChat.setEnabled(true);
+//                swNotice.setEnabled(true);
             }
         });
 
@@ -205,29 +205,29 @@ public class NotificationActivity extends AppCompatActivity {
             swCancel.setEnabled(true);
             swCancel.setChecked(true);
 
-/*            tvPost.setEnabled(true);
-            swLike.setEnabled(true);
-            swLike.setChecked(true);
-            swComment.setEnabled(true);
-            swComment.setChecked(true);
-            swReportAbuse.setEnabled(true);
-            swReportAbuse.setChecked(true);
-
-            tvChats.setEnabled(true);
-            swDirectChats.setEnabled(true);
-            swDirectChats.setChecked(true);
-            tvDirectChatsSound.setEnabled(true);
-            swGroupChats.setEnabled(true);
-            swGroupChats.setChecked(true);
-            tvGroupChatsSound.setEnabled(true);
-
-            tvCommunity.setEnabled(true);
-            swPeople.setEnabled(true);
-            swPeople.setChecked(true);
-            swManagementChat.setEnabled(true);
-            swManagementChat.setChecked(true);
-            swNotice.setEnabled(true);
-            swNotice.setChecked(true);*/
+//            tvPost.setEnabled(true);
+//            swLike.setEnabled(true);
+//            swLike.setChecked(true);
+//            swComment.setEnabled(true);
+//            swComment.setChecked(true);
+//            swReportAbuse.setEnabled(true);
+//            swReportAbuse.setChecked(true);
+//
+//            tvChats.setEnabled(true);
+//            swDirectChats.setEnabled(true);
+//            swDirectChats.setChecked(true);
+//            tvDirectChatsSound.setEnabled(true);
+//            swGroupChats.setEnabled(true);
+//            swGroupChats.setChecked(true);
+//            tvGroupChatsSound.setEnabled(true);
+//
+//            tvCommunity.setEnabled(true);
+//            swPeople.setEnabled(true);
+//            swPeople.setChecked(true);
+//            swManagementChat.setEnabled(true);
+//            swManagementChat.setChecked(true);
+//            swNotice.setEnabled(true);
+//            swNotice.setChecked(true);
 
             setNotificationSettings();
         });
@@ -298,54 +298,53 @@ public class NotificationActivity extends AppCompatActivity {
                         swCancel.setChecked(true);
                     }
 
-                 /*   if (response.body().getLike() != null) {
-                        swLike.setChecked(response.body().getLike());
-                    } else {
-                        swLike.setChecked(true);
-                    }
-
-                    if (response.body().getComment() != null) {
-                        swComment.setChecked(response.body().getComment());
-                    } else {
-                        swComment.setChecked(true);
-                    }
-
-                    if (response.body().getReportAbuse() != null) {
-                        swReportAbuse.setChecked(response.body().getReportAbuse());
-                    } else {
-                        swReportAbuse.setChecked(true);
-                    }
-
-                    if (response.body().getDirectChat() != null) {
-                        swDirectChats.setChecked(response.body().getDirectChat());
-                    } else {
-                        swDirectChats.setChecked(true);
-                    }
-
-                    if (response.body().getGroupChat() != null) {
-                        swGroupChats.setChecked(response.body().getGroupChat());
-                    } else {
-                        swGroupChats.setChecked(true);
-                    }
-
-                    if (response.body().getNewPeopleJoinedCommunity() != null) {
-                        swPeople.setChecked(response.body().getNewPeopleJoinedCommunity());
-                    } else {
-                        swPeople.setChecked(true);
-                    }
-
-                    if (response.body().getManagementChat() != null) {
-                        swManagementChat.setChecked(response.body().getManagementChat());
-                    } else {
-                        swManagementChat.setChecked(true);
-                    }
-
-                    if (response.body().getNotice() != null) {
-                        swNotice.setChecked(response.body().getNotice());
-                    } else {
-                        swNotice.setChecked(true);
-                    }
-*/
+//                    if (response.body().getLike() != null) {
+//                        swLike.setChecked(response.body().getLike());
+//                    } else {
+//                        swLike.setChecked(true);
+//                    }
+//
+//                    if (response.body().getComment() != null) {
+//                        swComment.setChecked(response.body().getComment());
+//                    } else {
+//                        swComment.setChecked(true);
+//                    }
+//
+//                    if (response.body().getReportAbuse() != null) {
+//                        swReportAbuse.setChecked(response.body().getReportAbuse());
+//                    } else {
+//                        swReportAbuse.setChecked(true);
+//                    }
+//
+//                    if (response.body().getDirectChat() != null) {
+//                        swDirectChats.setChecked(response.body().getDirectChat());
+//                    } else {
+//                        swDirectChats.setChecked(true);
+//                    }
+//
+//                    if (response.body().getGroupChat() != null) {
+//                        swGroupChats.setChecked(response.body().getGroupChat());
+//                    } else {
+//                        swGroupChats.setChecked(true);
+//                    }
+//
+//                    if (response.body().getNewPeopleJoinedCommunity() != null) {
+//                        swPeople.setChecked(response.body().getNewPeopleJoinedCommunity());
+//                    } else {
+//                        swPeople.setChecked(true);
+//                    }
+//
+//                    if (response.body().getManagementChat() != null) {
+//                        swManagementChat.setChecked(response.body().getManagementChat());
+//                    } else {
+//                        swManagementChat.setChecked(true);
+//                    }
+//
+//                    if (response.body().getNotice() != null) {
+//                        swNotice.setChecked(response.body().getNotice());
+//                    } else {
+//                        swNotice.setChecked(true);
+//                    }
                     if (response.body().getPauseAll() != null) {
                         swPause.setChecked(response.body().getPauseAll());
                     } else {
@@ -371,14 +370,22 @@ public class NotificationActivity extends AppCompatActivity {
         notifications.setAcceptOrDecline(swAcceptDecline.isChecked());
         notifications.setShareOrLike(swShareLike.isChecked());
         notifications.setCancelled(swCancel.isChecked());
-/*        notifications.setLike(swLike.isChecked());
-        notifications.setComment(swComment.isChecked());
-        notifications.setReportAbuse(swReportAbuse.isChecked());
-        notifications.setDirectChat(swDirectChats.isChecked());
-        notifications.setGroupChat(swGroupChats.isChecked());
-        notifications.setNewPeopleJoinedCommunity(swPeople.isChecked());
-        notifications.setManagementChat(swManagementChat.isChecked());
-        notifications.setNotice(swNotice.isChecked());*/
+        notifications.setLike(false);
+        notifications.setComment(false);
+        notifications.setReportAbuse(false);
+        notifications.setDirectChat(false);
+        notifications.setGroupChat(false);
+        notifications.setNewPeopleJoinedCommunity(false);
+        notifications.setManagementChat(false);
+        notifications.setNotice(false);
+//        notifications.setLike(swLike.isChecked());
+//        notifications.setComment(swComment.isChecked());
+//        notifications.setReportAbuse(swReportAbuse.isChecked());
+//        notifications.setDirectChat(swDirectChats.isChecked());
+//        notifications.setGroupChat(swGroupChats.isChecked());
+//        notifications.setNewPeopleJoinedCommunity(swPeople.isChecked());
+//        notifications.setManagementChat(swManagementChat.isChecked());
+//        notifications.setNotice(swNotice.isChecked());
         notifications.setPauseAll(swPause.isChecked());
         notifications.setNotificationSettingId(this.notifications.getNotificationSettingId());
 
@@ -389,11 +396,7 @@ public class NotificationActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<Notifications> call, @NonNull Response<Notifications> response) {
                 if (response.isSuccessful()) {
                     Utility.INSTANCE.dismissDialog(progressDialog);
-                    internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_notification_success, true, View.VISIBLE, R.string.dd_ok, v -> {
-                        Utility.INSTANCE.dismissDialog(internetDialog);
-                        finish();
-                    }, View.GONE, null, null);
-                    internetDialog.show();
+                    finish();
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
                     try {
@@ -412,8 +415,6 @@ public class NotificationActivity extends AppCompatActivity {
                 Utility.INSTANCE.dismissDialog(progressDialog);
             }
         });
-
-
     }
 
     @Override
@@ -437,55 +438,57 @@ public class NotificationActivity extends AppCompatActivity {
                     super.onBackPressed();
                 }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
                 internetDialog.show();
-            } /*else if (swLike.isChecked() != notifications.getLike()) {
-                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
-                    Utility.INSTANCE.dismissDialog(internetDialog);
-                    super.onBackPressed();
-                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                internetDialog.show();
-            } else if (swComment.isChecked() != notifications.getComment()) {
-                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
-                    Utility.INSTANCE.dismissDialog(internetDialog);
-                    super.onBackPressed();
-                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                internetDialog.show();
-            } else if (swReportAbuse.isChecked() != notifications.getReportAbuse()) {
-                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
-                    Utility.INSTANCE.dismissDialog(internetDialog);
-                    super.onBackPressed();
-                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                internetDialog.show();
-            } else if (swDirectChats.isChecked() != notifications.getDirectChat()) {
-                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
-                    Utility.INSTANCE.dismissDialog(internetDialog);
-                    super.onBackPressed();
-                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                internetDialog.show();
-            } else if (swGroupChats.isChecked() != notifications.getGroupChat()) {
-                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
-                    Utility.INSTANCE.dismissDialog(internetDialog);
-                    super.onBackPressed();
-                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                internetDialog.show();
-            } else if (swPeople.isChecked() != notifications.getNewPeopleJoinedCommunity()) {
-                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
-                    Utility.INSTANCE.dismissDialog(internetDialog);
-                    super.onBackPressed();
-                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                internetDialog.show();
-            } else if (swManagementChat.isChecked() != notifications.getManagementChat()) {
-                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
-                    Utility.INSTANCE.dismissDialog(internetDialog);
-                    super.onBackPressed();
-                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                internetDialog.show();
-            } else if (swNotice.isChecked() != notifications.getNotice()) {
-                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
-                    Utility.INSTANCE.dismissDialog(internetDialog);
-                    super.onBackPressed();
-                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
-                internetDialog.show();
-            } */else if (swPause.isChecked() != notifications.getPauseAll()) {
+            }
+//            else if (swLike.isChecked() != notifications.getLike()) {
+//                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
+//                    Utility.INSTANCE.dismissDialog(internetDialog);
+//                    super.onBackPressed();
+//                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+//                internetDialog.show();
+//            } else if (swComment.isChecked() != notifications.getComment()) {
+//                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
+//                    Utility.INSTANCE.dismissDialog(internetDialog);
+//                    super.onBackPressed();
+//                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+//                internetDialog.show();
+//            } else if (swReportAbuse.isChecked() != notifications.getReportAbuse()) {
+//                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
+//                    Utility.INSTANCE.dismissDialog(internetDialog);
+//                    super.onBackPressed();
+//                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+//                internetDialog.show();
+//            } else if (swDirectChats.isChecked() != notifications.getDirectChat()) {
+//                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
+//                    Utility.INSTANCE.dismissDialog(internetDialog);
+//                    super.onBackPressed();
+//                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+//                internetDialog.show();
+//            } else if (swGroupChats.isChecked() != notifications.getGroupChat()) {
+//                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
+//                    Utility.INSTANCE.dismissDialog(internetDialog);
+//                    super.onBackPressed();
+//                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+//                internetDialog.show();
+//            } else if (swPeople.isChecked() != notifications.getNewPeopleJoinedCommunity()) {
+//                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
+//                    Utility.INSTANCE.dismissDialog(internetDialog);
+//                    super.onBackPressed();
+//                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+//                internetDialog.show();
+//            } else if (swManagementChat.isChecked() != notifications.getManagementChat()) {
+//                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
+//                    Utility.INSTANCE.dismissDialog(internetDialog);
+//                    super.onBackPressed();
+//                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+//                internetDialog.show();
+//            } else if (swNotice.isChecked() != notifications.getNotice()) {
+//                internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
+//                    Utility.INSTANCE.dismissDialog(internetDialog);
+//                    super.onBackPressed();
+//                }, View.VISIBLE, R.string.dd_no, v -> Utility.INSTANCE.dismissDialog(internetDialog));
+//                internetDialog.show();
+//            }
+            else if (swPause.isChecked() != notifications.getPauseAll()) {
                 internetDialog = Utility.INSTANCE.showAlert(NotificationActivity.this, R.string.dd_discard, false, View.VISIBLE, R.string.dd_yes, v -> {
                     Utility.INSTANCE.dismissDialog(internetDialog);
                     super.onBackPressed();

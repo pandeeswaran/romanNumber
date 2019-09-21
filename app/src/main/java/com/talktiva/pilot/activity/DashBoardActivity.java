@@ -41,11 +41,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
 import com.talktiva.pilot.Talktiva;
-import com.talktiva.pilot.fragment.EmptyFragment;
 import com.talktiva.pilot.fragment.EventFragment;
 import com.talktiva.pilot.fragment.FeedbackFragment;
-import com.talktiva.pilot.fragment.HomeFragment;
-import com.talktiva.pilot.fragment.NotificationFragment;
 import com.talktiva.pilot.fragment.ProfileFragment;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.NetworkChangeReceiver;
@@ -120,8 +117,10 @@ public class DashBoardActivity extends AppCompatActivity {
         AppEventsLogger.activateApp(Objects.requireNonNull(Talktiva.Companion.getInstance()));
 
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
-        token = FirebaseInstanceId.getInstance().getToken();
-        sendFcmToken(token);
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(DashBoardActivity.this, instanceIdResult -> {
+            token = instanceIdResult.getToken();
+            sendFcmToken(token);
+        });
 
         progressDialog = Utility.INSTANCE.showProgress(DashBoardActivity.this);
 
@@ -206,12 +205,12 @@ public class DashBoardActivity extends AppCompatActivity {
                     View smallItemText = item.findViewById(R.id.smallLabel);
                     if (smallItemText instanceof TextView) {
                         ((TextView) smallItemText).setTypeface(Utility.INSTANCE.getFontRegular());
-                        ((TextView) smallItemText).setTextSize(10);
+                        ((TextView) smallItemText).setTextSize(12);
                     }
                     View largeItemText = item.findViewById(R.id.largeLabel);
                     if (largeItemText instanceof TextView) {
                         ((TextView) largeItemText).setTypeface(Utility.INSTANCE.getFontRegular());
-                        ((TextView) largeItemText).setTextSize(10);
+                        ((TextView) largeItemText).setTextSize(12);
                     }
                 }
             }
@@ -316,6 +315,11 @@ public class DashBoardActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     private void setPendingEventCount() {
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<Count> call = apiInterface.getPendingEventCount(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))));
@@ -351,7 +355,6 @@ public class DashBoardActivity extends AppCompatActivity {
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                     logoutFromFacebook();
                                     logoutFromGoogle();
@@ -371,7 +374,6 @@ public class DashBoardActivity extends AppCompatActivity {
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-                                Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                                 Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                 logoutFromFacebook();
                                 logoutFromGoogle();
@@ -380,7 +382,7 @@ public class DashBoardActivity extends AppCompatActivity {
                             });
                             internetDialog.show();
                         }
-                    } else if (dayDiff <= 50) {
+                    } else if (dayDiff <= 100) {
                         return;
                     } else if (!response.body().getAddressProofUploaded()) {
                         if (internetDialog != null) {
@@ -399,7 +401,6 @@ public class DashBoardActivity extends AppCompatActivity {
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                     logoutFromFacebook();
                                     logoutFromGoogle();
@@ -423,7 +424,6 @@ public class DashBoardActivity extends AppCompatActivity {
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-                                Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                                 Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                 logoutFromFacebook();
                                 logoutFromGoogle();
@@ -442,7 +442,6 @@ public class DashBoardActivity extends AppCompatActivity {
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                                     Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-                                    Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                                     Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                     logoutFromFacebook();
                                     logoutFromGoogle();
@@ -459,7 +458,6 @@ public class DashBoardActivity extends AppCompatActivity {
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                                 Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-                                Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                                 Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                                 logoutFromFacebook();
                                 logoutFromGoogle();
@@ -489,9 +487,11 @@ public class DashBoardActivity extends AppCompatActivity {
     }
 
     private void logoutFromGoogle() {
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener(this, task -> {
-                });
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, task -> {
+                    });
+        }
     }
 
     private void logoutFromFacebook() {

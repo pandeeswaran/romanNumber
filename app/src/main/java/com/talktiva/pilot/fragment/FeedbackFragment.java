@@ -77,7 +77,7 @@ public class FeedbackFragment extends Fragment {
         ((DashBoardActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
         Objects.requireNonNull(((DashBoardActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
-        Utility.INSTANCE.setTitleText(toolbar, R.id.fba_toolbar_tv_title, R.string.db_bnm_title_feedback);
+        Utility.INSTANCE.setTitleText(toolbar, R.id.fba_toolbar_tv_title, R.string.fba_title);
 
         progressDialog = Utility.INSTANCE.showProgress(getContext());
 

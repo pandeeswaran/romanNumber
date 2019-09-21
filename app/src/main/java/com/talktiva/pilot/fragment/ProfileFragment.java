@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
@@ -81,11 +83,11 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.pa_tv_ea_title)
     TextView tvEventAttended;
 
-    @BindView(R.id.pa_tv_post_count)
-    TextView tvPostCount;
-
-    @BindView(R.id.pa_tv_post)
-    TextView tvPost;
+//    @BindView(R.id.pa_tv_post_count)
+//    TextView tvPostCount;
+//
+//    @BindView(R.id.pa_tv_post)
+//    TextView tvPost;
 
     @BindView(R.id.pa_tv_notification)
     TextView tvNotification;
@@ -125,7 +127,7 @@ public class ProfileFragment extends Fragment {
             tvAddEmail.setText(Objects.requireNonNull(Objects.requireNonNull(user.getAddress()).getStreet()).concat(" ").concat(getResources().getString(R.string.divider)).concat(" ").concat(Objects.requireNonNull(user.getEmail())));
             tvEventHostedCount.setText(String.valueOf(user.getEventHostedCount()));
             tvEventAttendedCount.setText(String.valueOf(user.getEventAttendedCount()));
-            tvPostCount.setText(String.valueOf(user.getPostCount()));
+//            tvPostCount.setText(String.valueOf(user.getPostCount()));
             String str = getResources().getString(R.string.pa_tv_family);
             tvFamily.setText(str.concat(" (").concat(String.valueOf(user.getFamilyMemberCount())).concat(")"));
             RequestCreator rc = Picasso.get().load(user.getUserImage());
@@ -152,7 +154,7 @@ public class ProfileFragment extends Fragment {
         ((DashBoardActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
         Objects.requireNonNull(((DashBoardActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
-        mGoogleSignInClient = GoogleSignIn.getClient(getContext(), new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build());
@@ -162,7 +164,7 @@ public class ProfileFragment extends Fragment {
 
 //        toolbar.setNavigationIcon(R.drawable.ic_back_white);
 
-        progressDialog = Utility.INSTANCE.showProgress(getContext());
+        progressDialog = Utility.INSTANCE.showProgress(getActivity());
 
         tvFullName.setTypeface(Utility.INSTANCE.getFontRegular());
         tvAddEmail.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -170,8 +172,8 @@ public class ProfileFragment extends Fragment {
         tvEventHosted.setTypeface(Utility.INSTANCE.getFontRegular());
         tvEventAttendedCount.setTypeface(Utility.INSTANCE.getFontRegular());
         tvEventAttended.setTypeface(Utility.INSTANCE.getFontRegular());
-        tvPostCount.setTypeface(Utility.INSTANCE.getFontRegular());
-        tvPost.setTypeface(Utility.INSTANCE.getFontRegular());
+//        tvPostCount.setTypeface(Utility.INSTANCE.getFontRegular());
+//        tvPost.setTypeface(Utility.INSTANCE.getFontRegular());
         tvNotification.setTypeface(Utility.INSTANCE.getFontRegular());
         tvFamily.setTypeface(Utility.INSTANCE.getFontRegular());
 //       tvFeedback.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -199,13 +201,12 @@ public class ProfileFragment extends Fragment {
                 Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
                 Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
                 Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-                Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
                 Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
                 logoutFromFacebook();
                 logoutFromGoogle();
                 dialogClose.dismiss();
+                getActivity().finish();
                 startActivity(new Intent(getContext(), WelcomeActivity.class));
-
             }, View.VISIBLE, R.string.dd_no, v2 -> dialogClose.dismiss());
             dialogClose.show();
         });
@@ -221,9 +222,11 @@ public class ProfileFragment extends Fragment {
     }
 
     private void logoutFromGoogle() {
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener((Executor) this, task -> {
-                });
+        if (GoogleSignIn.getLastSignedInAccount(getActivity().getApplicationContext()) != null) {
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener((Executor) this, task -> {
+                    });
+        }
     }
 
     private void logoutFromFacebook() {
@@ -256,7 +259,7 @@ public class ProfileFragment extends Fragment {
                     tvAddEmail.setText(Objects.requireNonNull(Objects.requireNonNull(user.getAddress()).getStreet()).concat(" ").concat(getResources().getString(R.string.divider)).concat(" ").concat(Objects.requireNonNull(user.getEmail())));
                     tvEventHostedCount.setText(String.valueOf(user.getEventHostedCount()));
                     tvEventAttendedCount.setText(String.valueOf(user.getEventAttendedCount()));
-                    tvPostCount.setText(String.valueOf(user.getPostCount()));
+//                    tvPostCount.setText(String.valueOf(user.getPostCount()));
                     String str = getResources().getString(R.string.pa_tv_family);
                     tvFamily.setText(str.concat(" (").concat(String.valueOf(user.getFamilyMemberCount())).concat(")"));
                     RequestCreator rc = Picasso.get().load(user.getUserImage());
@@ -274,4 +277,15 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).registerReceiver(r, new IntentFilter("updateProfile"));
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(Talktiva.Companion.getInstance())).unregisterReceiver(r);
+    }
 }

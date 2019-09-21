@@ -111,7 +111,7 @@
     <string name="db_bnm_title_event">Events</string>
     <string name="db_bnm_title_home">Home</string>
     <string name="db_bnm_title_chats">Chats</string>
-    <string name="db_bnm_title_feedback">Feedback</string>
+    <string name="db_bnm_title_feedback">Send Feedback</string>
     <string name="db_bnm_title_profile">Profile</string>
     <!--endregion-->
 
@@ -279,7 +279,7 @@
     <string name="pa_tv_eh_title">Event Hosted</string>
     <string name="pa_tv_ea_title">Event Attended</string>
     <string name="pa_tv_post">Post</string>
-    <string name="pa_tv_notification">Notification</string>
+    <string name="pa_tv_notification">Notifications</string>
     <string name="pa_tv_family">My Family Member</string>
     <string name="pa_tv_feedback">Send Feedback</string>
     <string name="pa_tv_setting">Settings</string>
@@ -290,7 +290,7 @@
     <!--endregion-->
 
     <!--region Notification Settings-->
-    <string name="na_title">Notification Settings</string>
+    <string name="na_title">Notifications</string>
     <string name="na_sw_pause">Pause All</string>
     <string name="na_tv_events">Events</string>
     <string name="na_sw_invited">Invited</string>

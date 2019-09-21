@@ -2,6 +2,7 @@ package com.talktiva.pilot.rest
 
 import com.talktiva.pilot.helper.AppConstant
 import com.talktiva.pilot.model.*
+import com.talktiva.pilot.model.tpav.AddressObject
 import com.talktiva.pilot.request.*
 import com.talktiva.pilot.results.ResultAllUser
 import com.talktiva.pilot.results.ResultEvents
@@ -207,6 +208,9 @@ interface ApiInterface {
     @GET(AppConstant.FCM_TOKEN)
     fun sendToken(@Header(AppConstant.AUTH) token: String, @Path(AppConstant.TOKEN) fcmToken: String): Call<ResultAllUser>
     //endregion
+
+    @GET(AppConstant.BASE_ADDRESS)
+    fun checkAddress(@Query(AppConstant.AUTH_ID) authId:String, @Query(AppConstant.AUTH_TOKEN) authToken:String, @Query(AppConstant.MATCH) match:String, @Query(AppConstant.STREET) street: String, @Query(AppConstant.CITY) city: String, @Query(AppConstant.STAT) state: String, @Query(AppConstant.ZIPCODE) zipCode: String) : Call<List<AddressObject>>
 
     /* Demo Api Calling With Token
     ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);

@@ -209,7 +209,6 @@
         app:layout_constraintTop_toBottomOf="@id/ca_tv_street_error"
         tools:ignore="UnusedAttribute" />
 
-
     <Button
         android:id="@+id/ca_btn_next"
         android:layout_width="match_parent"

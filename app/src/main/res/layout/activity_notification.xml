@@ -131,216 +131,215 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/na_sw_sl" />
 
-            <!--<TextView
-                android:id="@+id/na_tv_post"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@color/light_grey"
-                android:paddingStart="22dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="22dp"
-                android:paddingBottom="10dp"
-                android:text="@string/na_tv_post"
-                android:textAllCaps="false"
-                android:textColor="@color/colorPrimary"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_sw_cancel" />-->
+<!--            <TextView-->
+<!--                android:id="@+id/na_tv_post"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@color/light_grey"-->
+<!--                android:paddingStart="22dp"-->
+<!--                android:paddingTop="10dp"-->
+<!--                android:paddingEnd="22dp"-->
+<!--                android:paddingBottom="10dp"-->
+<!--                android:text="@string/na_tv_post"-->
+<!--                android:textAllCaps="false"-->
+<!--                android:textColor="@color/colorPrimary"-->
+<!--                android:textSize="14sp"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_sw_cancel" />-->
 
-     <!--       <Switch
-                android:id="@+id/na_sw_like"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="8dp"
-                android:checked="true"
-                android:padding="14dp"
-                android:text="@string/na_sw_like"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/tv_font"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_tv_post" />-->
+<!--            <Switch-->
+<!--                android:id="@+id/na_sw_like"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="18dp"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:checked="true"-->
+<!--                android:padding="14dp"-->
+<!--                android:text="@string/na_sw_like"-->
+<!--                android:textColor="@color/dark_grey"-->
+<!--                android:textSize="@dimen/tv_font"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_tv_post" />-->
 
-           <!-- <Switch
-                android:id="@+id/na_sw_comment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="8dp"
-                android:checked="true"
-                android:padding="14dp"
-                android:text="@string/na_sw_comment"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/tv_font"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_sw_like" />-->
-<!--
-            <Switch
-                android:id="@+id/na_sw_ra"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="8dp"
-                android:checked="true"
-                android:padding="14dp"
-                android:text="@string/na_sw_ra"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/tv_font"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_sw_comment" />-->
+<!--            <Switch-->
+<!--                android:id="@+id/na_sw_comment"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="18dp"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:checked="true"-->
+<!--                android:padding="14dp"-->
+<!--                android:text="@string/na_sw_comment"-->
+<!--                android:textColor="@color/dark_grey"-->
+<!--                android:textSize="@dimen/tv_font"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_sw_like" />-->
+<!--            <Switch-->
+<!--                android:id="@+id/na_sw_ra"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="18dp"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:checked="true"-->
+<!--                android:padding="14dp"-->
+<!--                android:text="@string/na_sw_ra"-->
+<!--                android:textColor="@color/dark_grey"-->
+<!--                android:textSize="@dimen/tv_font"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_sw_comment" />-->
 
-         <!--   <TextView
-                android:id="@+id/na_tv_chats"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@color/light_grey"
-                android:paddingStart="22dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="22dp"
-                android:paddingBottom="10dp"
-                android:text="@string/na_tv_chats"
-                android:textAllCaps="false"
-                android:textColor="@color/colorPrimary"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_sw_ra" />-->
+<!--            <TextView-->
+<!--                android:id="@+id/na_tv_chats"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@color/light_grey"-->
+<!--                android:paddingStart="22dp"-->
+<!--                android:paddingTop="10dp"-->
+<!--                android:paddingEnd="22dp"-->
+<!--                android:paddingBottom="10dp"-->
+<!--                android:text="@string/na_tv_chats"-->
+<!--                android:textAllCaps="false"-->
+<!--                android:textColor="@color/colorPrimary"-->
+<!--                android:textSize="14sp"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_sw_ra" />-->
 
-          <!--  <Switch
-                android:id="@+id/na_sw_dc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="8dp"
-                android:checked="true"
-                android:padding="14dp"
-                android:text="@string/na_sw_dc"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/tv_font"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_tv_chats" />-->
+<!--            <Switch-->
+<!--                android:id="@+id/na_sw_dc"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="18dp"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:checked="true"-->
+<!--                android:padding="14dp"-->
+<!--                android:text="@string/na_sw_dc"-->
+<!--                android:textColor="@color/dark_grey"-->
+<!--                android:textSize="@dimen/tv_font"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_tv_chats" />-->
 
-         <!--   <TextView
-                android:id="@+id/na_tv_dcs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:drawableEnd="@drawable/ic_next"
-                android:focusable="true"
-                android:foreground="?android:selectableItemBackground"
-                android:paddingStart="32dp"
-                android:paddingTop="14dp"
-                android:paddingEnd="22dp"
-                android:paddingBottom="14dp"
-                android:text="@string/na_tv_dcs"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/tv_font"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_sw_dc"
-                tools:ignore="UnusedAttribute" />-->
+<!--            <TextView-->
+<!--                android:id="@+id/na_tv_dcs"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:clickable="true"-->
+<!--                android:drawableEnd="@drawable/ic_next"-->
+<!--                android:focusable="true"-->
+<!--                android:foreground="?android:selectableItemBackground"-->
+<!--                android:paddingStart="32dp"-->
+<!--                android:paddingTop="14dp"-->
+<!--                android:paddingEnd="22dp"-->
+<!--                android:paddingBottom="14dp"-->
+<!--                android:text="@string/na_tv_dcs"-->
+<!--                android:textColor="@color/dark_grey"-->
+<!--                android:textSize="@dimen/tv_font"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_sw_dc"-->
+<!--                tools:ignore="UnusedAttribute" />-->
 
-         <!--   <Switch
-                android:id="@+id/na_sw_gc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="8dp"
-                android:checked="true"
-                android:padding="14dp"
-                android:text="@string/na_sw_gc"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/tv_font"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_tv_dcs" />-->
+<!--            <Switch-->
+<!--                android:id="@+id/na_sw_gc"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="18dp"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:checked="true"-->
+<!--                android:padding="14dp"-->
+<!--                android:text="@string/na_sw_gc"-->
+<!--                android:textColor="@color/dark_grey"-->
+<!--                android:textSize="@dimen/tv_font"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_tv_dcs" />-->
 
-         <!--   <TextView
-                android:id="@+id/na_tv_gcs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:drawableEnd="@drawable/ic_next"
-                android:focusable="true"
-                android:foreground="?android:selectableItemBackground"
-                android:paddingStart="32dp"
-                android:paddingTop="14dp"
-                android:paddingEnd="22dp"
-                android:paddingBottom="14dp"
-                android:text="@string/na_tv_gcs"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/tv_font"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_sw_gc"
-                tools:ignore="UnusedAttribute" />-->
+<!--            <TextView-->
+<!--                android:id="@+id/na_tv_gcs"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:clickable="true"-->
+<!--                android:drawableEnd="@drawable/ic_next"-->
+<!--                android:focusable="true"-->
+<!--                android:foreground="?android:selectableItemBackground"-->
+<!--                android:paddingStart="32dp"-->
+<!--                android:paddingTop="14dp"-->
+<!--                android:paddingEnd="22dp"-->
+<!--                android:paddingBottom="14dp"-->
+<!--                android:text="@string/na_tv_gcs"-->
+<!--                android:textColor="@color/dark_grey"-->
+<!--                android:textSize="@dimen/tv_font"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_sw_gc"-->
+<!--                tools:ignore="UnusedAttribute" />-->
 
-           <!-- <TextView
-                android:id="@+id/na_tv_community"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@color/light_grey"
-                android:paddingStart="22dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="22dp"
-                android:paddingBottom="8dp"
-                android:text="@string/na_tv_community"
-                android:textAllCaps="false"
-                android:textColor="@color/colorPrimary"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_tv_gcs" />-->
+<!--            <TextView-->
+<!--                android:id="@+id/na_tv_community"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@color/light_grey"-->
+<!--                android:paddingStart="22dp"-->
+<!--                android:paddingTop="8dp"-->
+<!--                android:paddingEnd="22dp"-->
+<!--                android:paddingBottom="8dp"-->
+<!--                android:text="@string/na_tv_community"-->
+<!--                android:textAllCaps="false"-->
+<!--                android:textColor="@color/colorPrimary"-->
+<!--                android:textSize="14sp"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_tv_gcs" />-->
 
-<!--            <Switch
-                android:id="@+id/na_sw_people"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="8dp"
-                android:checked="true"
-                android:padding="14dp"
-                android:text="@string/na_sw_people"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/tv_font"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_tv_community" />-->
+<!--            <Switch-->
+<!--                android:id="@+id/na_sw_people"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="18dp"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:checked="true"-->
+<!--                android:padding="14dp"-->
+<!--                android:text="@string/na_sw_people"-->
+<!--                android:textColor="@color/dark_grey"-->
+<!--                android:textSize="@dimen/tv_font"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_tv_community" />-->
 
-      <!--      <Switch
-                android:id="@+id/na_sw_mc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="8dp"
-                android:checked="true"
-                android:padding="14dp"
-                android:text="@string/na_sw_mc"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/tv_font"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_sw_people" />-->
+<!--            <Switch-->
+<!--                android:id="@+id/na_sw_mc"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="18dp"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:checked="true"-->
+<!--                android:padding="14dp"-->
+<!--                android:text="@string/na_sw_mc"-->
+<!--                android:textColor="@color/dark_grey"-->
+<!--                android:textSize="@dimen/tv_font"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_sw_people" />-->
 
-       <!--     <Switch
-                android:id="@+id/na_sw_notice"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="8dp"
-                android:checked="true"
-                android:padding="14dp"
-                android:text="@string/na_sw_notice"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/tv_font"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/na_sw_mc" />-->
+<!--            <Switch-->
+<!--                android:id="@+id/na_sw_notice"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="18dp"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:checked="true"-->
+<!--                android:padding="14dp"-->
+<!--                android:text="@string/na_sw_notice"-->
+<!--                android:textColor="@color/dark_grey"-->
+<!--                android:textSize="@dimen/tv_font"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/na_sw_mc" />-->
 
             <TextView
                 android:id="@+id/na_tv_ran"

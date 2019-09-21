@@ -163,7 +163,9 @@ public class AddressProofActivity extends AppCompatActivity {
 
         tvOr.setOnClickListener(v -> {
             if (Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_PASS_FLAG)).trim().equalsIgnoreCase("true")) {
-                startActivity(new Intent(AddressProofActivity.this, ChangePasswordActivity.class));
+                Intent intent = new Intent(AddressProofActivity.this, ChangePasswordActivity.class);
+                intent.putExtra(AppConstant.FROM, "Address");
+                startActivity(intent);
             } else {
                 startActivity(new Intent(AddressProofActivity.this, DashBoardActivity.class));
             }
@@ -329,7 +331,9 @@ public class AddressProofActivity extends AppCompatActivity {
                         }.getType());
                         internetDialog = Utility.INSTANCE.showAlert(AddressProofActivity.this, resultMessage.getResponseMessage(), true, View.VISIBLE, R.string.dd_ok, v -> {
                             if (Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_PASS_FLAG)).trim().equalsIgnoreCase("true")) {
-                                startActivity(new Intent(AddressProofActivity.this, ChangePasswordActivity.class));
+                                Intent intent = new Intent(AddressProofActivity.this, ChangePasswordActivity.class);
+                                intent.putExtra(AppConstant.FROM, "Address");
+                                startActivity(intent);
                             } else {
                                 startActivity(new Intent(AddressProofActivity.this, DashBoardActivity.class));
                             }
@@ -376,7 +380,6 @@ public class AddressProofActivity extends AppCompatActivity {
             Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
             Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
             Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
-            Utility.INSTANCE.blankPreference(AppConstant.PREF_PASS_FLAG);
             Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
             logoutFromFacebook();
             logoutFromGoogle();
@@ -405,9 +408,11 @@ public class AddressProofActivity extends AppCompatActivity {
     }
 
     private void logoutFromGoogle() {
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener(this, task -> {
-                });
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, task -> {
+                    });
+        }
     }
 
     private void logoutFromFacebook() {

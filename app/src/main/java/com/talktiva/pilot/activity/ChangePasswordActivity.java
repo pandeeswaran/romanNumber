@@ -14,10 +14,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
+import com.talktiva.pilot.Talktiva;
 import com.talktiva.pilot.helper.AppConstant;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.request.RequestPassword;
@@ -39,17 +47,14 @@ import retrofit2.Response;
 
 public class ChangePasswordActivity extends AppCompatActivity {
 
+    @BindView(R.id.acp_iv_cancel)
+    ImageView ivCancel;
+
     @BindView(R.id.acp_iv_info)
     ImageView ivInfo;
 
     @BindView(R.id.acp_tv)
     TextView textView;
-
-    @BindView(R.id.acp_et_old)
-    TextInputEditText etCurrentPass;
-
-    @BindView(R.id.acp_tv_old)
-    TextView tvCurrentPass;
 
     @BindView(R.id.acp_et_pass_1)
     TextInputEditText etNewPass;
@@ -60,15 +65,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
     @BindView(R.id.acp_iv_pass_info_1)
     ImageView ivNewPass;
 
-    @BindView(R.id.acp_et_pass_2)
-    TextInputEditText etConfirmPass;
-
-    @BindView(R.id.acp_tv_pass_2)
-    TextView tvConfirmPass;
-
-    @BindView(R.id.acp_iv_pass_info_2)
-    ImageView ivConfirmPass;
-
     @BindView(R.id.acp_btn_continue)
     Button btnContinue;
 
@@ -76,6 +72,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
     TextView tvFooter;
 
     private Dialog progressDialog, internetDialog;
+    private String pass;
+
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,22 +86,29 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         progressDialog = Utility.INSTANCE.showProgress(ChangePasswordActivity.this);
 
+        mGoogleSignInClient = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.server_client_id))
+                .requestEmail()
+                .build());
+
+        FacebookSdk.sdkInitialize(Talktiva.Companion.getInstance());
+        AppEventsLogger.activateApp(Objects.requireNonNull(Talktiva.Companion.getInstance()));
+
+        if (getIntent().getStringExtra(AppConstant.FROM).equalsIgnoreCase("Login")) {
+            pass = getIntent().getStringExtra("Password");
+        }
+
         textView.setTypeface(Utility.INSTANCE.getFontRegular());
-        etCurrentPass.setTypeface(Utility.INSTANCE.getFontRegular());
-        tvCurrentPass.setTypeface(Utility.INSTANCE.getFontRegular());
         etNewPass.setTypeface(Utility.INSTANCE.getFontRegular());
         tvNewPass.setTypeface(Utility.INSTANCE.getFontRegular());
-        etConfirmPass.setTypeface(Utility.INSTANCE.getFontRegular());
-        tvConfirmPass.setTypeface(Utility.INSTANCE.getFontRegular());
         btnContinue.setTypeface(Utility.INSTANCE.getFontRegular());
         tvFooter.setTypeface(Utility.INSTANCE.getFontRegular());
 
-        ivNewPass.setOnClickListener(v -> {
-            internetDialog = Utility.INSTANCE.showAlert(ChangePasswordActivity.this, R.color.colorPrimary, R.string.dd_info_pass, v1 -> Utility.INSTANCE.dismissDialog(internetDialog));
-            internetDialog.show();
+        ivCancel.setOnClickListener(v -> {
+            onBackPressed();
         });
 
-        ivConfirmPass.setOnClickListener(v -> {
+        ivNewPass.setOnClickListener(v -> {
             internetDialog = Utility.INSTANCE.showAlert(ChangePasswordActivity.this, R.color.colorPrimary, R.string.dd_info_pass, v1 -> Utility.INSTANCE.dismissDialog(internetDialog));
             internetDialog.show();
         });
@@ -114,24 +120,13 @@ public class ChangePasswordActivity extends AppCompatActivity {
         });
 
         btnContinue.setOnClickListener(v -> {
-            if (Objects.requireNonNull(etCurrentPass.getText()).toString().trim().length() == 0) {
-                tvCurrentPass.setText(R.string.acp_tv_cur_error);
-                tvCurrentPass.setVisibility(View.VISIBLE);
-            } else if (Objects.requireNonNull(etNewPass.getText()).toString().trim().length() == 0) {
+            if (Objects.requireNonNull(etNewPass.getText()).toString().trim().length() == 0) {
                 tvNewPass.setText(R.string.acp_tv_new_error);
                 tvNewPass.setVisibility(View.VISIBLE);
-            } else if (Objects.requireNonNull(etConfirmPass.getText()).toString().trim().length() == 0) {
-                tvConfirmPass.setText(R.string.acp_tv_confirm_error);
-                tvConfirmPass.setVisibility(View.VISIBLE);
             } else {
                 if (!isValidPass(etNewPass.getText().toString().trim())) {
                     tvNewPass.setText(R.string.acp_tv_pass_val);
                     tvNewPass.setVisibility(View.VISIBLE);
-                } else if (!isValidPass(etConfirmPass.getText().toString().trim())) {
-                    tvConfirmPass.setText(R.string.acp_tv_pass_val);
-                    tvConfirmPass.setVisibility(View.VISIBLE);
-                } else if (!etNewPass.getText().toString().trim().equalsIgnoreCase(etConfirmPass.getText().toString().trim())) {
-                    tvConfirmPass.setText(R.string.acp_tv_pass_confirm);
                 } else {
                     if (Utility.INSTANCE.isConnectingToInternet()) {
                         changePassword();
@@ -139,18 +134,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    @OnTextChanged(R.id.acp_et_old)
-    void setEtCurPassOnTextChange(CharSequence sequence) {
-        String s = sequence.toString().trim();
-        if (s.length() == 0) {
-            tvCurrentPass.setVisibility(View.GONE);
-            tvCurrentPass.setText(null);
-        } else {
-            tvCurrentPass.setVisibility(View.GONE);
-            tvCurrentPass.setText(null);
-        }
     }
 
     @OnTextChanged(R.id.acp_et_pass_1)
@@ -166,22 +149,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
         }
     }
 
-    @OnTextChanged(R.id.acp_et_pass_2)
-    void setEtConfirmPassOnTextChange(CharSequence sequence) {
-        String s = sequence.toString().trim();
-        if (s.length() == 0) {
-            tvConfirmPass.setVisibility(View.GONE);
-        } else if (!isValidPass(s)) {
-            tvConfirmPass.setVisibility(View.VISIBLE);
-            tvConfirmPass.setText(R.string.acp_tv_pass_val);
-        } else if (!Objects.requireNonNull(etNewPass.getText()).toString().trim().equalsIgnoreCase(s)) {
-            tvConfirmPass.setVisibility(View.VISIBLE);
-            tvConfirmPass.setText(R.string.acp_tv_pass_confirm);
-        } else {
-            tvConfirmPass.setVisibility(View.GONE);
-        }
-    }
-
     private boolean isValidPass(String s) {
         Pattern pattern = Pattern.compile("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
         return pattern.matcher(s).matches();
@@ -191,9 +158,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
         progressDialog.show();
 
         RequestPassword requestPassword = new RequestPassword();
-        requestPassword.setCurrentPasssword(Objects.requireNonNull(etCurrentPass.getText()).toString().trim());
+        requestPassword.setCurrentPasssword(pass);
         requestPassword.setNewPassword(Objects.requireNonNull(etNewPass.getText()).toString().trim());
-        requestPassword.setConfirmPassword(Objects.requireNonNull(etConfirmPass.getText()).toString().trim());
+        requestPassword.setConfirmPassword(Objects.requireNonNull(etNewPass.getText()).toString().trim());
 
         ApiInterface apiInterface = ApiClient.INSTANCE.getClient().create(ApiInterface.class);
         Call<ResultMessage> call = apiInterface.changePassword(AppConstant.CT_JSON, Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_T_TYPE)).concat(" ").concat(Objects.requireNonNull(Utility.INSTANCE.getPreference(AppConstant.PREF_A_TOKEN))), AppConstant.UTF, requestPassword);
@@ -205,7 +172,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
                     internetDialog = Utility.INSTANCE.showAlert(ChangePasswordActivity.this, Objects.requireNonNull(response.body()).getResponseMessage(), false, View.VISIBLE, R.string.dd_ok, v -> {
                         Utility.INSTANCE.dismissDialog(internetDialog);
-                        Utility.INSTANCE.setPreference(AppConstant.PREF_PASS_FLAG, "false");
                         startActivity(new Intent(ChangePasswordActivity.this, DashBoardActivity.class));
                         finish();
                     }, View.GONE, null, null);
@@ -216,15 +182,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
                         ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
                         }.getType());
                         for (int i = 0; i < resultError.getErrors().size(); i++) {
-                            if (resultError.getErrors().get(i).getField().equalsIgnoreCase("currentPasssword")) {
-                                tvCurrentPass.setText(resultError.getErrors().get(i).getMessage());
-                                tvCurrentPass.setVisibility(View.VISIBLE);
-                            } else if (resultError.getErrors().get(i).getField().equalsIgnoreCase("newPassword")) {
+                            if (resultError.getErrors().get(i).getField().equalsIgnoreCase("newPassword")) {
                                 tvNewPass.setText(resultError.getErrors().get(i).getMessage());
                                 tvNewPass.setVisibility(View.VISIBLE);
-                            } else if (resultError.getErrors().get(i).getField().equalsIgnoreCase("confirmPassword")){
-                                tvConfirmPass.setText(resultError.getErrors().get(i).getMessage());
-                                tvConfirmPass.setVisibility(View.VISIBLE);
                             }
                         }
                     } catch (IOException e) {
@@ -238,5 +198,33 @@ public class ChangePasswordActivity extends AppCompatActivity {
                 Utility.INSTANCE.dismissDialog(progressDialog);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        Utility.INSTANCE.blankPreference(AppConstant.PREF_R_TOKEN);
+        Utility.INSTANCE.blankPreference(AppConstant.PREF_A_TOKEN);
+        Utility.INSTANCE.blankPreference(AppConstant.PREF_T_TYPE);
+        Utility.INSTANCE.blankPreference(AppConstant.PREF_EXPIRE);
+        Utility.INSTANCE.blankPreference(AppConstant.PREF_USER);
+        Utility.INSTANCE.storeData(AppConstant.FILE_USER, "");
+        logoutFromFacebook();
+        logoutFromGoogle();
+        finish();
+        startActivity(new Intent(ChangePasswordActivity.this, LoginActivity.class));
+    }
+
+    private void logoutFromGoogle() {
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, task -> {
+                    });
+        }
+    }
+
+    private void logoutFromFacebook() {
+        if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
+            LoginManager.getInstance().logOut();
+        }
     }
 }
