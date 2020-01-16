@@ -1,7 +1,5 @@
 package com.talktiva.pilot.helper
 
-import android.service.autofill.FieldClassification
-
 object AppConstant {
 
     //region Headers
@@ -19,6 +17,7 @@ object AppConstant {
     const val APP = "APPLICATION"
     const val GOOGLE = "GOOGLE"
     const val FACEBOOK = "FACEBOOK"
+    const val APPLE = "APPLE"
     //endregion
 
     //region Path Parameters
@@ -83,8 +82,11 @@ object AppConstant {
 
     const val BASE_ADDRESS = "https://us-street.api.smartystreets.com/street-address"
 
-    const val BASE_URL = "http://13.59.232.104:9092"
-    //    const val BASE_URL = "http://54.80.108.189:9092"
+    const val BASE_URL = "https://microservices-prod.talktiva.com"
+//    const val BASE_URL = "http://192.168.0.3:9092"
+//    const val BASE_URL = "https://devapp.talktiva.com"
+//    const val BASE_URL = "http://13.59.232.104:9092"
+//    const val BASE_URL = "http://54.80.108.189:9092"
     const val BASE_EVENT = "/ms-event/api/v1/events"
     const val BASE_USER = "/ms-event/api/v1/users"
     const val BASE_NOTIFICATION = "/ms-event/api/v1/notifications"
@@ -125,14 +127,16 @@ object AppConstant {
 
     const val LOGIN = "/uaa/oauth/token"
 
-    const val LOGIN_TOKEN = "Basic dGFsa3RpdmFBcHA6dGFsa0BUaXZhITE="
+//    const val LOGIN_TOKEN = "Basic dGFsa3RpdmFBcHA6dGFsa0BUaXGoogleSignInOptions.Builder(GoogZhITE=" // Development
+    const val LOGIN_TOKEN =  "Basic dGFsa3RpdmFBcHA6dGFsa0BUaXZhUHJAZG1zITE=" // Production
+
 
     const val PP_TITLE = "Privacy Policy"
-    const val PRIVACY_POLICY = "https://talktiva.com/privacy.html"
+    const val PRIVACY_POLICY = "https://weneighbors.io/privacy.html"
     const val TC_TITLE = "Terms and Conditions"
-    const val TERMS_CONDITION = "https://talktiva.com/terms.html"
+    const val TERMS_CONDITION = "https://weneighbors.io/terms.html"
     const val ACK_TITLE = "Acknowledgements"
-    const val ACK = "https://talktiva.com/acknowledgements.html"
+    const val ACK = "https://weneighbors.io/terms.html"
 
     const val PREF_R_TOKEN = "refresh_token"
     const val PREF_A_TOKEN = "access_token"

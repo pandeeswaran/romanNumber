@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp">
 
     <item android:drawable="@color/colorPrimary" />
 
-    <item
-        android:width="500px"
-        android:height="104px"
-        android:drawable="@drawable/talktiva_logo_white"
-        android:gravity="center"
-        tools:ignore="UnusedAttribute" />
 
 </layer-list>

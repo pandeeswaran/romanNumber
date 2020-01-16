@@ -18,11 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -40,6 +35,9 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.OAuthProvider;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
@@ -56,9 +54,15 @@ import com.talktiva.pilot.results.ResultLogin;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
@@ -82,6 +86,9 @@ public class LoginActivity extends AppCompatActivity {
 
     @BindView(R.id.la_btn_fb)
     Button btnFacebook;
+
+    @BindView(R.id.la_btn_apple)
+    Button btnApple;
 
     @BindView(R.id.la_tv_or)
     TextView tvOr;
@@ -114,6 +121,8 @@ public class LoginActivity extends AppCompatActivity {
     private Dialog progressDialog, internetDialog;
     private BroadcastReceiver receiver;
 
+    private FirebaseAuth mFbAuth;
+
     private int GOOGLE_SIGN_IN = 101;
 
     private CallbackManager callbackManager;
@@ -139,6 +148,7 @@ public class LoginActivity extends AppCompatActivity {
         tvWelcome.setTypeface(Utility.INSTANCE.getFontRegular());
         btnGoogle.setTypeface(Utility.INSTANCE.getFontRegular());
         btnFacebook.setTypeface(Utility.INSTANCE.getFontRegular());
+        btnApple.setTypeface(Utility.INSTANCE.getFontRegular());
         tvOr.setTypeface(Utility.INSTANCE.getFontRegular());
         etEmail.setTypeface(Utility.INSTANCE.getFontRegular());
         tilPass.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -151,6 +161,8 @@ public class LoginActivity extends AppCompatActivity {
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build());
+
+        mFbAuth = FirebaseAuth.getInstance();
 
         FacebookSdk.sdkInitialize(Talktiva.Companion.getInstance());
         AppEventsLogger.activateApp(Objects.requireNonNull(Talktiva.Companion.getInstance()));
@@ -210,7 +222,37 @@ public class LoginActivity extends AppCompatActivity {
             startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
         });
 
-        btnFacebook.setOnClickListener(v -> LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email")));
+        btnFacebook.setOnClickListener(v -> {
+            LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+        });
+
+        btnApple.setOnClickListener(v -> {
+            OAuthProvider.Builder provider = OAuthProvider.newBuilder("apple.com", mFbAuth);
+            List<String> scopes =
+                    new ArrayList<String>() {
+                        {
+                            add("email");
+                            add("name");
+                        }
+                    };
+            provider.setScopes(scopes);
+            mFbAuth.startActivityForSignInWithProvider(this, provider.build())
+                    .addOnSuccessListener(
+                            authResult -> {
+                                FirebaseUser user = authResult.getUser();
+                                if (user != null) {
+                                    user.getIdToken(false).addOnSuccessListener(this, getTokenResult -> {
+                                        updateAppleUI(user);
+                                    });
+
+                                } else {
+                                    Log.e("Firebase", "activitySignIn:onSuccess => User Not Found");
+                                }
+
+                            })
+                    .addOnFailureListener(
+                            e -> Log.w("Firebase", "activitySignIn:onFailure", e));
+        });
 
         tvFooter.setOnClickListener(v -> {
             Intent i = new Intent(Intent.ACTION_VIEW);
@@ -226,6 +268,8 @@ public class LoginActivity extends AppCompatActivity {
             if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
                 updateFacebookUI(AccessToken.getCurrentAccessToken());
             }
+        } else if (mFbAuth != null && mFbAuth.getCurrentUser() != null) {
+            updateAppleUI(mFbAuth.getCurrentUser());
         } else {
             updateGoogleUI(GoogleSignIn.getLastSignedInAccount(this));
         }
@@ -308,8 +352,10 @@ public class LoginActivity extends AppCompatActivity {
                     try {
                         ResultError resultError = new Gson().fromJson(Objects.requireNonNull(response.errorBody()).string(), new TypeToken<ResultError>() {
                         }.getType());
-                        internetDialog = Utility.INSTANCE.showAlert(LoginActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
-                        internetDialog.show();
+                        if (resultError != null) {
+                            internetDialog = Utility.INSTANCE.showAlert(LoginActivity.this, resultError.getErrorDescription(), true, View.VISIBLE, R.string.dd_try, v -> Utility.INSTANCE.dismissDialog(internetDialog), View.GONE, null, null);
+                            internetDialog.show();
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -348,6 +394,7 @@ public class LoginActivity extends AppCompatActivity {
                             Utility.INSTANCE.dismissDialog(internetDialog);
                             logoutFromFacebook();
                             logoutFromGoogle();
+                            logoutFromApple();
                         }, View.GONE, null, null);
                         internetDialog.show();
                     } catch (IOException e) {
@@ -399,6 +446,12 @@ public class LoginActivity extends AppCompatActivity {
             mGoogleSignInClient.signOut()
                     .addOnCompleteListener(this, task -> {
                     });
+        }
+    }
+
+    private void logoutFromApple() {
+        if (mFbAuth != null && mFbAuth.getCurrentUser() != null) {
+            mFbAuth.signOut();
         }
     }
 
@@ -461,5 +514,13 @@ public class LoginActivity extends AppCompatActivity {
         parameters.putString("fields", "id, name, email, gender, birthday");
         graphRequest.setParameters(parameters);
         graphRequest.executeAsync();
+    }
+
+    private void updateAppleUI(FirebaseUser user) {
+        user.getIdToken(false).addOnSuccessListener(getTokenResult -> {
+            socialLogin(user.getEmail(), getTokenResult.getToken(), AppConstant.APPLE);
+        }).addOnFailureListener(e -> {
+            Log.w("Firebase", "GetToken:onFailure", e);
+        });
     }
 }

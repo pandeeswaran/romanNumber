@@ -29,6 +29,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.talktiva.pilot.R
 import com.talktiva.pilot.Talktiva
 import java.io.File
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -54,7 +55,8 @@ object Utility {
     //region Device Id and Device Name
     @SuppressLint("HardwareIds")
     fun getDeviceId(): String {
-        return Settings.Secure.getString(Talktiva.instance?.contentResolver, Settings.Secure.ANDROID_ID)
+        return Settings.Secure.getString(Talktiva.instance?.contentResolver,
+                Settings.Secure.ANDROID_ID)
     }
 
 //    fun getDeviceName(): String {
@@ -66,12 +68,14 @@ object Utility {
 
     //region Connection
     private val isNetworkAvailable: Boolean
-        get() = (Talktiva.instance!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo != null
+        get() = (Talktiva.instance!!.getSystemService(
+                Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo != null
 
     val isConnectingToInternet: Boolean
         get() {
             if (isNetworkAvailable) {
-                val info = (Talktiva.instance!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
+                val info = (Talktiva.instance!!.getSystemService(
+                        Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
                 @Suppress("DEPRECATION")
                 if (info != null)
                     return info.state == NetworkInfo.State.CONNECTED
@@ -93,25 +97,38 @@ object Utility {
 
     @SuppressLint("InlinedApi")
     internal fun requestInternet(context: Context) {
-        dialogInternet = showAlert(context, R.string.dd_msg_internet, false, VISIBLE, R.string.dd_setting, View.OnClickListener {
-            dialogInternet!!.dismiss()
-            Talktiva.instance!!.startActivity(Intent(Settings.ACTION_DATA_USAGE_SETTINGS))
-        }, GONE, null, null)
-        dialogInternet!!.show()
+        try {
+            dialogInternet = showAlert(context, R.string.dd_msg_internet, false, VISIBLE,
+                    R.string.dd_setting, View.OnClickListener {
+                dialogInternet!!.dismiss()
+                Talktiva.instance!!.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+            }, GONE, null, null)
+            dialogInternet!!.show()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
     }
 
     internal fun dismissRequestInternet() {
-        if (dialogInternet != null) {
-            if (dialogInternet!!.isShowing) {
-                dialogInternet!!.dismiss()
+        try {
+            if (dialogInternet != null) {
+                if (dialogInternet!!.isShowing) {
+                    dialogInternet!!.dismiss()
+                }
             }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         }
+
     }
     //endregion
 
     //region AlertDialog
     @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    fun showAlert(context: Context, msg: Int?, bool: Boolean?, positiveVisibility: Int?, positiveTitle: Int?, positiveClickListener: View.OnClickListener, negativeVisibility: Int?, negativeTitle: Int?, negativeClickListener: View.OnClickListener?): Dialog {
+    fun showAlert(context: Context, msg: Int?, bool: Boolean?, positiveVisibility: Int?,
+                  positiveTitle: Int?, positiveClickListener: View.OnClickListener,
+                  negativeVisibility: Int?, negativeTitle: Int?,
+                  negativeClickListener: View.OnClickListener?): Dialog {
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.dd_layout)
         dialog.setCancelable(bool!!)
@@ -129,22 +146,27 @@ object Utility {
         if (negativeVisibility != GONE) {
             (dialog.findViewById<View>(R.id.dialog_negative) as Button).typeface = fontRegular
             (dialog.findViewById<View>(R.id.dialog_negative) as Button).setText(negativeTitle!!)
-            dialog.findViewById<View>(R.id.dialog_negative).setOnClickListener(negativeClickListener)
+            dialog.findViewById<View>(R.id.dialog_negative)
+                    .setOnClickListener(negativeClickListener)
         }
 
-        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT,
+                Constraints.LayoutParams.WRAP_CONTENT)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
     @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    fun showAlert(context: Context, msg: String?, bool: Boolean?, positiveVisibility: Int?, positiveTitle: Int?, positiveClickListener: View.OnClickListener, negativeVisibility: Int?, negativeTitle: Int?, negativeClickListener: View.OnClickListener?): Dialog {
+    fun showAlert(context: Context, msg: String?, bool: Boolean?, positiveVisibility: Int?,
+                  positiveTitle: Int?, positiveClickListener: View.OnClickListener,
+                  negativeVisibility: Int?, negativeTitle: Int?,
+                  negativeClickListener: View.OnClickListener?): Dialog {
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.dd_layout)
         dialog.setCancelable(bool!!)
 
         (dialog.findViewById<View>(R.id.dialog_msg) as TextView).typeface = fontRegular
-        (dialog.findViewById<View>(R.id.dialog_msg) as TextView).text = msg!!
+        (dialog.findViewById<View>(R.id.dialog_msg) as TextView).text = msg
 
         (dialog.findViewById<View>(R.id.dialog_positive) as Button).typeface = fontRegular
         (dialog.findViewById<View>(R.id.dialog_positive) as Button).setText(positiveTitle!!)
@@ -156,32 +178,40 @@ object Utility {
         if (negativeVisibility != GONE) {
             (dialog.findViewById<View>(R.id.dialog_negative) as Button).typeface = fontRegular
             (dialog.findViewById<View>(R.id.dialog_negative) as Button).setText(negativeTitle!!)
-            dialog.findViewById<View>(R.id.dialog_negative).setOnClickListener(negativeClickListener)
+            dialog.findViewById<View>(R.id.dialog_negative)
+                    .setOnClickListener(negativeClickListener)
         }
 
-        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT,
+                Constraints.LayoutParams.WRAP_CONTENT)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
     @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    fun showAlert(context: Context, color: Int?, msg: Int?, bool: Boolean?, positiveVisibility: Int?, positiveTitle: Int?, positiveClickListener: View.OnClickListener?, negativeVisibility: Int?, negativeTitle: Int?, negativeClickListener: View.OnClickListener?): Dialog {
+    fun showAlert(context: Context, color: Int?, msg: Int?, bool: Boolean?,
+                  positiveVisibility: Int?, positiveTitle: Int?,
+                  positiveClickListener: View.OnClickListener?, negativeVisibility: Int?,
+                  negativeTitle: Int?, negativeClickListener: View.OnClickListener?): Dialog {
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.dd_layout)
         dialog.setCancelable(bool!!)
 
         (dialog.findViewById<TextView>(R.id.dialog_msg)).typeface = fontRegular
         (dialog.findViewById<TextView>(R.id.dialog_msg)).setText(msg!!)
-        (dialog.findViewById<TextView>(R.id.dialog_msg)).setTextColor(context.resources.getColor(color!!))
+        (dialog.findViewById<TextView>(R.id.dialog_msg)).setTextColor(
+                context.resources.getColor(color!!))
         (dialog.findViewById<TextView>(R.id.dialog_msg)).gravity = Gravity.START
-        (dialog.findViewById<TextView>(R.id.dialog_msg)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+        (dialog.findViewById<TextView>(R.id.dialog_msg)).setTextSize(TypedValue.COMPLEX_UNIT_SP,
+                16f)
 
         dialog.findViewById<View>(R.id.dialog_positive).visibility = positiveVisibility!!
 
         if (positiveVisibility != GONE) {
             (dialog.findViewById<View>(R.id.dialog_positive) as Button).typeface = fontRegular
             (dialog.findViewById<View>(R.id.dialog_positive) as Button).setText(positiveTitle!!)
-            dialog.findViewById<View>(R.id.dialog_positive).setOnClickListener(positiveClickListener)
+            dialog.findViewById<View>(R.id.dialog_positive)
+                    .setOnClickListener(positiveClickListener)
         }
 
         dialog.findViewById<View>(R.id.dialog_negative).visibility = negativeVisibility!!
@@ -189,23 +219,27 @@ object Utility {
         if (negativeVisibility != GONE) {
             (dialog.findViewById<View>(R.id.dialog_negative) as Button).typeface = fontRegular
             (dialog.findViewById<View>(R.id.dialog_negative) as Button).setText(negativeTitle!!)
-            dialog.findViewById<View>(R.id.dialog_negative).setOnClickListener(negativeClickListener)
+            dialog.findViewById<View>(R.id.dialog_negative)
+                    .setOnClickListener(negativeClickListener)
         }
 
-        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT,
+                Constraints.LayoutParams.WRAP_CONTENT)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
     @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    fun showAlert(context: Context, color: Int?, msg: Int?, closeClickListener: View.OnClickListener): Dialog {
+    fun showAlert(context: Context, color: Int?, msg: Int?,
+                  closeClickListener: View.OnClickListener): Dialog {
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.dd_dialog_dash)
         dialog.setCancelable(false)
 
         (dialog.findViewById<View>(R.id.dd_tv_msg) as TextView).typeface = fontRegular
         (dialog.findViewById<View>(R.id.dd_tv_msg) as TextView).setText(msg!!)
-        (dialog.findViewById<View>(R.id.dd_tv_msg) as TextView).setTextColor(context.resources.getColor(color!!))
+        (dialog.findViewById<View>(R.id.dd_tv_msg) as TextView).setTextColor(
+                context.resources.getColor(color!!))
         (dialog.findViewById<View>(R.id.dd_tv_msg) as TextView).gravity = Gravity.START
         (dialog.findViewById<TextView>(R.id.dd_tv_msg)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
 
@@ -215,13 +249,16 @@ object Utility {
 
         dialog.findViewById<ImageView>(R.id.dd_iv_close).setOnClickListener(closeClickListener)
 
-        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT,
+                Constraints.LayoutParams.WRAP_CONTENT)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
     @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    fun showAlert(context: Context, msg: Int?, positiveVisibility: Int?, positiveTitle: Int?, positiveClickListener: View.OnClickListener?, closeClickListener: View.OnClickListener): Dialog {
+    fun showAlert(context: Context, msg: Int?, positiveVisibility: Int?, positiveTitle: Int?,
+                  positiveClickListener: View.OnClickListener?,
+                  closeClickListener: View.OnClickListener): Dialog {
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.dd_dialog_dash)
         dialog.setCancelable(false)
@@ -234,20 +271,24 @@ object Utility {
         if (positiveVisibility != GONE) {
             (dialog.findViewById<Button>(R.id.dd_btn_positive)).typeface = fontRegular
             (dialog.findViewById<Button>(R.id.dd_btn_positive)).setText(positiveTitle!!)
-            dialog.findViewById<Button>(R.id.dd_btn_positive).setOnClickListener(positiveClickListener)
+            dialog.findViewById<Button>(R.id.dd_btn_positive)
+                    .setOnClickListener(positiveClickListener)
         }
 
         dialog.findViewById<Button>(R.id.dd_btn_negative).visibility = GONE
 
         dialog.findViewById<ImageView>(R.id.dd_iv_close).setOnClickListener(closeClickListener)
 
-        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT,
+                Constraints.LayoutParams.WRAP_CONTENT)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
     @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    fun showAlert(context: Context, msg: String?, positiveVisibility: Int?, positiveTitle: Int?, positiveClickListener: View.OnClickListener?, closeClickListener: View.OnClickListener?): Dialog {
+    fun showAlert(context: Context, msg: String?, positiveVisibility: Int?, positiveTitle: Int?,
+                  positiveClickListener: View.OnClickListener?,
+                  closeClickListener: View.OnClickListener?): Dialog {
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.dd_dialog_dash)
         dialog.setCancelable(false)
@@ -260,14 +301,16 @@ object Utility {
         if (positiveVisibility != GONE) {
             (dialog.findViewById<Button>(R.id.dd_btn_positive)).typeface = fontRegular
             (dialog.findViewById<Button>(R.id.dd_btn_positive)).setText(positiveTitle!!)
-            dialog.findViewById<Button>(R.id.dd_btn_positive).setOnClickListener(positiveClickListener)
+            dialog.findViewById<Button>(R.id.dd_btn_positive)
+                    .setOnClickListener(positiveClickListener)
         }
 
         dialog.findViewById<Button>(R.id.dd_btn_negative).visibility = GONE
 
         dialog.findViewById<ImageView>(R.id.dd_iv_close).setOnClickListener(closeClickListener)
 
-        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT,
+                Constraints.LayoutParams.WRAP_CONTENT)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
@@ -279,7 +322,8 @@ object Utility {
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.dd_loader)
         dialog.setCancelable(false)
-        (dialog.findViewById<View>(R.id.progress) as LottieAnimationView).setAnimation("loader.json")
+        (dialog.findViewById<View>(R.id.progress) as LottieAnimationView).setAnimation(
+                "loader.json")
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
@@ -295,7 +339,8 @@ object Utility {
 
     //region Error Dialog
     @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    fun showError(context: Context, msg: Int?, action: Int?, clickListener: View.OnClickListener): Dialog {
+    fun showError(context: Context, msg: Int?, action: Int?,
+                  clickListener: View.OnClickListener): Dialog {
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.dd_error)
         dialog.setCancelable(false)
@@ -307,13 +352,15 @@ object Utility {
         (dialog.findViewById<View>(R.id.de_btn) as Button).setText(action!!)
         dialog.findViewById<View>(R.id.de_btn).setOnClickListener(clickListener)
 
-        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.MATCH_PARENT)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT,
+                Constraints.LayoutParams.MATCH_PARENT)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
 
     @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    fun showError(context: Context, msg: String?, action: Int?, clickListener: View.OnClickListener): Dialog {
+    fun showError(context: Context, msg: String?, action: Int?,
+                  clickListener: View.OnClickListener): Dialog {
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.dd_error)
         dialog.setCancelable(false)
@@ -325,7 +372,8 @@ object Utility {
         (dialog.findViewById<View>(R.id.de_btn) as Button).setText(action!!)
         dialog.findViewById<View>(R.id.de_btn).setOnClickListener(clickListener)
 
-        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT, Constraints.LayoutParams.MATCH_PARENT)
+        dialog.window?.setLayout(Constraints.LayoutParams.MATCH_PARENT,
+                Constraints.LayoutParams.MATCH_PARENT)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return dialog
     }
@@ -333,7 +381,8 @@ object Utility {
 
     //region Toast Msg Show
     fun showMsg(id: Int?) {
-        Toast.makeText(Talktiva.instance, Talktiva.instance!!.resources!!.getString(id!!), Toast.LENGTH_SHORT).show()
+        Toast.makeText(Talktiva.instance, Talktiva.instance!!.resources!!.getString(id!!),
+                Toast.LENGTH_SHORT).show()
     }
 
     fun showMsg(string: String?) {
@@ -409,7 +458,8 @@ object Utility {
         val info = packageManager.queryIntentActivities(galleryIntent, 0)
         for (resolveInfo in info) {
             intent1 = Intent(galleryIntent)
-            intent1.component = ComponentName(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.name)
+            intent1.component = ComponentName(resolveInfo.activityInfo.packageName,
+                    resolveInfo.activityInfo.name)
             intent1.setPackage(resolveInfo.activityInfo.packageName)
             allIntents.add(intent1)
         }

@@ -12,12 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
@@ -43,8 +37,12 @@ import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
 
 import java.util.Objects;
-import java.util.concurrent.Executor;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -224,7 +222,7 @@ public class ProfileFragment extends Fragment {
     private void logoutFromGoogle() {
         if (GoogleSignIn.getLastSignedInAccount(getActivity().getApplicationContext()) != null) {
             mGoogleSignInClient.signOut()
-                    .addOnCompleteListener((Executor) this, task -> {
+                    .addOnCompleteListener(getActivity(), task -> {
                     });
         }
     }

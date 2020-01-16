@@ -99,6 +99,24 @@
             android:text="@string/la_btn_fb"
             android:textAllCaps="false"
             android:textSize="@dimen/btn_font"
+            android:visibility="gone"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/la_btn_google" />
+
+        <Button
+            android:id="@+id/la_btn_apple"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_apple"
+            android:padding="@dimen/et_padding"
+            android:text="@string/la_btn_apple"
+            android:textAllCaps="false"
+            android:textSize="@dimen/btn_font"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -115,7 +133,7 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/la_btn_fb">
+            app:layout_constraintTop_toBottomOf="@id/la_btn_apple">
 
             <View
                 android:layout_width="0dp"

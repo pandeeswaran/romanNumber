@@ -18,11 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -39,6 +34,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.OAuthProvider;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.talktiva.pilot.R;
@@ -48,6 +46,9 @@ import com.talktiva.pilot.helper.NetworkChangeReceiver;
 import com.talktiva.pilot.helper.Utility;
 import com.talktiva.pilot.model.Community;
 import com.talktiva.pilot.model.User;
+import com.talktiva.pilot.model.apple.AppleData;
+import com.talktiva.pilot.model.apple.Firebase;
+import com.talktiva.pilot.model.apple.Identities;
 import com.talktiva.pilot.request.RequestSignUp;
 import com.talktiva.pilot.rest.ApiClient;
 import com.talktiva.pilot.rest.ApiInterface;
@@ -57,10 +58,18 @@ import com.talktiva.pilot.results.ResultLogin;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
@@ -84,6 +93,9 @@ public class SignUpActivity extends AppCompatActivity {
 
     @BindView(R.id.sua_btn_facebook)
     Button btnFacebook;
+
+    @BindView(R.id.sua_btn_apple)
+    Button btnApple;
 
     @BindView(R.id.sua_tv_or)
     TextView tvOr;
@@ -124,6 +136,8 @@ public class SignUpActivity extends AppCompatActivity {
     private String invitationCode, apartment, street;
     private Community community;
 
+    private FirebaseAuth mFbAuth;
+
     private CallbackManager callbackManager;
 
     private int GOOGLE_SIGN_IN = 101;
@@ -143,6 +157,8 @@ public class SignUpActivity extends AppCompatActivity {
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build());
+
+        mFbAuth = FirebaseAuth.getInstance();
 
         Bundle bundle = getIntent().getExtras();
         if (Objects.requireNonNull(Objects.requireNonNull(bundle).getString(AppConstant.FROM)).equalsIgnoreCase(AppConstant.INVITATION)) {
@@ -175,6 +191,7 @@ public class SignUpActivity extends AppCompatActivity {
         textView.setTypeface(Utility.INSTANCE.getFontRegular());
         btnGoogle.setTypeface(Utility.INSTANCE.getFontRegular());
         btnFacebook.setTypeface(Utility.INSTANCE.getFontRegular());
+        btnApple.setTypeface(Utility.INSTANCE.getFontRegular());
         tvOr.setTypeface(Utility.INSTANCE.getFontRegular());
         etFullName.setTypeface(Utility.INSTANCE.getFontRegular());
         tvFullName.setTypeface(Utility.INSTANCE.getFontRegular());
@@ -220,6 +237,32 @@ public class SignUpActivity extends AppCompatActivity {
         btnFacebook.setOnClickListener(v -> {
             regType = 2;
             LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+        });
+
+        btnApple.setOnClickListener(v -> {
+            regType = 3;
+            OAuthProvider.Builder provider = OAuthProvider.newBuilder("apple.com", mFbAuth);
+            List<String> scopes =
+                    new ArrayList<String>() {
+                        {
+                            add("email");
+                            add("name");
+                        }
+                    };
+            provider.setScopes(scopes);
+            mFbAuth.startActivityForSignInWithProvider(this, provider.build())
+                    .addOnSuccessListener(
+                            authResult -> {
+                                FirebaseUser user = authResult.getUser();
+                                if (user != null) {
+                                    updateAppleUI(user);
+                                } else {
+                                    Log.e("Firebase", "activitySignIn:onSuccess => User Not Found");
+                                }
+
+                            })
+                    .addOnFailureListener(
+                            e -> Log.w("Firebase", "activitySignIn:onFailure", e));
         });
 
         btnSignUp.setOnClickListener(v -> {
@@ -313,6 +356,8 @@ public class SignUpActivity extends AppCompatActivity {
             if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
                 updateFacebookUI(AccessToken.getCurrentAccessToken());
             }
+        } else if (mFbAuth != null && mFbAuth.getCurrentUser() != null) {
+            updateAppleUI(mFbAuth.getCurrentUser());
         } else {
             updateGoogleUI(GoogleSignIn.getLastSignedInAccount(this));
         }
@@ -369,6 +414,59 @@ public class SignUpActivity extends AppCompatActivity {
         graphRequest.executeAsync();
     }
 
+    private void updateAppleUI(FirebaseUser user) {
+        user.getIdToken(false).addOnSuccessListener(getTokenResult -> {
+            Map<String, Object> claims = getTokenResult.getClaims();
+            Iterator keys = claims.keySet().iterator();
+            AppleData appleData = new AppleData();
+            while (keys.hasNext()) {
+                String key = (String) keys.next();
+                if (key.equalsIgnoreCase("aud"))
+                    appleData.setAud((String) claims.get(key));
+                else if (key.equalsIgnoreCase("auth_time"))
+                    appleData.setAuthTime((Integer) claims.get(key));
+                else if (key.equalsIgnoreCase("email"))
+                    appleData.setEmail((String) claims.get(key));
+                else if (key.equalsIgnoreCase("email_verified"))
+                    appleData.setEmailVerified((Boolean) claims.get(key));
+                else if (key.equalsIgnoreCase("exp"))
+                    appleData.setExp((Integer) claims.get(key));
+                else if (key.equalsIgnoreCase("firebase")) {
+                    Firebase firebase = new Firebase();
+                    Map<String, Object> fbMap = (Map<String, Object>) claims.get(key);
+                    assert fbMap != null;
+                    for (String fbKey : fbMap.keySet()) {
+                        if (fbKey.equalsIgnoreCase("identities")) {
+                            Identities identities = new Identities();
+                            Map<String, Object> identitiesMap = (Map<String, Object>) fbMap.get(fbKey);
+                            assert identitiesMap != null;
+                            for (String identityKey : identitiesMap.keySet()) {
+                                if (identityKey.equalsIgnoreCase("apple.com"))
+                                    identities.setAppleCom((List<String>) identitiesMap.get(identityKey));
+                                else if (identityKey.equalsIgnoreCase("email"))
+                                    identities.setEmail((List<String>) identitiesMap.get(identityKey));
+                            }
+                            firebase.setIdentities(identities);
+                        } else if (fbKey.equalsIgnoreCase("sign_in_provider")) {
+                            firebase.setSignInProvider((String) fbMap.get(key));
+                        }
+                    }
+                    appleData.setFirebase(firebase);
+                } else if (key.equalsIgnoreCase("iat"))
+                    appleData.setIat((Integer) claims.get(key));
+                else if (key.equalsIgnoreCase("iss"))
+                    appleData.setIss((String) claims.get(key));
+                else if (key.equalsIgnoreCase("sub"))
+                    appleData.setSub((String) claims.get(key));
+                else if (key.equalsIgnoreCase("user_id"))
+                    appleData.setUserId((String) claims.get(key));
+            }
+            getSocialRegister(user.getProviderData().get(1).getDisplayName(), appleData.getEmail(), getTokenResult.getToken(), appleData.getFirebase().getIdentities().getAppleCom().get(0));
+        }).addOnFailureListener(e -> {
+            Log.w("Firebase", "GetToken:onFailure", e);
+        });
+    }
+
     private void getNormalRegister() {
         progressDialog.show();
 
@@ -401,6 +499,9 @@ public class SignUpActivity extends AppCompatActivity {
                 break;
             case 2:
                 requestSignUp.setRegistrationType(AppConstant.FACEBOOK);
+                break;
+            case 3:
+                requestSignUp.setRegistrationType(AppConstant.APPLE);
                 break;
         }
 
@@ -446,6 +547,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
                                         logoutFromFacebook();
                                         logoutFromGoogle();
+                                        logoutFromApple();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
                                 }
@@ -562,6 +664,9 @@ public class SignUpActivity extends AppCompatActivity {
             case 2:
                 requestSignUp.setRegistrationType(AppConstant.FACEBOOK);
                 break;
+            case 3:
+                requestSignUp.setRegistrationType(AppConstant.APPLE);
+                break;
         }
         requestSignUp.setUdid(Utility.INSTANCE.getDeviceId());
 
@@ -582,6 +687,9 @@ public class SignUpActivity extends AppCompatActivity {
                         case 2:
                             getSocialAutoLogin(email, token, AppConstant.FACEBOOK);
                             break;
+                        case 3:
+                            getSocialAutoLogin(email, token, AppConstant.APPLE);
+                            break;
                     }
                 } else {
                     Utility.INSTANCE.dismissDialog(progressDialog);
@@ -595,6 +703,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
                                         logoutFromFacebook();
                                         logoutFromGoogle();
+                                        logoutFromApple();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
                                     return;
@@ -603,6 +712,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
                                         logoutFromFacebook();
                                         logoutFromGoogle();
+                                        logoutFromApple();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
                                     return;
@@ -611,6 +721,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
                                         logoutFromFacebook();
                                         logoutFromGoogle();
+                                        logoutFromApple();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
                                     return;
@@ -619,6 +730,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
                                         logoutFromFacebook();
                                         logoutFromGoogle();
+                                        logoutFromApple();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
                                 } else if (Objects.requireNonNull(resultError.getErrors().get(i).getField()).trim().equalsIgnoreCase(AppConstant.STREET)) {
@@ -626,6 +738,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         Utility.INSTANCE.dismissDialog(internetDialog);
                                         logoutFromFacebook();
                                         logoutFromGoogle();
+                                        logoutFromApple();
                                     }, View.GONE, null, null);
                                     internetDialog.show();
                                 }
@@ -697,6 +810,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Utility.INSTANCE.dismissDialog(internetDialog);
                             logoutFromFacebook();
                             logoutFromGoogle();
+                            logoutFromApple();
                         }, View.GONE, null, null);
                         internetDialog.show();
                     } catch (IOException e) {
@@ -723,6 +837,12 @@ public class SignUpActivity extends AppCompatActivity {
     private void logoutFromFacebook() {
         if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
             LoginManager.getInstance().logOut();
+        }
+    }
+
+    private void logoutFromApple() {
+        if (mFbAuth != null && mFbAuth.getCurrentUser() != null) {
+            mFbAuth.signOut();
         }
     }
 }

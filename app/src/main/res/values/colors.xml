@@ -16,8 +16,9 @@
     <color name="red">#E03131</color>
 
     <color name="fb">#3B5998</color>
+    <color name="apple">#333333</color>
     <color name="google">#D44638</color>
-
+    <color name="ic_launcher_background">#FFFFFF</color>
 </resources>
 
     <!--<color name="colorPrimary">#5956D7</color>-->

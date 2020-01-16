@@ -100,6 +100,24 @@
             android:text="@string/sua_btn_facebook"
             android:textAllCaps="false"
             android:textColor="@color/white"
+            android:visibility="gone"
+            android:textSize="@dimen/btn_font"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_btn_google" />
+
+        <Button
+            android:id="@+id/sua_btn_apple"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_apple"
+            android:padding="@dimen/et_padding"
+            android:text="@string/sua_btn_apple"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
             android:textSize="@dimen/btn_font"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -116,7 +134,7 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sua_btn_facebook">
+            app:layout_constraintTop_toBottomOf="@id/sua_btn_apple">
 
             <View
                 android:layout_width="0dp"

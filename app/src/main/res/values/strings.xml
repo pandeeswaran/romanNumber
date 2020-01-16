@@ -1,7 +1,7 @@
 <resources>
 
     <!--region Application Name-->
-    <string name="app_name">Talktiva</string>
+    <string name="app_name">WeNeighbors</string>
     <!--endregion-->
 
     <!--region Google Server Client Id-->
@@ -159,20 +159,21 @@
     <!--endregion-->
 
     <!--region Home Activity Footer-->
-    <string name="ha_footer">&#42; Privacy policies &#124; talktiva&#8482;</string>
+    <string name="ha_footer">&#42; Privacy policies &#124; WeNeighbors&#8482;</string>
 
     <string name="ha_btn_login">Log In</string>
     <string name="ha_btn_create">Create Account</string>
 
-    <string name="ha_tv_content_1">The Private social network for your community 1</string>
-    <string name="ha_tv_content_2">The Private social network for your community 2</string>
-    <string name="ha_tv_content_3">The Private social network for your community 3</string>
-    <string name="ha_tv_content_4">The Private social network for your community 4</string>
-    <string name="ha_tv_content_5">The Private social network for your community 5</string>
+    <string name="ha_tv_content_1">Best way to stay connected with community neighbors and management</string>
+    <string name="ha_tv_content_2">See what\'s happening in your community right now</string>
+    <string name="ha_tv_content_3">Create better and safer living environment together</string>
+    <string name="ha_tv_content_4">Foster a strong sense of community </string>
+    <string name="ha_tv_content_5">Private, secure and keep within your community</string>
     <!--endregion-->
 
     <!--region Login Activity Button/Hint/Error Text-->
     <string name="la_btn_fb">Sign-in with Facebook</string>
+    <string name="la_btn_apple">Sign-in with Apple</string>
     <string name="la_btn_google">Sign-in with Google</string>
 
     <string name="la_tv_welcome">Welcome Back&#33;</string>
@@ -242,6 +243,7 @@
     <string name="sua_tv_1">We\'re exited for you to join your</string>
     <string name="sua_tv_2">community network&#46;</string>
     <string name="sua_btn_facebook">Sign-up with Facebook</string>
+    <string name="sua_btn_apple">Sign-up with Apple</string>
     <string name="sua_btn_google">Sign-up with Google</string>
     <string name="sua_btn_su">Sign-Up</string>
     <string name="sua_et_full_name">Full Name</string>
@@ -334,7 +336,7 @@
     <string name="epa_et_dob">Birthday (Required)</string>
     <string name="epa_et_rs">Resident Since (Required)</string>
 
-    <string name="epa_tv_des">Please Note : If you change your name on talktiva, you can\'t change it again for 60 days.</string>
+    <string name="epa_tv_des">Please Note : If you change your name on WeNeighbors, you can\'t change it again for 60 days.</string>
 
     <string name="epa_sw_dob">Show my birthday</string>
 
