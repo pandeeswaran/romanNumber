@@ -1,2 +1,0 @@
-# realai-sppts-Scoreapp
-
