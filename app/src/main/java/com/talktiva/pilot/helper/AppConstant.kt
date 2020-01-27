@@ -127,7 +127,7 @@ object AppConstant {
 
     const val LOGIN = "/uaa/oauth/token"
 
-//    const val LOGIN_TOKEN = "Basic dGFsa3RpdmFBcHA6dGFsa0BUaXGoogleSignInOptions.Builder(GoogZhITE=" // Development
+//    const val LOGIN_TOKEN = "Basic dGFsa3RpdmFBcHA6dGFsa0BUaXZhITE=" // Development
     const val LOGIN_TOKEN =  "Basic dGFsa3RpdmFBcHA6dGFsa0BUaXZhUHJAZG1zITE=" // Production
 
 
