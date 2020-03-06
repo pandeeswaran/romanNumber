@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none"
+    tools:context=".activity.SignUpActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+        <ImageView
+            android:id="@+id/sua_iv_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            android:contentDescription="@string/app_name"
+            android:focusable="true"
+            android:padding="@dimen/et_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_info_grey"
+            tools:ignore="UnusedAttribute" />
+
+        <ImageView
+            android:id="@+id/sua_iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:contentDescription="@string/back"
+            android:focusable="true"
+            android:padding="@dimen/et_padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_back_theme"
+            tools:ignore="UnusedAttribute" />
+
+        <ImageView
+            android:id="@+id/sua_iv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/logo_margin"
+            android:layout_marginTop="@dimen/logo_top"
+            android:layout_marginEnd="@dimen/logo_margin"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/talktiva_logo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="PxUsage" />
+
+        <TextView
+            android:id="@+id/sua_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:textColor="@color/font"
+            android:textSize="@dimen/tv_font"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_iv" />
+
+        <Button
+            android:id="@+id/sua_btn_google"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_google"
+            android:padding="@dimen/et_padding"
+            android:text="@string/sua_btn_google"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="@dimen/btn_font"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_tv" />
+
+        <Button
+            android:id="@+id/sua_btn_facebook"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_facebook"
+            android:padding="@dimen/et_padding"
+            android:text="@string/sua_btn_facebook"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            android:textSize="@dimen/btn_font"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_btn_google" />
+
+        <Button
+            android:id="@+id/sua_btn_apple"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_apple"
+            android:padding="@dimen/et_padding"
+            android:text="@string/sua_btn_apple"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="@dimen/btn_font"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_btn_google" />
+
+        <LinearLayout
+            android:id="@+id/sua_ll_or"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_btn_apple">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary" />
+
+            <TextView
+                android:id="@+id/sua_tv_or"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/et_padding"
+                android:paddingEnd="@dimen/et_padding"
+                android:text="@string/la_ll_tv_or"
+                android:textColor="@color/dark_grey"
+                android:textSize="@dimen/tv_font" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/sua_et_fname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:hint="@string/sua_et_full_name"
+            android:inputType="textCapWords"
+            android:textColor="@color/colorPrimary"
+            android:textColorHint="@color/grey"
+            android:textSize="@dimen/tv_font"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_ll_or"
+            tools:ignore="Autofill" />
+
+        <TextView
+            android:id="@+id/sua_tv_fname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="24dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:text="@string/sua_tv_fname_error"
+            android:textColor="@color/red"
+            android:textSize="@dimen/error_font_size"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_et_fname" />
+
+        <EditText
+            android:id="@+id/sua_et_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="24dp"
+            android:hint="@string/sua_et_email"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/colorPrimary"
+            android:textColorHint="@color/grey"
+            android:textSize="@dimen/tv_font"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_tv_fname"
+            tools:ignore="Autofill" />
+
+        <TextView
+            android:id="@+id/sua_tv_email"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="24dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:text="@string/sua_tv_email_error"
+            android:textColor="@color/red"
+            android:textSize="@dimen/error_font_size"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_et_email" />
+
+        <EditText
+            android:id="@+id/sua_et_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="24dp"
+            android:hint="@string/sua_et_phone"
+            android:inputType="phone"
+            android:textColor="@color/colorPrimary"
+            android:textColorHint="@color/grey"
+            android:textSize="@dimen/tv_font"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_tv_email"
+            tools:ignore="Autofill" />
+
+        <LinearLayout
+            android:id="@+id/sua_ll_pass"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="24dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_et_phone">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/sua_til_pass"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                app:hintEnabled="false"
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="@color/colorPrimary"
+                app:passwordToggleTintMode="src_atop">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/sua_et_pass"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/sua_et_pass"
+                    android:inputType="textPassword"
+                    android:textColor="@color/colorPrimary"
+                    android:textColorHint="@color/grey"
+                    android:textSize="@dimen/tv_font" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageView
+                android:id="@+id/sua_iv_pass_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_help_wired"
+                tools:ignore="ContentDescription" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/sua_tv_pass"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="24dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:text="@string/sua_tv_email_error"
+            android:textColor="@color/red"
+            android:textSize="@dimen/error_font_size"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_ll_pass" />
+
+        <Button
+            android:id="@+id/sua_btn_sign_up"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/bg_theme_1"
+            android:padding="@dimen/et_padding"
+            android:text="@string/sua_btn_su"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="@dimen/btn_font"
+            app:layout_constraintBottom_toTopOf="@+id/sua_tv_footer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sua_tv_pass" />
+
+        <TextView
+            android:id="@+id/sua_tv_footer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/ha_footer"
+            android:textColor="@color/font"
+            android:textSize="@dimen/footer_font"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
