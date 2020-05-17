@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context=".PlayerIdentificationActivity">
+
+    <include layout="@layout/content_player_identification" />
+
+    <include layout="@layout/content_double_player_identification" />
+
+    <include layout="@layout/content_single_set_player_scoreboard" />
+
+    <include layout="@layout/content_score_board" />
+
+    <include layout="@layout/content_single_player" />
+
+    <include layout="@layout/content_double_player" />
+
+    <include layout="@layout/content_training" />
+
+    <include layout="@layout/layout_training_player_list" />
+
+    <include layout="@layout/content_win_popup" />
+
+    <include layout="@layout/content_image_view" />
+
+</RelativeLayout>
