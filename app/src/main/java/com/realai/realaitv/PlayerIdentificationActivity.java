@@ -63,7 +63,7 @@ public class PlayerIdentificationActivity extends Activity {
             tvTrainingPlayerName1, tvTrainingPlayerName2, tvTrainingPlayerName3, tvTrainingPlayerName4,
             tvTrainingPlayerName5, tvTrainingPlayerName6, tvTrainingPlayerName7, tvTrainingPlayerName8,
             tvNearSinglePlayerName, tvFarSinglePlayerName, tvWinMessage,
-            tv_three_single_far_player_name, tv_three_single_near_player_name;
+            tv_three_single_far_player_name, tv_three_single_near_player_name, tv_double_score_vs_player, tv_single_score_vs_player;
 
     CircleImageView profile_image, profile_double_player_image,
             score_ci_player1, score_ci_player2, score_ci_player3, score_ci_player4,
@@ -263,6 +263,8 @@ public class PlayerIdentificationActivity extends Activity {
         score_tv_playerName2 = findViewById(R.id.tv_player2);
         score_tv_playerName3 = findViewById(R.id.tv_player3);
         score_tv_playerName4 = findViewById(R.id.tv_player4);
+        tv_single_score_vs_player = findViewById(R.id.tv_single_score_vs_player);
+        tv_double_score_vs_player = findViewById(R.id.tv_double_score_vs_player);
         score_ci_player1 = findViewById(R.id.ci_player1);
         score_ci_player2 = findViewById(R.id.ci_player2);
         score_ci_player3 = findViewById(R.id.ci_player3);
@@ -394,8 +396,8 @@ public class PlayerIdentificationActivity extends Activity {
                     Log.e("edited Image", object.optString("url"));
                     llEditImageContainer.setVisibility(View.VISIBLE);
                     imgEditedView.setImageDrawable(null);
-                    imgEditedView.setImageResource(0);
-                    imgEditedView.setBackgroundResource(0);
+                    /*imgEditedView.setImageResource(0);
+                    imgEditedView.setBackgroundResource(0);*/
                     Glide.with(PlayerIdentificationActivity.this)
                             .load(object.optString("url"))
                             .error(R.drawable.default_background).into(imgEditedView);
@@ -631,13 +633,7 @@ public class PlayerIdentificationActivity extends Activity {
         tvSingleSetDoublePlayerNear2 = findViewById(R.id.tv_single_set_double_player_near2);
     }
 
-    private void enableSingleSetPlayerScoreBoard() {
-
-        if (removeOidList.length() == 0) {
-            hideAllContainerView();
-            startTime = SystemClock.uptimeMillis();
-            customHandler.postDelayed(updateTimerThread, 0);
-        }
+    private void enableDisableSingleSetScoreBoard() {
 
         llSingleSetPlayerContainer.setVisibility(View.VISIBLE);
         rlSingleSetPlayerNear.setVisibility(View.GONE);
@@ -647,6 +643,30 @@ public class PlayerIdentificationActivity extends Activity {
         tv_single_vs_player.setVisibility(View.GONE);
         tv_double_vs_player.setVisibility(View.GONE);
 
+        ciSingleSetDoublePlayerNear1.setVisibility(View.GONE);
+        ciSingleSetDoublePlayerNear2.setVisibility(View.GONE);
+        ciSingleSetDoublePlayerFar1.setVisibility(View.GONE);
+        ciSingleSetDoublePlayerFar2.setVisibility(View.GONE);
+        tvSingleSetDoublePlayerNear1.setVisibility(View.GONE);
+        tvSingleSetDoublePlayerNear2.setVisibility(View.GONE);
+        tvSingleSetDoublePlayerFar1.setVisibility(View.GONE);
+        tvSingleSetDoublePlayerFar2.setVisibility(View.GONE);
+
+        tvSingleSetDoublePlayerNear1.setText("");
+        tvSingleSetDoublePlayerNear2.setText("");
+        tvSingleSetDoublePlayerFar1.setText("");
+        tvSingleSetDoublePlayerFar2.setText("");
+    }
+
+    private void enableSingleSetPlayerScoreBoard() {
+
+        if (removeOidList.length() == 0) {
+            hideAllContainerView();
+            startTime = SystemClock.uptimeMillis();
+            customHandler.postDelayed(updateTimerThread, 0);
+        }
+
+        enableDisableSingleSetScoreBoard();
 
         if (playerArray != null) {
             for (int i = 0; i < playerArray.length(); i++) {
@@ -664,12 +684,16 @@ public class PlayerIdentificationActivity extends Activity {
                         } else {
                             rlSingleSetDoublePlayerNear.setVisibility(View.VISIBLE);
                             tv_double_vs_player.setVisibility(View.VISIBLE);
-                            if (tvSingleSetDoublePlayerNear1.getText().toString().isEmpty()) {
+                            if (tvSingleSetDoublePlayerNear1.getText().toString().trim().isEmpty()) {
+                                ciSingleSetDoublePlayerNear1.setVisibility(View.VISIBLE);
+                                tvSingleSetDoublePlayerNear1.setVisibility(View.VISIBLE);
                                 Glide.with(this)
                                         .load(playerArray.optJSONObject(i).optString("profileImageUrl"))
                                         .error(R.drawable.default_background).into(ciSingleSetDoublePlayerNear1);
                                 tvSingleSetDoublePlayerNear1.setText(playerArray.optJSONObject(i).optString("playerName"));
                             } else {
+                                ciSingleSetDoublePlayerNear2.setVisibility(View.VISIBLE);
+                                tvSingleSetDoublePlayerNear2.setVisibility(View.VISIBLE);
                                 Glide.with(this)
                                         .load(playerArray.optJSONObject(i).optString("profileImageUrl"))
                                         .error(R.drawable.default_background).into(ciSingleSetDoublePlayerNear2);
@@ -688,12 +712,16 @@ public class PlayerIdentificationActivity extends Activity {
                         } else {
                             rlSingleSetDoublePlayerFar.setVisibility(View.VISIBLE);
                             tv_double_vs_player.setVisibility(View.VISIBLE);
-                            if (tvSingleSetDoublePlayerFar1.getText().toString().isEmpty()) {
+                            if (tvSingleSetDoublePlayerFar1.getText().toString().trim().isEmpty()) {
+                                ciSingleSetDoublePlayerFar1.setVisibility(View.VISIBLE);
+                                tvSingleSetDoublePlayerFar1.setVisibility(View.VISIBLE);
                                 Glide.with(this)
                                         .load(playerArray.optJSONObject(i).optString("profileImageUrl"))
                                         .error(R.drawable.default_background).into(ciSingleSetDoublePlayerFar1);
                                 tvSingleSetDoublePlayerFar1.setText(playerArray.optJSONObject(i).optString("playerName"));
                             } else {
+                                ciSingleSetDoublePlayerFar2.setVisibility(View.VISIBLE);
+                                tvSingleSetDoublePlayerFar2.setVisibility(View.VISIBLE);
                                 Glide.with(this)
                                         .load(playerArray.optJSONObject(i).optString("profileImageUrl"))
                                         .error(R.drawable.default_background).into(ciSingleSetDoublePlayerFar2);
@@ -729,54 +757,69 @@ public class PlayerIdentificationActivity extends Activity {
         rl_three_double_player_far_container.setVisibility(View.GONE);
         rl_three_double_player_near_container.setVisibility(View.GONE);
         Log.e("game", gameSet);
+
+        score_ci_player1.setVisibility(View.GONE);
+        score_ci_player2.setVisibility(View.GONE);
+        score_ci_player3.setVisibility(View.GONE);
+        score_ci_player4.setVisibility(View.GONE);
+        score_tv_playerName1.setVisibility(View.GONE);
+        score_tv_playerName2.setVisibility(View.GONE);
+        score_tv_playerName3.setVisibility(View.GONE);
+        score_tv_playerName4.setVisibility(View.GONE);
+        tv_single_score_vs_player.setVisibility(View.GONE);
+        tv_double_score_vs_player.setVisibility(View.GONE);
         enableTvScoreDisplay();
 
+        score_tv_playerName1.setText("");
+        score_tv_playerName2.setText("");
+        score_tv_playerName3.setText("");
+        score_tv_playerName4.setText("");
 
         if (playerArray != null) {
             Log.e("123", "" + playerArray);
             for (int i = 0; i < playerArray.length(); i++) {
                 Log.e("AAA", playerArray.optJSONObject(i).optString("playerPosition"));
                 switch (playerArray.optJSONObject(i).optString("playerPosition")) {
-                    case "near":
+                    case "far":
                         if (matchType.equalsIgnoreCase("singles")) {
                             rl_three_single_player_near_container.setVisibility(View.VISIBLE);
-                            Glide.with(this)
-                                    .load(playerArray.optJSONObject(i).optString("profileImageUrl"))
-                                    .error(R.drawable.default_background).into(ci_three_single_near_player);
+                            tv_single_score_vs_player.setVisibility(View.VISIBLE);
+                            updateProfilePicture(playerArray.optJSONObject(i).optString("profileImageUrl"), ci_three_single_near_player);
                             tv_three_single_near_player_name.setText(playerArray.optJSONObject(i).optString("playerName"));
                         } else {
+                            tv_double_score_vs_player.setVisibility(View.VISIBLE);
                             rl_three_double_player_near_container.setVisibility(View.VISIBLE);
-                            if (score_tv_playerName1.getText().toString().isEmpty()) {
-                                Glide.with(this)
-                                        .load(playerArray.optJSONObject(i).optString("profileImageUrl"))
-                                        .error(R.drawable.default_background).into(score_ci_player1);
+                            if (score_tv_playerName1.getText().toString().trim().isEmpty()) {
+                                score_ci_player1.setVisibility(View.VISIBLE);
+                                score_tv_playerName1.setVisibility(View.VISIBLE);
+                                updateProfilePicture(playerArray.optJSONObject(i).optString("profileImageUrl"), score_ci_player1);
                                 score_tv_playerName1.setText(playerArray.optJSONObject(i).optString("playerName"));
                             } else {
-                                Glide.with(this)
-                                        .load(playerArray.optJSONObject(i).optString("profileImageUrl"))
-                                        .error(R.drawable.default_background).into(score_ci_player2);
+                                score_ci_player2.setVisibility(View.VISIBLE);
+                                score_tv_playerName2.setVisibility(View.VISIBLE);
+                                updateProfilePicture(playerArray.optJSONObject(i).optString("profileImageUrl"), score_ci_player2);
                                 score_tv_playerName2.setText(playerArray.optJSONObject(i).optString("playerName"));
                             }
                         }
                         break;
-                    case "far":
+                    case "near":
                         if (matchType.equalsIgnoreCase("singles")) {
+                            tv_single_score_vs_player.setVisibility(View.VISIBLE);
                             rl_three_single_player_far_container.setVisibility(View.VISIBLE);
-                            Glide.with(this)
-                                    .load(playerArray.optJSONObject(i).optString("profileImageUrl"))
-                                    .error(R.drawable.default_background).into(ci_three_single_far_player);
+                            updateProfilePicture(playerArray.optJSONObject(i).optString("profileImageUrl"), ci_three_single_far_player);
                             tv_three_single_far_player_name.setText(playerArray.optJSONObject(i).optString("playerName"));
                         } else {
                             rl_three_double_player_far_container.setVisibility(View.VISIBLE);
-                            if (score_tv_playerName3.getText().toString().isEmpty()) {
-                                Glide.with(this)
-                                        .load(playerArray.optJSONObject(i).optString("profileImageUrl"))
-                                        .error(R.drawable.default_background).into(score_ci_player3);
+                            tv_double_score_vs_player.setVisibility(View.VISIBLE);
+                            if (score_tv_playerName3.getText().toString().trim().isEmpty()) {
+                                score_ci_player3.setVisibility(View.VISIBLE);
+                                score_tv_playerName3.setVisibility(View.VISIBLE);
+                                updateProfilePicture(playerArray.optJSONObject(i).optString("profileImageUrl"), score_ci_player3);
                                 score_tv_playerName3.setText(playerArray.optJSONObject(i).optString("playerName"));
                             } else {
-                                Glide.with(this)
-                                        .load(playerArray.optJSONObject(i).optString("profileImageUrl"))
-                                        .error(R.drawable.default_background).into(score_ci_player4);
+                                score_ci_player4.setVisibility(View.VISIBLE);
+                                score_tv_playerName4.setVisibility(View.VISIBLE);
+                                updateProfilePicture(playerArray.optJSONObject(i).optString("profileImageUrl"), score_ci_player4);
                                 score_tv_playerName4.setText(playerArray.optJSONObject(i).optString("playerName"));
                             }
                         }

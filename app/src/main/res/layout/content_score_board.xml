@@ -31,6 +31,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_80sdp"
                     android:layout_marginStart="@dimen/_40sdp"
+                    android:visibility="gone"
                     android:layout_marginEnd="@dimen/_20sdp">
 
                     <de.hdodenhof.circleimageview.CircleImageView
@@ -64,7 +65,7 @@
                     android:layout_gravity="bottom"
                     android:layout_marginStart="@dimen/_40sdp"
                     android:layout_marginEnd="@dimen/_20sdp"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
 
                     <de.hdodenhof.circleimageview.CircleImageView
@@ -130,17 +131,33 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_20sdp"
-                    android:layout_marginStart="@dimen/_50sdp"
                     android:layout_marginTop="@dimen/_15sdp"
                     android:layout_marginBottom="@dimen/_15sdp">
 
                     <TextView
+                        android:id="@+id/tv_double_score_vs_player"
                         android:layout_width="@dimen/_40sdp"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
                         android:fontFamily="@font/bebas_bold"
                         android:gravity="center"
                         android:text="VS"
+                        android:layout_marginStart="@dimen/_38sdp"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_16sdp"
+                        android:visibility="gone"
+                        android:textStyle="bold|italic" />
+
+                    <TextView
+                        android:id="@+id/tv_single_score_vs_player"
+                        android:layout_width="@dimen/_40sdp"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:fontFamily="@font/bebas_bold"
+                        android:gravity="center"
+                        android:text="VS"
+                        android:visibility="gone"
+                        android:layout_marginStart="@dimen/_50sdp"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_16sdp"
                         android:textStyle="bold|italic" />
@@ -151,6 +168,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_80sdp"
                     android:layout_marginStart="@dimen/_40sdp"
+                    android:visibility="gone"
                     android:layout_marginEnd="@dimen/_20sdp">
 
                     <de.hdodenhof.circleimageview.CircleImageView
@@ -183,13 +201,14 @@
                     android:layout_height="@dimen/_120sdp"
                     android:layout_marginStart="@dimen/_40sdp"
                     android:layout_marginEnd="@dimen/_20sdp"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/ci_player3"
                         android:layout_width="@dimen/_40sdp"
                         android:layout_height="@dimen/_40sdp"
                         android:layout_alignParentStart="true"
+                        android:src="@drawable/training_bg"
                         android:layout_alignParentTop="true"
                         android:layout_centerInParent="true"
                         app:civ_border_color="@color/border_color1"
@@ -237,6 +256,7 @@
                         android:layout_below="@+id/ci_player3"
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
+                        android:src="@drawable/training_bg"
                         android:layout_marginTop="@dimen/_minus5sdp"
                         app:civ_border_color="@color/border_color1"
                         app:civ_border_width="@dimen/_3sdp" />
