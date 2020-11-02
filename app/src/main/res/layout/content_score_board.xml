@@ -30,9 +30,9 @@
                     android:id="@+id/rl_three_single_player_far_container"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_80sdp"
-                    android:layout_marginStart="@dimen/_40sdp"
-                    android:visibility="gone"
-                    android:layout_marginEnd="@dimen/_20sdp">
+                    android:layout_marginStart="@dimen/_25sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:visibility="visible">
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/ci_three_single_far_player"
@@ -49,12 +49,13 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="@dimen/_10sdp"
-                        android:fontFamily="@font/bebas_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
                         android:text=""
-                        android:textAllCaps="true"
+                        android:textAllCaps="false"
+                        android:singleLine="true"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
+                        android:textSize="@dimen/_20sdp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -63,9 +64,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_120sdp"
                     android:layout_gravity="bottom"
-                    android:layout_marginStart="@dimen/_40sdp"
-                    android:layout_marginEnd="@dimen/_20sdp"
-                    android:visibility="visible">
+                    android:layout_marginStart="@dimen/_25sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:visibility="gone">
 
 
                     <de.hdodenhof.circleimageview.CircleImageView
@@ -88,12 +89,13 @@
                         android:layout_centerInParent="true"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_toRightOf="@+id/ci_player1"
-                        android:fontFamily="@font/bebas_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
+                        android:singleLine="true"
                         android:text=""
-                        android:textAllCaps="true"
+                        android:textAllCaps="false"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
+                        android:textSize="@dimen/_20sdp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -106,12 +108,13 @@
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_marginTop="@dimen/_minus5sdp"
                         android:layout_toRightOf="@+id/ci_player1"
-                        android:fontFamily="@font/bebas_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
                         android:text=""
-                        android:textAllCaps="true"
+                        android:singleLine="true"
+                        android:textAllCaps="false"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
+                        android:textSize="@dimen/_20sdp"
                         android:textStyle="bold" />
 
                     <de.hdodenhof.circleimageview.CircleImageView
@@ -139,37 +142,38 @@
                         android:layout_width="@dimen/_40sdp"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
-                        android:fontFamily="@font/bebas_bold"
+                        android:layout_marginStart="@dimen/_25sdp"
+                        android:fontFamily="@font/avenirnextmediumpro"
                         android:gravity="center"
-                        android:text="VS"
-                        android:layout_marginStart="@dimen/_38sdp"
+                        android:text="vs"
+                        android:textAllCaps="false"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
-                        android:visibility="gone"
-                        android:textStyle="bold|italic" />
+                        android:textSize="@dimen/_20sdp"
+                        android:textStyle="bold|italic"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/tv_single_score_vs_player"
                         android:layout_width="@dimen/_40sdp"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
-                        android:fontFamily="@font/bebas_bold"
+                        android:layout_marginStart="@dimen/_38sdp"
+                        android:fontFamily="@font/avenirnextmediumpro"
                         android:gravity="center"
-                        android:text="VS"
-                        android:visibility="gone"
-                        android:layout_marginStart="@dimen/_50sdp"
+                        android:text="vs"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
-                        android:textStyle="bold|italic" />
+                        android:textSize="@dimen/_20sdp"
+                        android:textStyle="bold|italic"
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/rl_three_single_player_near_container"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_80sdp"
-                    android:layout_marginStart="@dimen/_40sdp"
-                    android:visibility="gone"
-                    android:layout_marginEnd="@dimen/_20sdp">
+                    android:layout_marginStart="@dimen/_25sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:visibility="visible">
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/ci_three_single_near_player"
@@ -186,12 +190,13 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="@dimen/_10sdp"
-                        android:fontFamily="@font/bebas_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
-                        android:text="Pandeeswaran"
-                        android:textAllCaps="true"
+                        android:text=""
+                        android:textAllCaps="false"
+                        android:singleLine="true"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
+                        android:textSize="@dimen/_20sdp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -199,18 +204,18 @@
                     android:id="@+id/rl_three_double_player_near_container"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_120sdp"
-                    android:layout_marginStart="@dimen/_40sdp"
-                    android:layout_marginEnd="@dimen/_20sdp"
-                    android:visibility="visible">
+                    android:layout_marginStart="@dimen/_25sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:visibility="gone">
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/ci_player3"
                         android:layout_width="@dimen/_40sdp"
                         android:layout_height="@dimen/_40sdp"
                         android:layout_alignParentStart="true"
-                        android:src="@drawable/training_bg"
                         android:layout_alignParentTop="true"
                         android:layout_centerInParent="true"
+                        android:src="@drawable/training_bg"
                         app:civ_border_color="@color/border_color1"
                         app:civ_border_width="@dimen/_3sdp" />
 
@@ -223,12 +228,13 @@
                         android:layout_centerInParent="true"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_toRightOf="@+id/ci_player3"
-                        android:fontFamily="@font/bebas_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
                         android:text=""
-                        android:textAllCaps="true"
+                        android:textAllCaps="false"
+                        android:singleLine="true"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
+                        android:textSize="@dimen/_20sdp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -241,12 +247,13 @@
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_marginTop="@dimen/_minus5sdp"
                         android:layout_toRightOf="@+id/ci_player4"
-                        android:fontFamily="@font/bebas_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
                         android:text=""
-                        android:textAllCaps="true"
+                        android:textAllCaps="false"
+                        android:singleLine="true"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
+                        android:textSize="@dimen/_20sdp"
                         android:textStyle="bold" />
 
                     <de.hdodenhof.circleimageview.CircleImageView
@@ -256,8 +263,8 @@
                         android:layout_below="@+id/ci_player3"
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
-                        android:src="@drawable/training_bg"
                         android:layout_marginTop="@dimen/_minus5sdp"
+                        android:src="@drawable/training_bg"
                         app:civ_border_color="@color/border_color1"
                         app:civ_border_width="@dimen/_3sdp" />
 
@@ -303,12 +310,12 @@
                             android:layout_marginStart="@dimen/_10sdp"
                             android:layout_marginEnd="@dimen/_10sdp"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/score_number_font"
+                            android:fontFamily="@font/poppins_bold"
                             android:gravity="center"
                             android:text="00"
-                            android:textAllCaps="true"
+                            android:textAllCaps="false"
                             android:textColor="@color/white"
-                            android:textSize="@dimen/_25sdp"
+                            android:textSize="@dimen/_28sdp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -319,10 +326,10 @@
                             android:layout_marginStart="@dimen/_10sdp"
                             android:layout_marginEnd="@dimen/_10sdp"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/score_number_font"
+                            android:fontFamily="@font/poppins_bold"
                             android:gravity="center"
                             android:text="00"
-                            android:textAllCaps="true"
+                            android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_25sdp"
                             android:textStyle="bold" />
@@ -335,10 +342,10 @@
                             android:layout_marginStart="@dimen/_10sdp"
                             android:layout_marginEnd="@dimen/_10sdp"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/score_number_font"
+                            android:fontFamily="@font/poppins_bold"
                             android:gravity="center"
                             android:text="00"
-                            android:textAllCaps="true"
+                            android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_25sdp"
                             android:textStyle="bold" />
@@ -360,7 +367,7 @@
                         android:layout_centerInParent="true"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_marginEnd="@dimen/_10sdp"
-                        android:fontFamily="@font/bebas_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:gravity="center"
                         android:text="00:00"
                         android:textColor="@color/white"
@@ -374,7 +381,7 @@
                         android:layout_centerInParent="true"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_marginEnd="@dimen/_10sdp"
-                        android:fontFamily="@font/bebas_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:gravity="center"
                         android:text="00:00"
                         android:textColor="@color/white"
@@ -388,7 +395,7 @@
                         android:layout_centerInParent="true"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_marginEnd="@dimen/_10sdp"
-                        android:fontFamily="@font/bebas_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:gravity="center"
                         android:text="00:00"
                         android:textColor="@color/white"
@@ -418,10 +425,10 @@
                             android:layout_marginStart="@dimen/_10sdp"
                             android:layout_marginEnd="@dimen/_10sdp"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/score_number_font"
+                            android:fontFamily="@font/poppins_bold"
                             android:gravity="center"
                             android:text="00"
-                            android:textAllCaps="true"
+                            android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_25sdp"
                             android:textStyle="bold" />
@@ -434,10 +441,10 @@
                             android:layout_marginStart="@dimen/_10sdp"
                             android:layout_marginEnd="@dimen/_10sdp"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/score_number_font"
+                            android:fontFamily="@font/poppins_bold"
                             android:gravity="center"
                             android:text="00"
-                            android:textAllCaps="true"
+                            android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_25sdp"
                             android:textStyle="bold" />
@@ -450,10 +457,10 @@
                             android:layout_marginStart="@dimen/_10sdp"
                             android:layout_marginEnd="@dimen/_10sdp"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/score_number_font"
+                            android:fontFamily="@font/poppins_bold"
                             android:gravity="center"
                             android:text="00"
-                            android:textAllCaps="true"
+                            android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_25sdp"
                             android:textStyle="bold" />

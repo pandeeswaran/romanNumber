@@ -11,6 +11,7 @@ import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -37,9 +38,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import utils.BlurTransformation;
 
-import static com.realai.realaitv.BuildConfig.DEBUG;
 
 
 public class PlayerIdentificationActivity extends Activity {
@@ -108,11 +107,9 @@ public class PlayerIdentificationActivity extends Activity {
     private RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            if (DEBUG) {
                 final String[] stateNames = {"IDLE", "DRAGGING", "SETTLING"};
                 Log.v("Scroll", "onScrollStateChanged "
                         + (newState < stateNames.length ? stateNames[newState] : newState));
-            }
             mScrollState = newState;
         }
     };
@@ -121,6 +118,8 @@ public class PlayerIdentificationActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player_identification);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (getIntent().getStringExtra("courtId") != null) {
             courtId = getIntent().getStringExtra("courtId");
@@ -203,7 +202,7 @@ public class PlayerIdentificationActivity extends Activity {
         verticalGridView.setNumColumns(4);
         verticalGridView.setWindowAlignment(VerticalGridView.WINDOW_ALIGN_BOTH_EDGE);
         verticalGridView.setWindowAlignmentOffsetPercent(35);
-        verticalGridView.setOnScrollListener(mScrollListener);
+       // verticalGridView.setOnScrollListener(mScrollListener);
         //verticalGridView.setAdapter(trainingPlayerAdapter);
     }
 
@@ -463,7 +462,7 @@ public class PlayerIdentificationActivity extends Activity {
         if (playerArray != null) {
             for (int k = 0; k < playerArray.length(); k++) {
                 switch (playerArray.optJSONObject(k).optString("playerPosition")) {
-                    case "near":
+                    case "far":
                         if (tvNearDoublePlayerName1.getText().toString().trim().isEmpty()) {
                             llContentDoubleNearContainer1.setVisibility(View.VISIBLE);
                             tvNearDoublePlayerName1.setText(playerArray.optJSONObject(k).optString("playerName"));
@@ -476,7 +475,7 @@ public class PlayerIdentificationActivity extends Activity {
                             updateProfilePicture(playerArray.optJSONObject(k).optString("profileImageUrl"), ciNearDoublePlayer2);
                         }
                         break;
-                    case "far":
+                    case "near":
                         if (tvFarDoublePlayerName1.getText().toString().isEmpty()) {
                             llContentDoubleFarContainer1.setVisibility(View.VISIBLE);
                             tvFarDoublePlayerName1.setText(playerArray.optJSONObject(k).optString("playerName"));
@@ -530,19 +529,29 @@ public class PlayerIdentificationActivity extends Activity {
         if (rlWinStatusContainer.getVisibility() == View.VISIBLE) {
             rlWinStatusContainer.setVisibility(View.GONE);
         }
+
+        isThreadRun = true;
         if (matchRound.equalsIgnoreCase("1")) {
-            tvSingleSetScore1.setText(object.optString("teamBScore"));
-            tvSingleSetScore2.setText(object.optString("teamAScore"));
+            tvSingleSetScore1.setText(object.optString("teamAScore"));
+            tvSingleSetScore1.setTextColor(getResources().getColor(R.color.white));
+            tvSingleSetScore2.setTextColor(getResources().getColor(R.color.white));
+            tvSingleSetScore2.setText(object.optString("teamBScore"));
         } else {
             if (object.optInt("gameSet") == 1) {
-                tvScoreDisplay1.setText(object.optString("teamBScore"));
-                tvScoreDisplay4.setText(object.optString("teamAScore"));
+                tvScoreDisplay1.setText(object.optString("teamAScore"));
+                tvScoreDisplay1.setTextColor(getResources().getColor(R.color.white));
+                tvScoreDisplay4.setText(object.optString("teamBScore"));
+                tvScoreDisplay4.setTextColor(getResources().getColor(R.color.white));
             } else if (object.optInt("gameSet") == 2) {
-                tvScoreDisplay2.setText(object.optString("teamBScore"));
-                tvScoreDisplay5.setText(object.optString("teamAScore"));
+                tvScoreDisplay2.setText(object.optString("teamAScore"));
+                tvScoreDisplay2.setTextColor(getResources().getColor(R.color.white));
+                tvScoreDisplay5.setText(object.optString("teamBScore"));
+                tvScoreDisplay5.setTextColor(getResources().getColor(R.color.white));
             } else {
-                tvScoreDisplay3.setText(object.optString("teamBScore"));
-                tvScoreDisplay6.setText(object.optString("teamAScore"));
+                tvScoreDisplay3.setText(object.optString("teamAScore"));
+                tvScoreDisplay3.setTextColor(getResources().getColor(R.color.white));
+                tvScoreDisplay6.setText(object.optString("teamBScore"));
+                tvScoreDisplay6.setTextColor(getResources().getColor(R.color.white));
             }
         }
     }
@@ -551,7 +560,7 @@ public class PlayerIdentificationActivity extends Activity {
         gameSet = object.optString("gameSet");
         startTime = SystemClock.uptimeMillis();
         if (object.optInt("setCount") == 1) {
-            if (object.optString("winTeam").equals("Team B")) {
+            if (object.optString("winTeam").equals("Team A")) {
                 tvScoreDisplay1.setTextColor(getResources().getColor(R.color.win_text));
                 tvSingleSetScore1.setTextColor(getResources().getColor(R.color.win_text));
             } else {
@@ -559,13 +568,13 @@ public class PlayerIdentificationActivity extends Activity {
                 tvSingleSetScore2.setTextColor(getResources().getColor(R.color.win_text));
             }
         } else if (object.optInt("setCount") == 2) {
-            if (object.optString("winTeam").equals("Team B")) {
+            if (object.optString("winTeam").equals("Team A")) {
                 tvScoreDisplay2.setTextColor(getResources().getColor(R.color.win_text));
             } else {
                 tvScoreDisplay5.setTextColor(getResources().getColor(R.color.win_text));
             }
         } else if (object.optInt("setCount") == 3) {
-            if (object.optString("winTeam").equals("Team B")) {
+            if (object.optString("winTeam").equals("Team A")) {
                 tvScoreDisplay3.setTextColor(getResources().getColor(R.color.win_text));
             } else {
                 tvScoreDisplay6.setTextColor(getResources().getColor(R.color.win_text));
@@ -643,14 +652,20 @@ public class PlayerIdentificationActivity extends Activity {
         tv_single_vs_player.setVisibility(View.GONE);
         tv_double_vs_player.setVisibility(View.GONE);
 
-        ciSingleSetDoublePlayerNear1.setVisibility(View.GONE);
-        ciSingleSetDoublePlayerNear2.setVisibility(View.GONE);
-        ciSingleSetDoublePlayerFar1.setVisibility(View.GONE);
-        ciSingleSetDoublePlayerFar2.setVisibility(View.GONE);
-        tvSingleSetDoublePlayerNear1.setVisibility(View.GONE);
-        tvSingleSetDoublePlayerNear2.setVisibility(View.GONE);
-        tvSingleSetDoublePlayerFar1.setVisibility(View.GONE);
-        tvSingleSetDoublePlayerFar2.setVisibility(View.GONE);
+        int view;
+        if (matchType.equalsIgnoreCase("singles")) {
+            view = 8;
+        } else {
+            view = 4;
+        }
+        ciSingleSetDoublePlayerNear1.setVisibility(view);
+        ciSingleSetDoublePlayerNear2.setVisibility(view);
+        ciSingleSetDoublePlayerFar1.setVisibility(view);
+        ciSingleSetDoublePlayerFar2.setVisibility(view);
+        tvSingleSetDoublePlayerNear1.setVisibility(view);
+        tvSingleSetDoublePlayerNear2.setVisibility(view);
+        tvSingleSetDoublePlayerFar1.setVisibility(view);
+        tvSingleSetDoublePlayerFar2.setVisibility(view);
 
         tvSingleSetDoublePlayerNear1.setText("");
         tvSingleSetDoublePlayerNear2.setText("");
@@ -672,7 +687,7 @@ public class PlayerIdentificationActivity extends Activity {
             for (int i = 0; i < playerArray.length(); i++) {
                 Log.e("AAA", playerArray.optJSONObject(i).optString("playerPosition"));
                 switch (playerArray.optJSONObject(i).optString("playerPosition")) {
-                    case "near":
+                    case "far":
                         if (matchType.equalsIgnoreCase("singles")) {
                             rlSingleSetPlayerNear.setVisibility(View.VISIBLE);
                             tv_single_vs_player.setVisibility(View.VISIBLE);
@@ -701,7 +716,7 @@ public class PlayerIdentificationActivity extends Activity {
                             }
                         }
                         break;
-                    case "far":
+                    case "near":
                         if (matchType.equalsIgnoreCase("singles")) {
                             rlSingleSetPlayerFar.setVisibility(View.VISIBLE);
                             tv_single_vs_player.setVisibility(View.VISIBLE);
@@ -732,17 +747,6 @@ public class PlayerIdentificationActivity extends Activity {
                 }
             }
         }
-
-        //  if(setMatchId.equalsIgnoreCase("")) {
-        //  startTime = SystemClock.uptimeMillis();
-        // customHandler.postDelayed(updateTimerThread, 0);
-        //  }
-
-
-    }
-
-    private void setSinglePlayerNameAndImage(CircleImageView imageView, TextView tvPlayerName1, TextView tvPlayerName2) {
-
     }
 
     private void enableThreeSetScoreBoard() {
@@ -758,14 +762,21 @@ public class PlayerIdentificationActivity extends Activity {
         rl_three_double_player_near_container.setVisibility(View.GONE);
         Log.e("game", gameSet);
 
-        score_ci_player1.setVisibility(View.GONE);
-        score_ci_player2.setVisibility(View.GONE);
-        score_ci_player3.setVisibility(View.GONE);
-        score_ci_player4.setVisibility(View.GONE);
-        score_tv_playerName1.setVisibility(View.GONE);
-        score_tv_playerName2.setVisibility(View.GONE);
-        score_tv_playerName3.setVisibility(View.GONE);
-        score_tv_playerName4.setVisibility(View.GONE);
+        int view;
+        if (matchType.equalsIgnoreCase("singles")) {
+            view = 8;
+        } else {
+            view = 4;
+        }
+
+        score_ci_player1.setVisibility(view);
+        score_ci_player2.setVisibility(view);
+        score_ci_player3.setVisibility(view);
+        score_ci_player4.setVisibility(view);
+        score_tv_playerName1.setVisibility(view);
+        score_tv_playerName2.setVisibility(view);
+        score_tv_playerName3.setVisibility(view);
+        score_tv_playerName4.setVisibility(view);
         tv_single_score_vs_player.setVisibility(View.GONE);
         tv_double_score_vs_player.setVisibility(View.GONE);
         enableTvScoreDisplay();
@@ -990,29 +1001,10 @@ public class PlayerIdentificationActivity extends Activity {
                             }
                         });
             } else if (playerArray.length() == 3) {
-                /*ll_identification_player_container.animate()
-                        .alpha(0f)
-                        .setDuration(1000)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-                                hideAllContainerView();
-                                llContentDouble_player.setVisibility(View.VISIBLE);
-                                setValueForDecisionView();
-                            }
-                        });*/
                 setValueForDecisionView();
             } else if (playerArray.length() == 4) {
                 setValueForDecisionView();
             }
-            /*material_icon.setVisibility(View.GONE);
-            material_icon.setInitials(true);
-            material_icon.setInitialsNumber(4);
-            material_icon.setLetter(playerArray.optJSONObject(0).optString("playerName"));
-            material_icon.setLetterSize(60);
-            material_icon.setLetterColor(getResources().getColor(R.color.search_opaque));
-            material_icon.setShapeColor(getResources().getColor(R.color.background_gradient_end));*/
         }
 
     }
@@ -1080,9 +1072,6 @@ public class PlayerIdentificationActivity extends Activity {
         }
     }
 
-    private void populatePlayerName() {
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -1126,13 +1115,5 @@ public class PlayerIdentificationActivity extends Activity {
         }
 
     };
-
-    private void resetTimer() {
-        startTime = 0L;
-        customHandler = new Handler();
-        timeInMilliseconds = 0L;
-        timeSwapBuff = 0L;
-        updatedTime = 0L;
-    }
 
 }
