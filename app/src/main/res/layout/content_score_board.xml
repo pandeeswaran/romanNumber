@@ -8,16 +8,18 @@
     android:orientation="vertical"
     android:visibility="visible">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:weightSum="3">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/ll_player_view_container"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1.25"
+            android:layout_toStartOf="@+id/ll_score_view"
+            android:layout_weight="1.5"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -51,11 +53,11 @@
                         android:layout_marginStart="@dimen/_10sdp"
                         android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
+                        android:singleLine="true"
                         android:text=""
                         android:textAllCaps="false"
-                        android:singleLine="true"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_20sdp"
+                        android:textSize="@dimen/_30sdp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -110,8 +112,8 @@
                         android:layout_toRightOf="@+id/ci_player1"
                         android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
-                        android:text=""
                         android:singleLine="true"
+                        android:text=""
                         android:textAllCaps="false"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_20sdp"
@@ -192,11 +194,11 @@
                         android:layout_marginStart="@dimen/_10sdp"
                         android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
+                        android:singleLine="true"
                         android:text=""
                         android:textAllCaps="false"
-                        android:singleLine="true"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_20sdp"
+                        android:textSize="@dimen/_30sdp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -230,9 +232,9 @@
                         android:layout_toRightOf="@+id/ci_player3"
                         android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
+                        android:singleLine="true"
                         android:text=""
                         android:textAllCaps="false"
-                        android:singleLine="true"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_20sdp"
                         android:textStyle="bold" />
@@ -249,9 +251,9 @@
                         android:layout_toRightOf="@+id/ci_player4"
                         android:fontFamily="@font/poppins_bold"
                         android:gravity="center|start"
+                        android:singleLine="true"
                         android:text=""
                         android:textAllCaps="false"
-                        android:singleLine="true"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_20sdp"
                         android:textStyle="bold" />
@@ -275,195 +277,416 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/ll_score_view"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1.75"
+            android:layout_alignParentEnd="true"
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:orientation="vertical">
 
                 <RelativeLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="@dimen/_120sdp"
                     android:layout_gravity="bottom"
-                    android:layout_marginStart="@dimen/_20sdp"
+                    android:layout_marginStart="@dimen/_10sdp"
                     android:layout_marginEnd="@dimen/_20sdp">
 
-
+                    <!--End added-->
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_alignParentBottom="true"
-                        android:gravity="bottom"
+                        android:gravity="bottom|end"
                         android:orientation="horizontal"
                         android:weightSum="3">
 
                         <TextView
                             android:id="@+id/tv_score1"
-                            android:layout_width="@dimen/_60sdp"
+                            android:layout_width="@dimen/_80sdp"
                             android:layout_height="@dimen/_80sdp"
                             android:layout_centerInParent="true"
                             android:layout_marginStart="@dimen/_10sdp"
-                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:autoSizeMaxTextSize="130sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:autoSizeStepGranularity="2sp"
+                            android:autoSizeTextType="uniform"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppinsbold"
                             android:gravity="center"
                             android:text="00"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_28sdp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:visibility="visible" />
+
+                        <LinearLayout
+                            android:id="@+id/ll_score1_completed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:id="@+id/tv_score1_completed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="@dimen/_80sdp"
+                                android:fontFamily="@font/avenirnextmediumpro"
+                                android:gravity="bottom"
+                                android:text="0"
+                                android:textAllCaps="false"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/_28sdp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
 
                         <TextView
                             android:id="@+id/tv_score2"
-                            android:layout_width="@dimen/_60sdp"
+                            android:layout_width="@dimen/_80sdp"
                             android:layout_height="@dimen/_80sdp"
-                            android:layout_centerInParent="true"
                             android:layout_marginStart="@dimen/_10sdp"
-                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:autoSizeMaxTextSize="130sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:autoSizeStepGranularity="2sp"
+                            android:autoSizeTextType="uniform"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppinsbold"
                             android:gravity="center"
                             android:text="00"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_25sdp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                        <LinearLayout
+                            android:id="@+id/ll_score2_completed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_10sdp"
+                            android:gravity="center"
+                            android:visibility="visible">
+
+                            <TextView
+                                android:id="@+id/tv_score2_completed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="@dimen/_80sdp"
+                                android:fontFamily="@font/avenirnextmediumpro"
+                                android:gravity="bottom|center"
+                                android:text="0"
+                                android:textAllCaps="false"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/_28sdp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/tv_score3"
-                            android:layout_width="@dimen/_60sdp"
+                            android:layout_width="@dimen/_80sdp"
                             android:layout_height="@dimen/_80sdp"
-                            android:layout_centerInParent="true"
                             android:layout_marginStart="@dimen/_10sdp"
                             android:layout_marginEnd="@dimen/_10sdp"
+                            android:autoSizeMaxTextSize="130sp"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeStepGranularity="2sp"
+                            android:autoSizeTextType="uniform"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppinsbold"
                             android:gravity="center"
                             android:text="00"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_25sdp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                        <LinearLayout
+                            android:id="@+id/ll_score3_completed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_10sdp"
+                            android:gravity="center"
+                            android:visibility="visible">
+
+                            <TextView
+                                android:id="@+id/tv_score3_completed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="@dimen/_80sdp"
+                                android:fontFamily="@font/avenirnextmediumpro"
+                                android:gravity="bottom"
+                                android:text="0"
+                                android:textAllCaps="false"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/_28sdp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
                     </LinearLayout>
                 </RelativeLayout>
 
+                <!--added end and bottom-->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="@dimen/_20sdp"
-                    android:layout_marginStart="@dimen/_20sdp"
+                    android:layout_marginStart="@dimen/_10sdp"
                     android:layout_marginTop="@dimen/_15sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
                     android:layout_marginBottom="@dimen/_15sdp"
+                    android:layout_weight="3"
+                    android:gravity="end"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/tv_timer1"
-                        android:layout_width="@dimen/_60sdp"
+                        android:layout_width="@dimen/_80sdp"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
                         android:layout_marginStart="@dimen/_10sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/avenirnextmediumpro"
                         android:gravity="center"
                         android:text="00:00"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
-                        android:textStyle="bold" />
+                        android:textSize="@dimen/_20sdp"
+                        android:textStyle="bold"
+                        android:visibility="visible" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_timer1_completed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:gravity="center"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tv_timer1_completed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/_80sdp"
+                            android:fontFamily="@font/avenirnextmediumpro"
+                            android:gravity="bottom|center"
+                            android:text="0"
+                            android:textAllCaps="false"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/_28sdp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
 
                     <TextView
                         android:id="@+id/tv_timer2"
-                        android:layout_width="@dimen/_60sdp"
+                        android:layout_width="@dimen/_80sdp"
                         android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:layout_marginStart="@dimen/_10sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/avenirnextmediumpro"
+                        android:layout_marginStart="@dimen/_13sdp"
                         android:gravity="center"
                         android:text="00:00"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
-                        android:textStyle="bold" />
+                        android:textSize="@dimen/_20sdp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_timer2_completed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:gravity="center"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:id="@+id/tv_timer2_completed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/_80sdp"
+                            android:fontFamily="@font/avenirnextmediumpro"
+                            android:gravity="bottom|center"
+                            android:text="0"
+                            android:textAllCaps="false"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/_28sdp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
 
                     <TextView
                         android:id="@+id/tv_timer3"
-                        android:layout_width="@dimen/_60sdp"
+                        android:layout_width="@dimen/_80sdp"
                         android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:layout_marginStart="@dimen/_10sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:fontFamily="@font/poppins_bold"
-                        android:gravity="center"
+                        android:layout_marginStart="@dimen/_13sdp"
+                        android:fontFamily="@font/avenirnextmediumpro"
+                        android:gravity="center|end"
                         android:text="00:00"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/_16sdp"
-                        android:textStyle="bold" />
+                        android:textSize="@dimen/_20sdp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_timer3_completed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:gravity="center"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:id="@+id/tv_timer3_completed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/_80sdp"
+                            android:fontFamily="@font/avenirnextmediumpro"
+                            android:gravity="bottom"
+                            android:text="0"
+                            android:textAllCaps="false"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/_28sdp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <RelativeLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="@dimen/_120sdp"
-                    android:layout_marginStart="@dimen/_20sdp"
+                    android:layout_marginStart="@dimen/_10sdp"
                     android:layout_marginEnd="@dimen/_20sdp">
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_alignParentTop="true"
-                        android:gravity="top"
+                        android:gravity="top|end"
                         android:orientation="horizontal"
                         android:weightSum="3">
 
+                        <LinearLayout
+                            android:id="@+id/ll_score4_completed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:id="@+id/tv_score4_completed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="@dimen/_80sdp"
+                                android:fontFamily="@font/avenirnextmediumpro"
+                                android:gravity="top"
+                                android:text="0"
+                                android:textAllCaps="false"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/_28sdp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+
                         <TextView
                             android:id="@+id/tv_score4"
-                            android:layout_width="@dimen/_60sdp"
+                            android:layout_width="@dimen/_80sdp"
                             android:layout_height="@dimen/_80sdp"
                             android:layout_centerInParent="true"
                             android:layout_marginStart="@dimen/_10sdp"
-                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:autoSizeMaxTextSize="130sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:autoSizeStepGranularity="2sp"
+                            android:autoSizeTextType="uniform"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppinsbold"
                             android:gravity="center"
                             android:text="00"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
-                            android:textSize="@dimen/_25sdp"
-                            android:textStyle="bold" />
+                            android:textSize="@dimen/_28sdp"
+                            android:textStyle="bold"
+                            android:visibility="visible" />
 
                         <TextView
                             android:id="@+id/tv_score5"
-                            android:layout_width="@dimen/_60sdp"
+                            android:layout_width="@dimen/_80sdp"
                             android:layout_height="@dimen/_80sdp"
                             android:layout_centerInParent="true"
                             android:layout_marginStart="@dimen/_10sdp"
-                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:autoSizeMaxTextSize="130sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:autoSizeStepGranularity="2sp"
+                            android:autoSizeTextType="uniform"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppinsbold"
                             android:gravity="center"
                             android:text="00"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_25sdp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                        <LinearLayout
+                            android:id="@+id/ll_score5_completed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_10sdp"
+                            android:gravity="center"
+                            android:visibility="visible">
+
+                            <TextView
+                                android:id="@+id/tv_score5_completed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="@dimen/_80sdp"
+                                android:layout_gravity="center"
+                                android:fontFamily="@font/avenirnextmediumpro"
+                                android:gravity="top|center"
+                                android:text="0"
+                                android:textAllCaps="false"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/_28sdp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
 
                         <TextView
                             android:id="@+id/tv_score6"
-                            android:layout_width="@dimen/_60sdp"
+                            android:layout_width="@dimen/_80sdp"
                             android:layout_height="@dimen/_80sdp"
                             android:layout_centerInParent="true"
                             android:layout_marginStart="@dimen/_10sdp"
                             android:layout_marginEnd="@dimen/_10sdp"
+                            android:autoSizeMaxTextSize="130sp"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeStepGranularity="2sp"
+                            android:autoSizeTextType="uniform"
                             android:background="@drawable/score_board"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppinsbold"
                             android:gravity="center"
                             android:text="00"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_25sdp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                        <LinearLayout
+                            android:id="@+id/ll_score6_completed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_10sdp"
+                            android:gravity="center"
+                            android:visibility="visible">
+
+                            <TextView
+                                android:id="@+id/tv_score6_completed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="@dimen/_80sdp"
+                                android:fontFamily="@font/avenirnextmediumpro"
+                                android:gravity="top"
+                                android:text="0"
+                                android:textAllCaps="false"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/_28sdp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -473,6 +696,6 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>
