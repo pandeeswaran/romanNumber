@@ -19,15 +19,13 @@ public class APIClient {
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
-
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://183.82.241.246:9020/realai/")
-                //.baseUrl("http://192.168.0.123:9000/realai/")
-               // .baseUrl("http://192.168.6.105:9020/realai/")
+             //   .baseUrl("http://172.105.40.220:9020/realai/")
+                .baseUrl("http://192.168.0.110:9020/realai/")
+                // .baseUrl("http://192.168.6.105:9020/realai/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
-
 
 
         return retrofit;

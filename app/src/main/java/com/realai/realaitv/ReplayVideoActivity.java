@@ -3,6 +3,7 @@ package com.realai.realaitv;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 
@@ -21,7 +22,7 @@ import videoPlayer.AndExoPlayerView;
 public class ReplayVideoActivity extends Activity {
 
     private AndExoPlayerView andExoPlayerView;
-    private String TEST_URL_MP4 = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
+    private String TEST_URL_MP4 = "https://realaiuploadplayersvideo.s3.ap-south-1.amazonaws.com/2020-09-29/a12e03be-5fa3-4438-858e-026cccf93258/near/213a77c7-869a-4566-b040-315fada2cd12/HighlightsVideo/1601385560423.mp4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +30,7 @@ public class ReplayVideoActivity extends Activity {
         setContentView(R.layout.activity_replay_video);
 
         andExoPlayerView = findViewById(R.id.andExoPlayerView);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (getIntent().getStringExtra("REPLAY_URL") != null) {
             TEST_URL_MP4 = getIntent().getStringExtra("REPLAY_URL");

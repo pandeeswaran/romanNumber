@@ -21,8 +21,8 @@ public class MqttHelper {
     //public ip outside chennai office is 183.82.241.246:1883
 
      // final String serverUri = "tcp://192.168.6.105:1883";
-    //  final String serverUri = "tcp://192.168.0.123:1883"; //testing
-      final String serverUri = "tcp://183.82.241.246:1883";
+     final String serverUri = "tcp://192.168.0.123:1883"; //testing
+     // final String serverUri = "tcp://172.105.40.220:1883";
 
     final String subscriptionTopic = "realAI";
 

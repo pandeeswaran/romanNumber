@@ -27,4 +27,6 @@
 
     <include layout="@layout/content_image_view" />
 
+    <include layout="@layout/content_replay_video"/>
+
 </RelativeLayout>
