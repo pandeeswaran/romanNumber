@@ -1,3 +1,3 @@
-# realai-sppts-userapp
+# realai-sppts-tvapp
 
-IoT-RealAI realai-sppts-userapp
+IoT-RealAI-realai-sppts-tvapp
